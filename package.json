@@ -5,15 +5,30 @@
   "main": "dist/index.js",
   "type": "module",
   "scripts": {
-    "build": "tsc",
+    "dev": "vite",
+    "build": "tsc && vite build",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "preview": "vite preview",
+    "format": "prettier --write ."
+  },
+  "dependencies": {
+    "lucide-react": "^0.400.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@crxjs/vite-plugin": "^2.3.0",
+    "@types/chrome": "^0.1.37",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
     "@typescript-eslint/eslint-plugin": "^8.56.1",
     "@typescript-eslint/parser": "^8.56.1",
+    "@vitejs/plugin-react-swc": "^3.11.0",
     "eslint": "^9.39.3",
     "eslint-config-prettier": "^10.1.8",
+    "eslint-define-config": "^2.1.0",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-jsdoc": "^61.7.1",
     "eslint-plugin-jsx-a11y": "^6.10.2",
@@ -22,17 +37,15 @@
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.5.2",
+    "eslint-plugin-security": "^4.0.0",
     "eslint-plugin-sonarjs": "^3.0.5",
     "eslint-plugin-unicorn": "^63.0.0",
     "eslint-plugin-unused-imports": "^4.4.1",
     "globals": "^17.4.0",
     "prettier": "^3.8.1",
     "typescript": "^5.5.3",
-    "typescript-eslint": "^8.56.1"
+    "typescript-eslint": "^8.56.1",
+    "vite": "^6.4.1"
   },
-  "private": true,
-  "dependencies": {
-    "eslint-define-config": "^2.1.0",
-    "eslint-plugin-security": "^4.0.0"
-  }
+  "private": true
 }
