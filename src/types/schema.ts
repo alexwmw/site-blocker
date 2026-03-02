@@ -1,4 +1,8 @@
-export type Theme = 'light' | 'dark';
+export const THEMES = ['light', 'dark'] as const;
+
+export type Theme = (typeof THEMES)[number];
+
+export type ActiveDays = [boolean, boolean, boolean, boolean, boolean, boolean, boolean];
 
 export enum DayOfWeek {
   Monday = 0,
@@ -10,19 +14,9 @@ export enum DayOfWeek {
   Sunday,
 }
 
-export type DayBooleans = [
-  Monday: boolean,
-  Tuesday: boolean,
-  Wednesday: boolean,
-  Thursday: boolean,
-  Friday: boolean,
-  Saturday: boolean,
-  Sunday: boolean,
-];
-
 export type Schedule = {
   enabled: boolean;
-  activeDays: DayBooleans;
+  activeDays: ActiveDays;
   allDay: boolean;
   start: string; // "09:00"
   end: string; // "17:00"
@@ -45,7 +39,13 @@ export type BlockRule = {
   id: string;
   pattern: string;
   matchType: 'domain' | 'path';
-  createdAt: number;
+  createdAt: string;
   enabled: boolean;
   unblockUntil?: number;
 };
+
+export interface StorageSchema {
+  version: 3;
+  settings: Settings;
+  rules: BlockRule[];
+}

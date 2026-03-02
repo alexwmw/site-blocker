@@ -1,18 +1,19 @@
-import type { DayOfWeek, Schedule } from './schema';
+import type { DayOfWeek, Schedule, Theme } from './schema';
+import { THEMES } from './schema';
 
 function timeToMinutes(time: string): number {
   const [h, m] = time.split(':').map(Number);
   return h * 60 + m;
 }
 
-function isDayActive(schedule: Schedule, day: DayOfWeek): boolean {
+export function isDayActive(schedule: Schedule, day: DayOfWeek): boolean {
   if (!schedule.enabled) {
     return false;
   }
   return schedule.activeDays[day];
 }
 
-function isTimeActive(schedule: Schedule, now: Date = new Date()): boolean {
+export function isTimeActive(schedule: Schedule, now: Date = new Date()): boolean {
   if (!schedule.enabled) {
     return false;
   }
@@ -34,14 +35,12 @@ function isTimeActive(schedule: Schedule, now: Date = new Date()): boolean {
   return currentMinutes >= start || currentMinutes < end;
 }
 
-function isScheduleActiveNow(schedule: Schedule, now: Date = new Date()): boolean {
+export function isScheduleActiveNow(schedule: Schedule, now: Date = new Date()): boolean {
   const day = now.getDay() as DayOfWeek;
 
   return schedule.enabled && isDayActive(schedule, day) && isTimeActive(schedule, now);
 }
 
-export const ScheduleUtils = {
-  isDayActive,
-  isTimeActive,
-  isScheduleActiveNow,
-};
+export function isTheme(value: unknown): value is Theme {
+  return typeof value === 'string' && THEMES.includes(value as Theme);
+}
