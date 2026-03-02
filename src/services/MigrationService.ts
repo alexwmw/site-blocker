@@ -31,7 +31,12 @@ export class MigrationService {
   }
 
   private static toNumber(value: string | number | undefined, fallback: number): number {
-    return Number(value ?? fallback);
+    const n = Number(value ?? fallback);
+
+    if (Number.isNaN(n)) {
+      return fallback;
+    }
+    return n;
   }
 
   private static toHoursMinutesString(value: string | undefined, fallback: string): string {
@@ -55,25 +60,29 @@ export class MigrationService {
     }
 
     try {
-      // Expected format: "16/02/2025, 22:15:14"
-      // 1. Split date and time
       const [datePart, timePart] = dateStr.split(', ');
-      if (!datePart || !timePart) {
-        throw new Error('Invalid format');
+      const [v1, v2, year] = datePart.split(/[./-]/u).map(Number);
+      const [h, m, s] = (timePart || '00:00:00').split(':').map(Number);
+
+      let day = v1;
+      let month = v2;
+
+      // SMART SWAP: If the second number is > 12, the first MUST be the month (US style)
+      if (v2 > 12 && v1 <= 12) {
+        month = v1;
+        day = v2;
+      }
+      // If BOTH are <= 12, we assume DD/MM, but it's a guess.
+
+      // Filter out dates greater than DD 31 / MM 12
+      if (day > 31 || month > 12) {
+        throw new Error('Invalid date');
       }
 
-      // 2. Extract numbers from "16/02/2025"
-      const [day, month, year] = datePart.split('/').map(Number);
+      const date = new Date(year, month - 1, day, h, m, s);
 
-      // 3. Extract numbers from "22:15:14"
-      const [hours, minutes, seconds] = timePart.split(':').map(Number);
-
-      // 4. Use the numeric constructor (Month is 0-indexed in JS!)
-      const date = new Date(year, month - 1, day, hours, minutes, seconds);
-
-      return isNaN(date.getTime()) ? new Date().toISOString() : date.toISOString();
+      return date.toISOString();
     } catch {
-      // If anything fails, fallback to 'now' to prevent migration crash
       return new Date().toISOString();
     }
   }
