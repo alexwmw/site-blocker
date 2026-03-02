@@ -1,7 +1,7 @@
-import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react-swc';
 import { crx } from '@crxjs/vite-plugin';
-import manifest from './manifest.json'; //
+import manifest from './manifest.json';
+import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   plugins: [react(), crx({ manifest })],
@@ -15,6 +15,10 @@ export default defineConfig({
         assetFileNames: 'assets/[name]-[hash].[ext]',
       },
     },
+  },
+  test: {
+    globals: true,
+    environment: 'happy-dom',
   },
   server: {
     port: 5173,

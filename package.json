@@ -42,10 +42,12 @@
     "eslint-plugin-unicorn": "^63.0.0",
     "eslint-plugin-unused-imports": "^4.4.1",
     "globals": "^17.4.0",
+    "happy-dom": "^20.7.0",
     "prettier": "^3.8.1",
     "typescript": "^5.5.3",
     "typescript-eslint": "^8.56.1",
-    "vite": "^6.4.1"
+    "vite": "^6.4.1",
+    "vitest": "^4.0.18"
   },
   "private": true
 }

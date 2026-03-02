@@ -1,0 +1,141 @@
+{
+  "options": {
+    "activeDays": {
+      "class": "scheduling",
+      "description": "Days on which blocking will be active",
+      "id": "activeDays",
+      "label": "Active days",
+      "parentId": "scheduleBlocking",
+      "pos": 1,
+      "type": "switchList",
+      "value": [
+        {
+          "label": "Monday",
+          "value": "true"
+        },
+        {
+          "label": "Tuesday",
+          "value": "true"
+        },
+        {
+          "label": "Wednesday",
+          "value": false
+        },
+        {
+          "label": "Thursday",
+          "value": "true"
+        },
+        {
+          "label": "Friday",
+          "value": "true"
+        },
+        {
+          "label": "Saturday",
+          "value": "true"
+        },
+        {
+          "label": "Sunday",
+          "value": "true"
+        }
+      ]
+    },
+    "activeTimes": {
+      "class": "scheduling",
+      "description": "Times during which blocking will be active",
+      "id": "activeTimes",
+      "label": "Active times",
+      "parentId": "scheduleBlocking",
+      "pos": 2,
+      "type": "timeLimit",
+      "value": {
+        "allDay": {
+          "label": "All day",
+          "value": false
+        },
+        "end": {
+          "label": "End time",
+          "value": "21:49"
+        },
+        "start": {
+          "label": "Start time",
+          "value": "09:00"
+        }
+      }
+    },
+    "allowRevisits": {
+      "class": "settings",
+      "description": "Allow multiple visits to sites that have been unblocked using the button within a certain time frame",
+      "id": "allowRevisits",
+      "label": "Allow re-visits after unblocking",
+      "pos": 4,
+      "type": "switch",
+      "value": true
+    },
+    "isRated": {
+      "value": true
+    },
+    "revisitLimit": {
+      "class": "settings",
+      "description": "Time frame during which visits to blocked sites will be allowed after unblocking",
+      "id": "revisitLimit",
+      "label": "Re-visit time limit",
+      "max": 100,
+      "min": 1,
+      "parentId": "allowRevisits",
+      "pos": 5,
+      "type": "number",
+      "unit": "min",
+      "value": "30"
+    },
+    "scheduleBlocking": {
+      "class": "scheduling",
+      "description": "Only block sites during certain days and hours",
+      "id": "scheduleBlocking",
+      "label": "Allow scheduling",
+      "pos": 0,
+      "type": "switch",
+      "value": false
+    },
+    "theme": {
+      "class": "settings",
+      "description": "Choose light or dark theme for the extension menus",
+      "id": "theme",
+      "label": "Menu theme",
+      "options": ["Light", "Dark"],
+      "pos": 0,
+      "type": "theme",
+      "value": "Dark"
+    },
+    "unblockTimeout": {
+      "class": "settings",
+      "description": "Number of seconds required when holding the unlock button",
+      "id": "unblockTimeout",
+      "label": "Time-out button hold duration",
+      "max": 99,
+      "min": 3,
+      "pos": 1,
+      "step": 1,
+      "type": "number",
+      "unit": "sec",
+      "value": "6"
+    }
+  },
+  "providers": [
+    {
+      "dateAdded": "16/02/2025, 22:15:14",
+      "hostname": "www.theguardian.com",
+      "id": "id17e3877c9f54f",
+      "isByPath": true,
+      "lastUnblock": "24/02/2026, 23:04:43",
+      "unblocked": false
+    },
+    {
+      "dateAdded": "08/02/2026, 23:35:14",
+      "hostname": "www.reddit.com",
+      "id": "id6b5d171144225",
+      "isByPath": false,
+      "lastUnblock": "28/02/2026, 11:10:41",
+      "unblocked": false
+    }
+  ]
+}
