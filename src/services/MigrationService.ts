@@ -119,9 +119,17 @@ export class MigrationService {
     const current = await chrome.storage.local.get('version');
 
     if (current?.version === 3) {
+      console.log('Current data does not require migration.');
       return;
     }
+
     const legacy = await chrome.storage.sync.get();
+
+    if (legacy) {
+      console.log('Legacy data found - attempting migration.');
+    } else {
+      console.log('No legacy data found - proceeding with defaults.');
+    }
 
     const rawMigratedData: StorageSchema = {
       version: 3,

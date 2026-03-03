@@ -47,7 +47,7 @@ describe('StorageService', () => {
     storageMock.local.get.mockResolvedValue({ settings: defaultSettings });
 
     // Trying to pass a string to a number field
-    await expect(StorageService.updateSettings({ holdDurationSeconds: 'not-a-number' } as any)).rejects.toThrow();
+    await expect(StorageService.updateSettings({ holdDurationSeconds: 'not-a-number' } as never)).rejects.toThrow();
   });
 
   it('should filter out the correct rule when removing', async () => {

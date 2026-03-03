@@ -1,10 +1,19 @@
-import react from '@vitejs/plugin-react-swc';
 import { crx } from '@crxjs/vite-plugin';
-import manifest from './manifest.json';
+import react from '@vitejs/plugin-react-swc';
 import { defineConfig } from 'vitest/config';
 
+import manifest from './manifest.json';
+
 export default defineConfig({
-  plugins: [react(), crx({ manifest })],
+  plugins: [
+    react(),
+    crx({
+      manifest,
+      contentScripts: {
+        injectCss: true,
+      },
+    }),
+  ],
   build: {
     emptyOutDir: true,
     outDir: 'dist',
@@ -26,5 +35,6 @@ export default defineConfig({
     hmr: {
       port: 5173,
     },
+    cors: true,
   },
 });

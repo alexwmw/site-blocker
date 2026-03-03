@@ -45,7 +45,7 @@ export function isTheme(value: unknown): value is Theme {
   return typeof value === 'string' && THEMES.includes(value as Theme);
 }
 
-export function deepMerge<T>(target: T, source: any): T {
+export function deepMerge<T>(target: T, source: never): T {
   const output = { ...target };
   if (target && typeof target === 'object' && source && typeof source === 'object') {
     Object.keys(source).forEach((key) => {
