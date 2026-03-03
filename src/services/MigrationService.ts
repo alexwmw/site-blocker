@@ -2,22 +2,7 @@ import type { LegacyOptions } from '../types/legacy-schema';
 import type { ActiveDays, BlockRule, Settings, StorageSchema } from '../types/schema';
 import { isTheme } from '../types/schema-utils';
 
-const DEFAULT_SETTINGS: Settings = {
-  theme: 'light',
-  holdDurationSeconds: 20,
-  schedule: {
-    enabled: true,
-    activeDays: [false, false, false, false, false, false, false],
-    allDay: false,
-    start: '00:00',
-    end: '23:59',
-  },
-  revisit: {
-    enabled: true,
-    durationMinutes: 10,
-  },
-  isRated: false,
-};
+import defaultSettings from './defaultSettings';
 
 export class MigrationService {
   private static toBool(val: string | boolean | undefined, fallback: boolean): boolean {
@@ -89,19 +74,19 @@ export class MigrationService {
 
   private static mapSettings(old: LegacyOptions): Settings {
     return {
-      theme: isTheme(old.theme?.value) ? old.theme.value : DEFAULT_SETTINGS.theme,
-      holdDurationSeconds: this.toNumber(old.unblockTimeout?.value, DEFAULT_SETTINGS.holdDurationSeconds),
+      theme: isTheme(old.theme?.value) ? old.theme.value : defaultSettings.theme,
+      holdDurationSeconds: this.toNumber(old.unblockTimeout?.value, defaultSettings.holdDurationSeconds),
       revisit: {
-        enabled: this.toBool(old.allowRevisits?.value, DEFAULT_SETTINGS.revisit.enabled),
-        durationMinutes: this.toNumber(old.revisitLimit?.value, DEFAULT_SETTINGS.revisit.durationMinutes),
+        enabled: this.toBool(old.allowRevisits?.value, defaultSettings.revisit.enabled),
+        durationMinutes: this.toNumber(old.revisitLimit?.value, defaultSettings.revisit.durationMinutes),
       },
-      isRated: this.toBool(old.isRated?.value, DEFAULT_SETTINGS.isRated),
+      isRated: this.toBool(old.isRated?.value, defaultSettings.isRated),
       schedule: {
-        enabled: this.toBool(old.scheduleBlocking?.value, DEFAULT_SETTINGS.schedule.enabled),
-        activeDays: this.parseLegacyActiveDays(old, DEFAULT_SETTINGS.schedule.activeDays),
-        allDay: this.toBool(old.activeTimes?.value?.allDay?.value, DEFAULT_SETTINGS.schedule.allDay),
-        start: this.toHoursMinutesString(old.activeTimes?.value?.start?.value, DEFAULT_SETTINGS.schedule.start),
-        end: this.toHoursMinutesString(old.activeTimes?.value?.end?.value, DEFAULT_SETTINGS.schedule.end),
+        enabled: this.toBool(old.scheduleBlocking?.value, defaultSettings.schedule.enabled),
+        activeDays: this.parseLegacyActiveDays(old, defaultSettings.schedule.activeDays),
+        allDay: this.toBool(old.activeTimes?.value?.allDay?.value, defaultSettings.schedule.allDay),
+        start: this.toHoursMinutesString(old.activeTimes?.value?.start?.value, defaultSettings.schedule.start),
+        end: this.toHoursMinutesString(old.activeTimes?.value?.end?.value, defaultSettings.schedule.end),
       },
     };
   }

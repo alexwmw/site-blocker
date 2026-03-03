@@ -80,7 +80,7 @@ describe('MigrationService - Deep Logic Tests', () => {
   });
 
   describe('Full Migration - Real World Scenario', () => {
-    it('should migrate complex legacy object to clean schema', async () => {
+    it('should migrate complex legacy object to clean types', async () => {
       const realLegacyData = LEGACY_DATA_1;
 
       chromeMock.storage.sync.get.mockResolvedValue(realLegacyData);

@@ -44,3 +44,19 @@ export function isScheduleActiveNow(schedule: Schedule, now: Date = new Date()):
 export function isTheme(value: unknown): value is Theme {
   return typeof value === 'string' && THEMES.includes(value as Theme);
 }
+
+export function deepMerge<T>(target: T, source: any): T {
+  const output = { ...target };
+  if (target && typeof target === 'object' && source && typeof source === 'object') {
+    Object.keys(source).forEach((key) => {
+      if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
+        // @ts-ignore
+        output[key] = deepMerge(target[key], source[key]);
+      } else {
+        // @ts-ignore
+        output[key] = source[key];
+      }
+    });
+  }
+  return output;
+}
