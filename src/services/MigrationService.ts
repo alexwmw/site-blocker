@@ -1,5 +1,6 @@
 import type { LegacyOptions } from '../types/legacy-schema';
 import type { ActiveDays, BlockRule, Settings, StorageSchema } from '../types/schema';
+import { storageSchema } from '../types/schema';
 import { isTheme } from '../types/schema-utils';
 
 import defaultSettings from './defaultSettings';
@@ -115,19 +116,32 @@ export class MigrationService {
   }
 
   static async migrate(): Promise<void> {
-    const legacy = await chrome.storage.sync.get();
+    const current = await chrome.storage.local.get('version');
 
-    // If 'version' exists, we've already migrated
-    if (legacy.version || !legacy.options) {
+    if (current?.version === 3) {
       return;
     }
+    const legacy = await chrome.storage.sync.get();
 
-    const migratedData: StorageSchema = {
+    const rawMigratedData: StorageSchema = {
       version: 3,
-      settings: this.mapSettings(legacy.options),
-      rules: this.mapRules(legacy.providers),
+      settings: legacy.options ? this.mapSettings(legacy.options) : defaultSettings,
+      rules: legacy.providers ? this.mapRules(legacy.providers) : [],
     };
-    await chrome.storage.local.set(migratedData);
-    console.log('Migration complete:', migratedData);
+
+    const result = storageSchema.safeParse(rawMigratedData);
+
+    if (result.success) {
+      await chrome.storage.local.set(result.data);
+      await await chrome.storage.sync.clear();
+      console.log('Migration complete:', result.data);
+    } else {
+      console.error('Migration failed validation:', result.error.flatten());
+      await chrome.storage.local.set({
+        version: 3,
+        settings: defaultSettings,
+        rules: [],
+      });
+    }
   }
 }

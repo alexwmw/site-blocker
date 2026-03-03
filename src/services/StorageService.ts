@@ -1,7 +1,7 @@
 import type { SafeParseReturnType, ZodIssue } from 'zod';
 
 import type { BlockRule, Settings, StorageSchema } from '../types/schema';
-import { BlockRuleSchema, BlockRulesSchema, SettingsSchema } from '../types/schema';
+import { blockRuleSchema, blockRulesSchema, settingsSchema } from '../types/schema';
 import { deepMerge } from '../types/schema-utils';
 
 import defaultSettings from './defaultSettings';
@@ -14,7 +14,7 @@ export class StorageService {
     const result = await chrome.storage.local.get(SETTINGS_KEY);
 
     const data = result[SETTINGS_KEY];
-    const validated = SettingsSchema.safeParse(data);
+    const validated = settingsSchema.safeParse(data);
 
     if (validated.success) {
       return validated.data;
@@ -30,7 +30,7 @@ export class StorageService {
   static async updateSettings(updates: Partial<Settings>): Promise<void> {
     const current: Settings = await this.getSettings();
     const merged: Settings = deepMerge(current, updates);
-    const finalSettings: Settings = SettingsSchema.parse(merged);
+    const finalSettings: Settings = settingsSchema.parse(merged);
 
     await chrome.storage.local.set({ [SETTINGS_KEY]: finalSettings });
   }
@@ -48,7 +48,7 @@ export class StorageService {
   static async getRules(): Promise<BlockRule[]> {
     const result = await chrome.storage.local.get(RULES_KEY);
     const data = result[RULES_KEY];
-    const validated = BlockRulesSchema.safeParse(data);
+    const validated = blockRulesSchema.safeParse(data);
 
     if (validated.success) {
       return validated.data;
@@ -61,7 +61,7 @@ export class StorageService {
     return [];
   }
   static async addRule(newRule: BlockRule): Promise<void> {
-    const validated = BlockRuleSchema.parse(newRule);
+    const validated = blockRuleSchema.parse(newRule);
 
     const currentRules: BlockRule[] = await this.getRules();
     await chrome.storage.local.set({

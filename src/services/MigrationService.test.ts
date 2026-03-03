@@ -6,8 +6,8 @@ import LEGACY_DATA_1 from './test-data/example-legacy-data_1.json';
 // Mock the Chrome API
 const chromeMock = {
   storage: {
-    sync: { get: vi.fn() },
-    local: { set: vi.fn() },
+    sync: { get: vi.fn(), set: vi.fn(), clear: vi.fn() },
+    local: { get: vi.fn(), set: vi.fn(), clear: vi.fn() },
   },
 };
 vi.stubGlobal('chrome', chromeMock);
@@ -80,9 +80,19 @@ describe('MigrationService - Deep Logic Tests', () => {
   });
 
   describe('Full Migration - Real World Scenario', () => {
+    it('should not migrate if version 3 already exists', async () => {
+      // Simulate version 3 already being there
+      chromeMock.storage.local.get.mockResolvedValue({ version: 3 });
+
+      await MigrationService.migrate();
+
+      // Verify sync.get was never even called
+      expect(chromeMock.storage.sync.get).not.toHaveBeenCalled();
+    });
+
     it('should migrate complex legacy object to clean types', async () => {
       const realLegacyData = LEGACY_DATA_1;
-
+      chromeMock.storage.local.get.mockResolvedValue({});
       chromeMock.storage.sync.get.mockResolvedValue(realLegacyData);
       await MigrationService.migrate();
 

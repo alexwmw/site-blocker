@@ -19,6 +19,7 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'happy-dom',
+    fileParallelism: false,
   },
   server: {
     port: 5173,

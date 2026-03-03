@@ -2,9 +2,9 @@ import { z } from 'zod';
 
 export const THEMES = ['light', 'dark'] as const;
 
-export const ThemeSchema = z.enum(THEMES);
+export const themeSchema = z.enum(THEMES);
 
-export type Theme = z.infer<typeof ThemeSchema>;
+export type Theme = z.infer<typeof themeSchema>;
 
 export enum DayOfWeek {
   Monday = 0,
@@ -16,7 +16,7 @@ export enum DayOfWeek {
   Sunday,
 }
 
-export const ActiveDaysSchema = z.tuple([
+export const activeDaysSchema = z.tuple([
   z.boolean(), // Mon
   z.boolean(), // Tue
   z.boolean(), // Wed
@@ -26,51 +26,53 @@ export const ActiveDaysSchema = z.tuple([
   z.boolean(), // Sun
 ]);
 
-export type ActiveDays = z.infer<typeof ActiveDaysSchema>;
+export type ActiveDays = z.infer<typeof activeDaysSchema>;
 
-export const ScheduleSchema = z.object({
+export const scheduleSchema = z.object({
   enabled: z.boolean(),
-  activeDays: ActiveDaysSchema,
+  activeDays: activeDaysSchema,
   allDay: z.boolean(),
   start: z.string().regex(/^[0-2][0-9]:[0-5][0-9]$/),
   end: z.string().regex(/^[0-2][0-9]:[0-5][0-9]$/),
 });
 
-export const SettingsSchema = z.object({
-  theme: ThemeSchema,
+export const settingsSchema = z.object({
+  theme: themeSchema,
   holdDurationSeconds: z.number().min(3).max(99),
   isRated: z.boolean(),
-  schedule: ScheduleSchema,
+  schedule: scheduleSchema,
   revisit: z.object({
     enabled: z.boolean(),
     durationMinutes: z.number(),
   }),
 });
 
-export type Settings = z.infer<typeof SettingsSchema>;
-export type Schedule = z.infer<typeof ScheduleSchema>;
+export type Settings = z.infer<typeof settingsSchema>;
+export type Schedule = z.infer<typeof scheduleSchema>;
 
 export const MATCH_TYPES = ['domain', 'path'] as const;
 
-export const MatchTypeSchema = z.enum(MATCH_TYPES);
+export const matchTypeSchema = z.enum(MATCH_TYPES);
 
-export type MatchType = z.infer<typeof MatchTypeSchema>;
+export type MatchType = z.infer<typeof matchTypeSchema>;
 
-export const BlockRuleSchema = z.object({
+export const blockRuleSchema = z.object({
   id: z.string(),
   pattern: z.string(),
-  matchType: MatchTypeSchema,
+  matchType: matchTypeSchema,
   createdAt: z.string().datetime(), // Validates ISO string,
   enabled: z.boolean(),
   unblockUntil: z.number().optional(),
 });
 
-export const BlockRulesSchema = z.array(BlockRuleSchema);
+export const blockRulesSchema = z.array(blockRuleSchema);
 
-export type BlockRule = z.infer<typeof BlockRuleSchema>;
+export type BlockRule = z.infer<typeof blockRuleSchema>;
 
-export interface StorageSchema {
-  version: 3;
-  settings: Settings;
-  rules: BlockRule[];
-}
+export const storageSchema = z.object({
+  version: z.number(),
+  settings: settingsSchema,
+  rules: blockRulesSchema,
+});
+
+export type StorageSchema = z.infer<typeof storageSchema>;

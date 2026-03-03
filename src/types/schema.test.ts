@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
-import { SettingsSchema } from './schema';
+import { settingsSchema } from './schema';
 
 describe('Schema Validation', () => {
   it('should accept valid military time', () => {
-    const result = SettingsSchema.shape.schedule.safeParse({
+    const result = settingsSchema.shape.schedule.safeParse({
       enabled: true,
       activeDays: [true, true, true, true, true, true, true],
       allDay: false,
@@ -15,7 +15,7 @@ describe('Schema Validation', () => {
   });
 
   it('should reject invalid time formats', () => {
-    const result = SettingsSchema.shape.schedule.safeParse({
+    const result = settingsSchema.shape.schedule.safeParse({
       start: '9:00 AM', // Wrong format
       end: '25:00', // Impossible hour
     });
@@ -23,7 +23,7 @@ describe('Schema Validation', () => {
   });
 
   it('should enforce exactly 7 days in activeDays', () => {
-    const result = SettingsSchema.shape.schedule.safeParse({
+    const result = settingsSchema.shape.schedule.safeParse({
       activeDays: [true, true], // Too short
     });
     expect(result.success).toBe(false);
