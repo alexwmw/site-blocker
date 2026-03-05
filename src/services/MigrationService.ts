@@ -1,6 +1,6 @@
 import type { LegacyOptions } from '../types/legacy-schema';
-import type { ActiveDays, BlockRule, Settings, StorageSchema } from '../types/schema';
-import { storageSchema } from '../types/schema';
+import type { ActiveDays, BlockRule, Settings, StorageSchema, Theme } from '../types/schema';
+import { storageSchema, TIME_REGEX } from '../types/schema';
 import { isTheme } from '../types/schema-utils';
 
 import defaultSettings from './defaultSettings';
@@ -29,7 +29,15 @@ export class MigrationService {
     if (typeof value !== 'string') {
       return fallback;
     }
-    return Boolean(value.match(/^[0-2][0-9]:[0-5][0-9]$/u)) ? value : fallback;
+    return Boolean(value.trim().match(TIME_REGEX)) ? value.trim() : fallback;
+  }
+
+  private static toTheme(value: string | undefined, fallback: Theme): Theme {
+    if (typeof value !== 'string') {
+      return fallback;
+    }
+    const stringValue = value.toLowerCase(); // Legacy values are capitalised
+    return isTheme(stringValue) ? stringValue : fallback;
   }
 
   private static parseLegacyActiveDays(old: LegacyOptions, fallback: ActiveDays): ActiveDays {
@@ -75,7 +83,7 @@ export class MigrationService {
 
   private static mapSettings(old: LegacyOptions): Settings {
     return {
-      theme: isTheme(old.theme?.value) ? old.theme!.value : defaultSettings.theme,
+      theme: this.toTheme(old.theme?.value, defaultSettings.theme),
       holdDurationSeconds: this.toNumber(old.unblockTimeout?.value, defaultSettings.holdDurationSeconds),
       revisit: {
         enabled: this.toBool(old.allowRevisits?.value, defaultSettings.revisit.enabled),

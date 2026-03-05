@@ -35,28 +35,17 @@ export function isTimeActive(schedule: Schedule, now: Date = new Date()): boolea
   return currentMinutes >= start || currentMinutes < end;
 }
 
-export function isScheduleActiveNow(schedule: Schedule, now: Date = new Date()): boolean {
-  const day = now.getDay() as DayOfWeek;
+/** Fix Sunday-indexed day integer */
+function getDayOfWeek(day: number | Date): DayOfWeek {
+  const n = typeof day === 'number' ? day : day.getDay();
+  return (n + 6) % 7;
+}
 
+export function isScheduleActiveNow(schedule: Schedule, now: Date = new Date()): boolean {
+  const day: DayOfWeek = getDayOfWeek(now);
   return schedule.enabled && isDayActive(schedule, day) && isTimeActive(schedule, now);
 }
 
 export function isTheme(value: unknown): value is Theme {
-  return typeof value === 'string' && THEMES.includes(value as Theme);
-}
-
-export function deepMerge<T>(target: T, source: never): T {
-  const output = { ...target };
-  if (target && typeof target === 'object' && source && typeof source === 'object') {
-    Object.keys(source).forEach((key) => {
-      if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
-        // @ts-ignore
-        output[key] = deepMerge(target[key], source[key]);
-      } else {
-        // @ts-ignore
-        output[key] = source[key];
-      }
-    });
-  }
-  return output;
+  return typeof value === 'string' && (THEMES as readonly string[]).includes(value);
 }

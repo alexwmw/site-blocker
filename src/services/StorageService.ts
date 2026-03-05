@@ -2,7 +2,7 @@ import type { SafeParseReturnType, ZodIssue } from 'zod';
 
 import type { BlockRule, Settings, StorageSchema } from '../types/schema';
 import { blockRuleSchema, blockRulesSchema, settingsSchema } from '../types/schema';
-import { deepMerge } from '../types/schema-utils';
+import { deepMerge } from '../utils/deepMerge';
 
 import defaultSettings from './defaultSettings';
 

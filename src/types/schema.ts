@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+export const TIME_REGEX = /^([01][0-9]|2[0-3]):[0-5][0-9]$/;
+
 export const THEMES = ['light', 'dark'] as const;
 
 export const themeSchema = z.enum(THEMES);
@@ -32,8 +34,8 @@ export const scheduleSchema = z.object({
   enabled: z.boolean(),
   activeDays: activeDaysSchema,
   allDay: z.boolean(),
-  start: z.string().regex(/^[0-2][0-9]:[0-5][0-9]$/),
-  end: z.string().regex(/^[0-2][0-9]:[0-5][0-9]$/),
+  start: z.string().regex(TIME_REGEX),
+  end: z.string().regex(TIME_REGEX),
 });
 
 export const settingsSchema = z.object({
