@@ -75,7 +75,7 @@ export class MigrationService {
 
   private static mapSettings(old: LegacyOptions): Settings {
     return {
-      theme: isTheme(old.theme?.value) ? old.theme.value : defaultSettings.theme,
+      theme: isTheme(old.theme?.value) ? old.theme!.value : defaultSettings.theme,
       holdDurationSeconds: this.toNumber(old.unblockTimeout?.value, defaultSettings.holdDurationSeconds),
       revisit: {
         enabled: this.toBool(old.allowRevisits?.value, defaultSettings.revisit.enabled),
@@ -141,7 +141,7 @@ export class MigrationService {
 
     if (result.success) {
       await chrome.storage.local.set(result.data);
-      await await chrome.storage.sync.clear();
+      await chrome.storage.sync.clear();
       console.log('Migration complete:', result.data);
     } else {
       console.error('Migration failed validation:', result.error.flatten());
