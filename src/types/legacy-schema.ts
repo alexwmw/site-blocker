@@ -13,7 +13,7 @@ export type LegacyOptions = {
   isRated?: { value?: boolean | string };
   allowRevisits?: { value?: boolean | string };
   revisitLimit?: { value?: number | string };
-  unblockTimeout?: { value?: number | string }; // Don't forget the hold duration!
+  unblockTimeout?: { value?: number | string };
   scheduleBlocking?: { value?: boolean | string };
 };
 
