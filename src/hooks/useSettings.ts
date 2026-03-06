@@ -12,7 +12,7 @@ const useSettings = () => {
 
     // Listen for Storage Changes
     const listener = (changes: { [key: string]: chrome.storage.StorageChange }) => {
-      // If 'settings' key was updated anywhere in the extension...
+      // If the 'settings' key was updated anywhere in the extension...
       if (changes.settings) {
         setSettings(changes.settings.newValue as Settings);
       }
@@ -20,7 +20,7 @@ const useSettings = () => {
 
     chrome.storage.onChanged.addListener(listener);
 
-    // Cleanup the listener when the component unmounts
+    // Clean up the listener when the component unmounts
     return () => chrome.storage.onChanged.removeListener(listener);
   }, []);
 
