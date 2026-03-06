@@ -1,5 +1,7 @@
 import type { BlockRule } from '../types/schema';
 
+import { StorageService } from './StorageService';
+
 const defaultRule: BlockRule = {
   id: 'default',
   pattern: 'example.com',
@@ -15,6 +17,10 @@ export class BlockService {
    * @param url string
    */
   static isSupportedUrl(url: string): boolean {
+    const urlObj: URL = new URL(url);
+    if (urlObj.protocol !== 'http:' && urlObj.protocol !== 'https:') {
+      return false;
+    }
     return true;
   }
 
@@ -33,7 +39,19 @@ export class BlockService {
    * @param targetUrl string
    */
   static ruleMatchesUrl(rule: BlockRule, targetUrl: string): boolean {
-    return true;
+    if (!rule.enabled) {
+      return false;
+    }
+    const urlObj: URL = new URL(targetUrl);
+    if (rule.matchType === 'domain') {
+      return Boolean(urlObj.hostname.toLowerCase().match(rule.pattern.toLowerCase()));
+    }
+    if (rule.matchType === 'path') {
+      const target = `${urlObj.hostname}${urlObj.pathname}`.toLowerCase();
+      console.log('target', target);
+      return target.startsWith(rule.pattern.toLowerCase());
+    }
+    return false;
   }
 
   /**
@@ -43,6 +61,15 @@ export class BlockService {
    * @param targetUrl string
    */
   static async findMatchingRule(targetUrl: string): Promise<BlockRule | null> {
-    return defaultRule;
+    if (!this.isSupportedUrl(targetUrl)) {
+      return null;
+    }
+    const rules = await StorageService.getRules();
+    for (const rule of rules) {
+      if (this.ruleMatchesUrl(rule, targetUrl)) {
+        return rule;
+      }
+    }
+    return null;
   }
 }
