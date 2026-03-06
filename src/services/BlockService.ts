@@ -2,14 +2,6 @@ import type { BlockRule } from '../types/schema';
 
 import { StorageService } from './StorageService';
 
-const defaultRule: BlockRule = {
-  id: 'default',
-  pattern: 'example.com',
-  matchType: 'domain',
-  createdAt: new Date().toISOString(),
-  enabled: true,
-};
-
 export class BlockService {
   /**
    * Return true only for valid http: or https: URLs.
@@ -17,11 +9,19 @@ export class BlockService {
    * @param url string
    */
   static isSupportedUrl(url: string): boolean {
-    const urlObj: URL = new URL(url);
-    if (urlObj.protocol !== 'http:' && urlObj.protocol !== 'https:') {
+    try {
+      const urlObj: URL = new URL(url);
+      if (urlObj.protocol !== 'http:' && urlObj.protocol !== 'https:') {
+        return false;
+      }
+      return true;
+    } catch {
       return false;
     }
-    return true;
+  }
+
+  private static stripWww(str: string): string {
+    return str.replace(/^www\./u, '');
   }
 
   /**
@@ -42,16 +42,25 @@ export class BlockService {
     if (!rule.enabled) {
       return false;
     }
-    const urlObj: URL = new URL(targetUrl);
-    if (rule.matchType === 'domain') {
-      return Boolean(urlObj.hostname.toLowerCase().match(rule.pattern.toLowerCase()));
+    if (!this.isSupportedUrl(targetUrl)) {
+      return false;
     }
-    if (rule.matchType === 'path') {
-      const target = `${urlObj.hostname}${urlObj.pathname}`.toLowerCase();
-      console.log('target', target);
-      return target.startsWith(rule.pattern.toLowerCase());
+    try {
+      const urlObj: URL = new URL(targetUrl);
+      const domain = this.stripWww(urlObj.hostname.toLowerCase());
+      const pattern = this.stripWww(rule.pattern.toLowerCase());
+      if (rule.matchType === 'domain') {
+        return domain === pattern || domain.endsWith(`.${pattern}`);
+      }
+      const path = urlObj.pathname.toLowerCase();
+      if (rule.matchType === 'path') {
+        const target = `${domain}${path}`;
+        return target.startsWith(pattern);
+      }
+      return false;
+    } catch {
+      return false;
     }
-    return false;
   }
 
   /**
