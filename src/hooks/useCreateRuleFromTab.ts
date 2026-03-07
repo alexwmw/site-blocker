@@ -5,8 +5,9 @@ import type { BlockRule, MatchType } from '../types/schema';
 import { createRuleId } from '../utils/createRuleId';
 
 /**
+ * Builds block rules from a tab URL.
  *
- * @param tab An optional tab from which to create the rule, otherwise uses last active tab
+ * @param tab Optional tab to use directly. If omitted, the hook queries the currently active tab.
  */
 const useCreateRuleFromTab = (tab?: chrome.tabs.Tab) => {
   const [activeTab, setActiveTab] = useState<chrome.tabs.Tab | null>(tab ?? null);
@@ -16,16 +17,20 @@ const useCreateRuleFromTab = (tab?: chrome.tabs.Tab) => {
     if (tab) {
       return;
     }
+
     const query: chrome.tabs.QueryInfo = { active: true, lastFocusedWindow: true };
     chrome.tabs
       .query(query)
       .then((tabs) => {
-        const activeTab = tabs[0];
-        setActiveTab(activeTab);
-        setIsSupported(Boolean(activeTab?.url && BlockService.isSupportedUrl(activeTab.url)));
+        setActiveTab(tabs[0] ?? null);
       })
       .catch(console.error);
   }, [tab]);
+
+  useEffect(() => {
+    const url = activeTab?.url;
+    setIsSupported(Boolean(url && BlockService.isSupportedUrl(url)));
+  }, [activeTab]);
 
   const createUrlRule = (matchType: MatchType, patternType: 'domain' | 'path'): BlockRule | null => {
     const url = activeTab?.url;

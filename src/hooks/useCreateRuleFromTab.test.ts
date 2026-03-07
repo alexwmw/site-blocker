@@ -24,7 +24,26 @@ describe('useCreateRuleFromActiveTab', () => {
 
     await waitFor(() => {
       expect(result.current.activeTab?.url).toBe('https://www.theguardian.com/');
+      expect(result.current.isSupported).toBe(true);
     });
+
+    expect(chromeMock.tabs.query).not.toHaveBeenCalled();
+    expect(result.current.createDomainPrefixRule()?.pattern).toBe('theguardian.com');
+  });
+
+  it('does not query tabs when a provided tab is unsupported', async () => {
+    chromeMock.tabs.query.mockResolvedValue([{ url: 'https://www.reddit.com/r/aita' }]);
+
+    const myTab = { url: 'chrome://extensions' };
+
+    const { result } = renderHook(() => useCreateRuleFromTab(myTab as chrome.tabs.Tab));
+
+    await waitFor(() => {
+      expect(result.current.activeTab?.url).toBe('chrome://extensions');
+      expect(result.current.isSupported).toBe(false);
+    });
+
+    expect(chromeMock.tabs.query).not.toHaveBeenCalled();
   });
 
   it('loads active tab and marks supported URLs', async () => {
