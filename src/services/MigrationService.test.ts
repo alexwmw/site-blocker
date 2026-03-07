@@ -79,6 +79,23 @@ describe('MigrationService - Deep Logic Tests', () => {
     });
   });
 
+
+
+  describe('Rule Mapping (mapRules)', () => {
+    it('should map legacy isByPath=true to prefix and false to exact', () => {
+      const oldRules = [
+        { id: 'a', hostname: 'reddit.com/r/aita', isByPath: true, dateAdded: '16/02/2025, 22:15:14', unblocked: false },
+        { id: 'b', hostname: 'reddit.com/r/aita', isByPath: false, dateAdded: '16/02/2025, 22:15:14', unblocked: false },
+      ];
+
+      // @ts-expect-error - testing private method directly
+      const mapped = MigrationService.mapRules(oldRules);
+
+      expect(mapped[0].matchType).toBe('prefix');
+      expect(mapped[1].matchType).toBe('exact');
+    });
+  });
+
   describe('Full Migration - Real World Scenario', () => {
     it('should not migrate if version 3 already exists', async () => {
       // Simulate version 3 already being there

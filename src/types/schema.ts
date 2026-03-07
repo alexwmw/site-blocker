@@ -52,7 +52,7 @@ export const settingsSchema = z.object({
 export type Settings = z.infer<typeof settingsSchema>;
 export type Schedule = z.infer<typeof scheduleSchema>;
 
-export const MATCH_TYPES = ['domain', 'path'] as const;
+export const MATCH_TYPES = ['exact', 'prefix'] as const;
 
 export const matchTypeSchema = z.enum(MATCH_TYPES);
 
