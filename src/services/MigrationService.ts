@@ -2,6 +2,7 @@ import type { LegacyOptions } from '../types/legacy-schema';
 import type { ActiveDays, BlockRule, Settings, StorageSchema, Theme } from '../types/schema';
 import { storageSchema, TIME_REGEX } from '../types/schema';
 import { isTheme } from '../types/schema-utils';
+import { createRuleId } from '../utils/createRuleId';
 
 import defaultSettings from './defaultSettings';
 
@@ -111,7 +112,7 @@ export class MigrationService {
         continue;
       }
       const newRule: BlockRule = {
-        id: rule.id,
+        id: createRuleId(),
         pattern: rule.hostname,
         // Legacy semantics:
         // - isByPath=true  => match page and descendants (prefix)
