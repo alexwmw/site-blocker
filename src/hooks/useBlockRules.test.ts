@@ -9,7 +9,7 @@ import useBlockRules from './useBlockRules';
 const DEFAULT_RULE: BlockRule = {
   id: '111',
   pattern: 'abc.com',
-  matchType: 'path',
+  matchType: 'prefix',
   enabled: true,
   createdAt: '2026-03-06T00:00:00.000Z',
 };
