@@ -113,7 +113,10 @@ export class MigrationService {
       const newRule: BlockRule = {
         id: rule.id,
         pattern: rule.hostname,
-        matchType: rule.isByPath ? 'path' : 'domain',
+        // Legacy semantics:
+        // - isByPath=true  => match page and descendants (prefix)
+        // - isByPath=false => match exact page only
+        matchType: this.toBool(rule.isByPath, true) ? 'prefix' : 'exact',
         createdAt: this.parseLegacyDate(rule.dateAdded),
         enabled: !this.toBool(rule.unblocked, false),
       };

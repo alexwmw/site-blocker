@@ -52,8 +52,8 @@ describe('StorageService', () => {
 
   it('should filter out the correct rule when removing', async () => {
     const rules: BlockRule[] = [
-      { id: '1', pattern: 'string', matchType: 'path', createdAt: new Date().toISOString(), enabled: true },
-      { id: '2', pattern: 'string', matchType: 'path', createdAt: new Date().toISOString(), enabled: true },
+      { id: '1', pattern: 'string', matchType: 'prefix', createdAt: new Date().toISOString(), enabled: true },
+      { id: '2', pattern: 'string', matchType: 'prefix', createdAt: new Date().toISOString(), enabled: true },
     ];
     storageMock.local.get.mockResolvedValue({ rules });
 
