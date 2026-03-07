@@ -43,7 +43,7 @@ const PopupApp = () => {
     }
     const rule: BlockRule = {
       id: 'test',
-      matchType: 'domain',
+      matchType: 'prefix',
       pattern,
       createdAt: new Date().toISOString(),
       enabled: true,
