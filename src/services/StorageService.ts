@@ -110,4 +110,16 @@ export class StorageService {
 
     await this.setRules(newRules);
   }
+
+  static addListener(
+    listener: (changes: { [p: string]: chrome.storage.StorageChange }, areaName?: chrome.storage.AreaName) => void,
+  ): void {
+    chrome.storage.onChanged.addListener(listener);
+  }
+
+  static removeListener(
+    listener: (changes: { [p: string]: chrome.storage.StorageChange }, areaName?: chrome.storage.AreaName) => void,
+  ): void {
+    chrome.storage.onChanged.removeListener(listener);
+  }
 }

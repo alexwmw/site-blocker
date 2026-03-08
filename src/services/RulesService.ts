@@ -2,7 +2,7 @@ import type { BlockRule } from '../types/schema';
 
 import { StorageService } from './StorageService';
 
-export class BlockService {
+export class RulesService {
   /**
    * Return true only for valid http: or https: URLs.
    * Return false for invalid URLs and everything else (chrome://, about:blank, etc).

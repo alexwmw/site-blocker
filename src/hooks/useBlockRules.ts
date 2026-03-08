@@ -18,10 +18,10 @@ const useBlockRules = () => {
       }
     };
 
-    chrome.storage.onChanged.addListener(listener);
+    StorageService.addListener(listener);
 
     // Clean up the listener when the component unmounts
-    return () => chrome.storage.onChanged.removeListener(listener);
+    return () => StorageService.removeListener(listener);
   }, []);
 
   const addRule = async (rule: BlockRule) => {
