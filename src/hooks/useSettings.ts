@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 
+import type { StorageListener } from '../services/StorageService';
 import { StorageService } from '../services/StorageService';
 import type { Settings } from '../types/schema';
 
@@ -11,7 +12,7 @@ const useSettings = () => {
     StorageService.getSettings().then(setSettings).catch(console.error);
 
     // Listen for Storage Changes
-    const listener = (changes: { [key: string]: chrome.storage.StorageChange }) => {
+    const listener: StorageListener = (changes) => {
       // If the 'settings' key was updated anywhere in the extension...
       if (changes.settings) {
         setSettings(changes.settings.newValue as Settings);

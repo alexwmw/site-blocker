@@ -9,6 +9,11 @@ import defaultSettings from './defaultSettings';
 const SETTINGS_KEY: keyof StorageSchema = 'settings';
 const RULES_KEY: keyof StorageSchema = 'rules';
 
+export type StorageListener = (
+  changes: { [p: string]: chrome.storage.StorageChange },
+  areaName?: chrome.storage.AreaName,
+) => void;
+
 export class StorageService {
   static async getSettings(): Promise<Settings> {
     const result = await chrome.storage.local.get(SETTINGS_KEY);
@@ -111,15 +116,11 @@ export class StorageService {
     await this.setRules(newRules);
   }
 
-  static addListener(
-    listener: (changes: { [p: string]: chrome.storage.StorageChange }, areaName?: chrome.storage.AreaName) => void,
-  ): void {
+  static addListener(listener: StorageListener): void {
     chrome.storage.onChanged.addListener(listener);
   }
 
-  static removeListener(
-    listener: (changes: { [p: string]: chrome.storage.StorageChange }, areaName?: chrome.storage.AreaName) => void,
-  ): void {
+  static removeListener(listener: StorageListener): void {
     chrome.storage.onChanged.removeListener(listener);
   }
 }
