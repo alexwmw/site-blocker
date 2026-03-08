@@ -50,6 +50,30 @@ describe('StorageService', () => {
     await expect(StorageService.updateSettings({ holdDurationSeconds: 'not-a-number' } as never)).rejects.toThrow();
   });
 
+  it('should update specific properties on specific rules and leave all else unchanged', async () => {
+    const rules: BlockRule[] = [
+      { id: '1', pattern: 'string', matchType: 'prefix', createdAt: new Date().toISOString(), enabled: true },
+      { id: '2', pattern: 'another', matchType: 'prefix', createdAt: new Date().toISOString(), enabled: true },
+    ];
+    storageMock.local.get.mockResolvedValue({ rules });
+
+    await StorageService.updateRule('1', {
+      pattern: 'test-pattern',
+    });
+
+    const [[setCall]] = storageMock.local.set.mock.calls;
+
+    expect(setCall.rules).toHaveLength(2);
+    expect(setCall.rules[0]).not.toBe(rules[0]); // to be a new object
+
+    expect(setCall.rules[0].pattern).toBe('test-pattern');
+    expect(setCall.rules[0]).toStrictEqual({
+      ...rules[0],
+      pattern: 'test-pattern',
+    });
+    expect(setCall.rules[1]).toStrictEqual(rules[1]);
+  });
+
   it('should filter out the correct rule when removing', async () => {
     const rules: BlockRule[] = [
       { id: '1', pattern: 'string', matchType: 'prefix', createdAt: new Date().toISOString(), enabled: true },

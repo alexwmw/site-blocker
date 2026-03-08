@@ -73,6 +73,34 @@ export class StorageService {
     await chrome.storage.local.set({ [RULES_KEY]: newRules });
   }
 
+  static async updateRule(ruleId: string, updates: Partial<BlockRule>): Promise<BlockRule | null> {
+    const currentRules: BlockRule[] = await this.getRules();
+    let updatedRule: BlockRule | null = null;
+
+    const newRules = currentRules.map((rule) => {
+      if (rule.id !== ruleId) {
+        return rule;
+      }
+
+      const merged = blockRuleSchema.parse({
+        ...rule,
+        ...updates,
+      });
+
+      console.log('successfully merged', merged);
+
+      updatedRule = merged;
+      return merged;
+    });
+
+    if (!updatedRule) {
+      return null;
+    }
+
+    await this.setRules(newRules);
+    return updatedRule;
+  }
+
   static async removeRule(ruleId: string): Promise<void> {
     const currentRules: BlockRule[] = await this.getRules();
 
