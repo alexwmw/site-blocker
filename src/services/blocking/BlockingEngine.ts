@@ -37,6 +37,8 @@ export default class BlockingEngine implements BlockingStrategy {
     })().catch(console.error);
   };
 
+  private started: boolean = false;
+
   /**
    * load rules/settings
    * detect permission mode
@@ -46,6 +48,10 @@ export default class BlockingEngine implements BlockingStrategy {
    * register permission listeners
    */
   async start() {
+    if (this.started) {
+      return;
+    }
+    this.started = true;
     const rules = await StorageService.getRules();
     const settings = await StorageService.getSettings();
 
