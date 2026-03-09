@@ -20,7 +20,7 @@ export default class BlockingEngine implements BlockingStrategy {
     return permissions?.includes('declarativeNetRequest') ? this.dnrStrategy : this.tabRedirectStrategy;
   }
 
-  handlePermissionChange = (permissions: chrome.permissions.Permissions) => {
+  private handlePermissionChange = (permissions: chrome.permissions.Permissions) => {
     (async () => {
       const prev = this.activeStrategy;
       const next = this.pickStrategyFromPermissions(permissions.permissions);
