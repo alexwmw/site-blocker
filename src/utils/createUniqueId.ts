@@ -1,4 +1,4 @@
-export function createRuleId(): string {
+export function createUniqueId(): string {
   if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
     return crypto.randomUUID();
   }

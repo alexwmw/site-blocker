@@ -169,12 +169,13 @@ export class RulesService {
    * Load rules via StorageService.getRules().
    * Return the first matching rule using ruleMatchesUrl, else null.
    * @param targetUrl string
+   * @param localRules
    */
-  static async findMatchingRule(targetUrl: string): Promise<BlockRule | null> {
+  static async findMatchingRule(targetUrl: string, localRules?: BlockRule[]): Promise<BlockRule | null> {
     if (!this.isSupportedUrl(targetUrl)) {
       return null;
     }
-    const rules = await StorageService.getRules();
+    const rules = localRules ?? (await StorageService.getRules());
     for (const rule of rules) {
       if (this.ruleMatchesUrl(rule, targetUrl)) {
         return rule;

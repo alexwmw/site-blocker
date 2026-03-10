@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { RulesService } from '../services/RulesService';
 import type { BlockRule, MatchType } from '../types/schema';
-import { createRuleId } from '../utils/createRuleId';
+import { createUniqueId } from '../utils/createUniqueId';
 
 /**
  *
@@ -42,7 +42,7 @@ const useCreateRuleFromTab = (tab?: chrome.tabs.Tab | null) => {
       }
 
       return {
-        id: createRuleId(),
+        id: createUniqueId(),
         matchType,
         pattern,
         createdAt: new Date().toISOString(),
