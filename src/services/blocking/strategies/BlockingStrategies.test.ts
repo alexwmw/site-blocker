@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { BlockRule, Settings } from '../../../types/schema';
 import { StorageService } from '../../StorageService';
@@ -40,9 +40,11 @@ describe('TabRedirectStrategy', () => {
 
   const tabsUpdate = vi.fn();
   const tabsGet = vi.fn();
+  const startedStrategies: TabRedirectStrategy[] = [];
 
   beforeEach(() => {
     vi.clearAllMocks();
+    startedStrategies.length = 0;
 
     vi.stubGlobal('chrome', {
       tabs: {
@@ -57,10 +59,15 @@ describe('TabRedirectStrategy', () => {
     });
   });
 
+  afterEach(async () => {
+    await Promise.all(startedStrategies.map((strategy) => strategy.stop()));
+  });
+
   it('registers and unregisters tab listeners on start/stop', async () => {
     const strategy = new TabRedirectStrategy();
 
     await strategy.start();
+    startedStrategies.push(strategy);
     await strategy.stop();
 
     expect(onUpdated.addListener).toHaveBeenCalledTimes(1);
@@ -73,6 +80,7 @@ describe('TabRedirectStrategy', () => {
     const strategy = new TabRedirectStrategy();
     await strategy.sync([makeRule()], defaultSettings);
     await strategy.start();
+    startedStrategies.push(strategy);
 
     onUpdated.emit(11, { url: 'https://reddit.com/r/aita/comments/123' }, { id: 11 } as chrome.tabs.Tab);
     await new Promise((resolve) => setTimeout(resolve, 0));
@@ -82,6 +90,44 @@ describe('TabRedirectStrategy', () => {
     expect(tabId).toBe(11);
     expect(updateProperties.url).toContain(getBlockPageUrl());
     expect(updateProperties.url).toContain('ruleId=rule-1');
+  });
+
+  it('does not redirect when a matching rule is temporarily unblocked', async () => {
+    const strategy = new TabRedirectStrategy();
+    await strategy.sync([makeRule({ unblockUntil: Date.now() + 60_000 })], defaultSettings);
+    await strategy.start();
+    startedStrategies.push(strategy);
+
+    onUpdated.emit(11, { url: 'https://reddit.com/r/aita/comments/123' }, { id: 11 } as chrome.tabs.Tab);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(tabsUpdate).not.toHaveBeenCalled();
+  });
+
+  it('redirects again once unblock window has expired', async () => {
+    const strategy = new TabRedirectStrategy();
+    await strategy.sync([makeRule({ unblockUntil: Date.now() - 1 })], defaultSettings);
+    await strategy.start();
+    startedStrategies.push(strategy);
+
+    onUpdated.emit(11, { url: 'https://reddit.com/r/aita/comments/123' }, { id: 11 } as chrome.tabs.Tab);
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(tabsUpdate).toHaveBeenCalledTimes(1);
+  });
+
+  it('evaluates active tab url on tab activation events', async () => {
+    tabsGet.mockResolvedValue({ id: 99, url: 'https://reddit.com/r/aita/comments/123' } as chrome.tabs.Tab);
+    const strategy = new TabRedirectStrategy();
+    await strategy.sync([makeRule()], defaultSettings);
+    await strategy.start();
+    startedStrategies.push(strategy);
+
+    onActivated.emit({ tabId: 99, windowId: 1 });
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(tabsGet).toHaveBeenCalledWith(99);
+    expect(tabsUpdate).toHaveBeenCalledTimes(1);
   });
 
   it('handleUnblock updates unblock state and navigates sender tab back to target', async () => {
@@ -95,6 +141,18 @@ describe('TabRedirectStrategy', () => {
     expect(updateRuleSpy).toHaveBeenCalledTimes(1);
     expect(updateRuleSpy.mock.calls[0]?.[0]).toBe('rule-1');
     expect(tabsUpdate).toHaveBeenCalledWith(24, { url: 'https://reddit.com/r/aita' });
+  });
+
+  it('handleUnblock returns unsupported URL reason and does not mutate state', async () => {
+    const strategy = new TabRedirectStrategy();
+    const updateRuleSpy = vi.spyOn(StorageService, 'updateRule').mockResolvedValue(makeRule());
+    await strategy.sync([makeRule()], defaultSettings);
+
+    const result = await strategy.handleUnblock('rule-1', 'chrome://extensions', 24);
+
+    expect(result).toEqual({ ok: false, reason: 'Unsupported target URL.' });
+    expect(updateRuleSpy).not.toHaveBeenCalled();
+    expect(tabsUpdate).not.toHaveBeenCalled();
   });
 });
 
