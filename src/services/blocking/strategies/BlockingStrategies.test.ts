@@ -2,24 +2,11 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { BlockRule, Settings } from '../../../types/schema';
 import { StorageService } from '../../StorageService';
+import { getBlockPageUrl } from '../getBlockPageUrl';
+import { createEvent } from '../test-utils';
 
 import DnrStrategy from './DnrStrategy';
 import TabRedirectStrategy from './TabRedirectStrategy';
-
-type Listener<TArgs extends unknown[]> = (...args: TArgs) => void;
-
-function createEvent<TArgs extends unknown[]>() {
-  const listeners = new Set<Listener<TArgs>>();
-  return {
-    addListener: vi.fn((listener: Listener<TArgs>) => listeners.add(listener)),
-    removeListener: vi.fn((listener: Listener<TArgs>) => listeners.delete(listener)),
-    emit: (...args: TArgs) => {
-      for (const listener of listeners) {
-        listener(...args);
-      }
-    },
-  };
-}
 
 const defaultSettings: Settings = {
   theme: 'light',
@@ -93,7 +80,7 @@ describe('TabRedirectStrategy', () => {
     expect(tabsUpdate).toHaveBeenCalledTimes(1);
     const [tabId, updateProperties] = tabsUpdate.mock.calls[0] as [number, chrome.tabs.UpdateProperties];
     expect(tabId).toBe(11);
-    expect(updateProperties.url).toContain('chrome-extension://test/block-page.html?');
+    expect(updateProperties.url).toContain(getBlockPageUrl());
     expect(updateProperties.url).toContain('ruleId=rule-1');
   });
 

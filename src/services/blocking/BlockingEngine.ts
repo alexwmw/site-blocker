@@ -70,6 +70,9 @@ export default class BlockingEngine implements BlockingStrategy {
    * activeStrategy.stop()
    */
   async stop() {
+    if (!this.started) {
+      return;
+    }
     chrome.permissions.onAdded.removeListener(this.handlePermissionChange);
     chrome.permissions.onRemoved.removeListener(this.handlePermissionChange);
     await this.activeStrategy.stop();

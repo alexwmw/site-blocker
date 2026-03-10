@@ -9,21 +9,8 @@ import BlockingEngine from './BlockingEngine';
 import type { UnblockResult } from './strategies/BlockingStrategy';
 import DnrStrategy from './strategies/DnrStrategy';
 import TabRedirectStrategy from './strategies/TabRedirectStrategy';
-
-type Listener<TArgs extends unknown[]> = (...args: TArgs) => void;
-
-function createEvent<TArgs extends unknown[]>() {
-  const listeners = new Set<Listener<TArgs>>();
-  return {
-    addListener: vi.fn((listener: Listener<TArgs>) => listeners.add(listener)),
-    removeListener: vi.fn((listener: Listener<TArgs>) => listeners.delete(listener)),
-    emit: (...args: TArgs) => {
-      for (const listener of listeners) {
-        listener(...args);
-      }
-    },
-  };
-}
+import type { Listener } from './test-utils';
+import { createEvent } from './test-utils';
 
 const rules: BlockRule[] = [
   {
