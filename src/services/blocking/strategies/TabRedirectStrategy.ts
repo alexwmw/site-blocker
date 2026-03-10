@@ -9,7 +9,6 @@ type EnforceArgs = {
   tabId?: number;
   url?: string;
   rule?: BlockRule;
-  reason?: string;
 };
 
 export default class TabRedirectStrategy implements BlockingStrategy {
@@ -35,27 +34,25 @@ export default class TabRedirectStrategy implements BlockingStrategy {
 
   private async evaluate(tabId?: number, url?: string) {
     if (!this.started) {
-      return { reason: 'Not started' };
+      return {};
     }
-    if (!url || !tabId) {
-      return { reason: 'No url and/or tabId' };
+    if (typeof tabId !== 'number' || !url) {
+      return {};
     }
-    console.log({ url, rules: this.rules });
     const matchingActiveRule: BlockRule | null = await RulesService.findMatchingRule(url, this.rules);
     if (!matchingActiveRule) {
-      return { reason: 'No matching rule' };
+      return {};
     }
     if (matchingActiveRule.unblockUntil) {
       if (matchingActiveRule.unblockUntil > Date.now()) {
-        return { reason: 'Unblock until is in effect' };
+        return {};
       }
     }
     return { tabId, url, rule: matchingActiveRule };
   }
 
-  private async enforce({ tabId, url, rule, reason }: EnforceArgs): Promise<void> {
-    // If a rule matches, build a block-page URL with context (ruleId, targetUrl, match info) and redirect tab there.
-    if (!tabId || !url || !rule) {
+  private async enforce({ tabId, url, rule }: EnforceArgs): Promise<void> {
+    if (typeof tabId !== 'number' || !url || !rule) {
       return;
     }
     const destination = TabRedirectStrategy.buildBlockPageUrl(rule, url);
@@ -100,11 +97,6 @@ export default class TabRedirectStrategy implements BlockingStrategy {
     chrome.tabs.onActivated.addListener(this.handleTabActivated);
   }
 
-  /**
-   * Stop watching browser activity.
-   * Remove listeners.
-   * No more redirect decisions happen.
-   */
   async stop() {
     if (!this.started) {
       return;
@@ -114,14 +106,6 @@ export default class TabRedirectStrategy implements BlockingStrategy {
     this.started = false;
   }
 
-  /**
-   * Replace in-memory rules/settings with latest data.
-   * From now on, listener callbacks use these newest rules.
-   * May also clear stale temporary state if needed.
-   *
-   * @param rules
-   * @param settings
-   */
   async sync(rules: BlockRule[], settings: Settings) {
     this.rules = rules;
     this.settings = settings;
