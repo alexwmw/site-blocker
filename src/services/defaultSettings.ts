@@ -10,7 +10,7 @@ const defaultSettings: Settings = {
     start: '00:00',
     end: '23:59',
   },
-  revisit: {
+  extendedUnblock: {
     enabled: true,
     durationMinutes: 10,
   },

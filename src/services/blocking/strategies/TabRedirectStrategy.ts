@@ -62,7 +62,7 @@ export default class TabRedirectStrategy implements BlockingStrategy {
   }
 
   private getUnblockUntilTime() {
-    const { enabled, durationMinutes = 0 } = this.settings?.revisit ?? {};
+    const { enabled, durationMinutes = 0 } = this.settings?.extendedUnblock ?? {};
     if (!enabled || !durationMinutes) {
       return null;
     }

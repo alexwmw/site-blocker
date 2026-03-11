@@ -86,9 +86,9 @@ export class MigrationService {
     return {
       theme: this.toTheme(old.theme?.value, defaultSettings.theme),
       holdDurationSeconds: this.toNumber(old.unblockTimeout?.value, defaultSettings.holdDurationSeconds),
-      revisit: {
-        enabled: this.toBool(old.allowRevisits?.value, defaultSettings.revisit.enabled),
-        durationMinutes: this.toNumber(old.revisitLimit?.value, defaultSettings.revisit.durationMinutes),
+      extendedUnblock: {
+        enabled: this.toBool(old.allowRevisits?.value, defaultSettings.extendedUnblock.enabled),
+        durationMinutes: this.toNumber(old.revisitLimit?.value, defaultSettings.extendedUnblock.durationMinutes),
       },
       isRated: this.toBool(old.isRated?.value, defaultSettings.isRated),
       schedule: {
