@@ -41,11 +41,11 @@ describe('BlockingEngine', () => {
   let tabStart: Mock<() => Promise<void>>;
   let tabStop: Mock<() => Promise<void>>;
   let tabSync: Mock<(rules: BlockRule[], settings: Settings) => Promise<void>>;
-  let tabHandleUnblock: Mock<(ruleId: string, targetUrl: string, senderTabId?: number) => Promise<UnblockResult>>;
+  let tabHandleUnblock: Mock<(ruleId: string[], targetUrl: string, senderTabId?: number) => Promise<UnblockResult>>;
   let dnrStart: Mock<() => Promise<void>>;
   let dnrStop: Mock<() => Promise<void>>;
   let dnrSync: Mock<(rules: BlockRule[], settings: Settings) => Promise<void>>;
-  let dnrHandleUnblock: Mock<(ruleId: string, targetUrl: string, senderTabId?: number) => Promise<UnblockResult>>;
+  let dnrHandleUnblock: Mock<(ruleId: string[], targetUrl: string, senderTabId?: number) => Promise<UnblockResult>>;
 
   const onAddedFactory = () => createEvent<[chrome.permissions.Permissions]>();
   const onRemovedFactory = () => createEvent<[chrome.permissions.Permissions]>();
@@ -145,10 +145,10 @@ describe('BlockingEngine', () => {
 
     await engine.start();
     await engine.sync(rules, defaultSettings);
-    const result = await engine.handleUnblock('rule-1', 'https://reddit.com', 10);
+    const result = await engine.handleUnblock(['rule-1'], 'https://reddit.com', 10);
 
     expect(dnrSync).toHaveBeenCalledWith(rules, defaultSettings);
-    expect(dnrHandleUnblock).toHaveBeenCalledWith('rule-1', 'https://reddit.com', 10);
+    expect(dnrHandleUnblock).toHaveBeenCalledWith(['rule-1'], 'https://reddit.com', 10);
     expect(tabHandleUnblock).not.toHaveBeenCalled();
     expect(result).toEqual({ ok: true, reason: 'dnr' });
   });

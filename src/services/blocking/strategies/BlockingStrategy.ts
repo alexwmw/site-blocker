@@ -9,5 +9,5 @@ export interface BlockingStrategy {
   start(): Promise<void>;
   stop(): Promise<void>;
   sync(rules: BlockRule[], settings: Settings): Promise<void>;
-  handleUnblock(ruleId: string, targetUrl: string, senderTabId?: number): Promise<UnblockResult>;
+  handleUnblock(ruleIds: string[], targetUrl: string, senderTabId?: number): Promise<UnblockResult>;
 }

@@ -8,7 +8,7 @@ import type { BlockingStrategy, UnblockResult } from './BlockingStrategy';
 type EnforceArgs = {
   tabId?: number;
   url?: string;
-  rule?: BlockRule;
+  rules?: BlockRule[];
 };
 
 export default class TabRedirectStrategy implements BlockingStrategy {
@@ -39,23 +39,22 @@ export default class TabRedirectStrategy implements BlockingStrategy {
     if (typeof tabId !== 'number' || !url) {
       return {};
     }
-    const matchingActiveRule: BlockRule | null = await RulesService.findMatchingRule(url, this.rules);
-    if (!matchingActiveRule) {
+    const matchingRules: BlockRule[] = await RulesService.findMatchingRules(url, this.rules);
+    if (matchingRules.length === 0) {
       return {};
     }
-    if (matchingActiveRule.unblockUntil) {
-      if (matchingActiveRule.unblockUntil > Date.now()) {
-        return {};
-      }
+    const matchingActiveRules = matchingRules.filter((rule: BlockRule) => !((rule.unblockUntil ?? NaN) > Date.now()));
+    if (matchingActiveRules.length === 0) {
+      return {};
     }
-    return { tabId, url, rule: matchingActiveRule };
+    return { tabId, url, rules: matchingActiveRules };
   }
 
-  private async enforce({ tabId, url, rule }: EnforceArgs): Promise<void> {
-    if (typeof tabId !== 'number' || !url || !rule) {
+  private async enforce({ tabId, url, rules }: EnforceArgs): Promise<void> {
+    if (typeof tabId !== 'number' || !url || !rules) {
       return;
     }
-    const destination = TabRedirectStrategy.buildBlockPageUrl(rule, url);
+    const destination = TabRedirectStrategy.buildBlockPageUrl(rules, url);
 
     await chrome.tabs.update(tabId, { url: destination });
     return;
@@ -69,21 +68,17 @@ export default class TabRedirectStrategy implements BlockingStrategy {
     return Date.now() + durationMinutes * 60 * 1000;
   }
 
-  private static splitPattern(pattern: string): { host: string; path: string } {
-    const [host = '', ...pathParts] = RulesService.normaliseRulePattern(pattern).split('/');
-    const path = pathParts.length > 0 ? `/${pathParts.join('/')}` : '';
-    return { host, path };
-  }
-
-  private static buildBlockPageUrl(rule: BlockRule, targetUrl: string): string {
-    const { host, path } = TabRedirectStrategy.splitPattern(rule.pattern);
+  private static buildBlockPageUrl(_rules: BlockRule[], targetUrl: string): string {
+    const prioritisedRules = RulesService.sortRulesBySpecificity(_rules);
+    const rule = prioritisedRules[0];
+    const { host, path } = RulesService.splitPattern(rule.pattern);
     const blockPageUrl = getBlockPageUrl();
     const params = new URLSearchParams({
-      ruleId: rule.id,
       targetUrl,
       patternHost: host,
       patternPath: path,
       matchType: rule.matchType,
+      ruleIds: prioritisedRules.map((r) => r.id).join(','),
     });
     return `${blockPageUrl}?${params.toString()}`;
   }
@@ -117,17 +112,18 @@ export default class TabRedirectStrategy implements BlockingStrategy {
    * - Navigate the requesting tab back to targetUrl immediately (if senderTabId available).
    * return success/failure.
    *
-   * @param ruleId
+   * @param ruleIds
    * @param targetUrl
    * @param senderTabId
    */
-  async handleUnblock(ruleId: string, targetUrl: string, senderTabId?: number): Promise<UnblockResult> {
+  async handleUnblock(ruleIds: string[], targetUrl: string, senderTabId?: number): Promise<UnblockResult> {
     if (!RulesService.isSupportedUrl(targetUrl)) {
       return { ok: false, reason: 'Unsupported target URL.' };
     }
     const unblockUntil = this.getUnblockUntilTime();
     if (unblockUntil) {
-      await StorageService.updateRule(ruleId, { unblockUntil });
+      const promises = ruleIds.map((ruleId) => StorageService.updateRule(ruleId, { unblockUntil }));
+      await Promise.all(promises);
     }
     if (typeof senderTabId === 'number') {
       await chrome.tabs.update(senderTabId, { url: targetUrl });

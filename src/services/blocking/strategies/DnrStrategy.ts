@@ -35,11 +35,11 @@ export default class DnrStrategy implements BlockingStrategy {
    *
    * If you can’t support this yet, return explicit unsupported reason.
    *
-   * @param ruleId
+   * @param ruleIds
    * @param targetUrl
    * @param senderTabId
    */
-  async handleUnblock(ruleId: string, targetUrl: string, senderTabId?: number): Promise<UnblockResult> {
+  async handleUnblock(ruleIds: string[], targetUrl: string, senderTabId?: number): Promise<UnblockResult> {
     return {
       ok: false,
       reason: '?',

@@ -104,24 +104,38 @@ describe('BlockService', () => {
     expect(RulesService.domainPatternFromUrl('chrome://extensions')).toBeNull();
   });
 
-  it('findMatchingRule returns first matching rule from storage', async () => {
+  it('findMatchingRules returns first matching rule from storage', async () => {
     const rules: BlockRule[] = [
       makeRule({ id: 'rule-1', pattern: 'news.ycombinator.com', matchType: 'prefix' }),
       makeRule({ id: 'rule-2', pattern: 'reddit.com/r/all', matchType: 'prefix' }),
     ];
     vi.spyOn(StorageService, 'getRules').mockResolvedValue(rules);
 
-    const match = await RulesService.findMatchingRule('https://old.reddit.com/r/all/comments/x');
+    const matches = await RulesService.findMatchingRules('https://old.reddit.com/r/all/comments/x');
 
-    expect(match?.id).toBe('rule-2');
+    expect(matches[0].id).toBe('rule-2');
   });
 
-  it('findMatchingRule returns null for unsupported urls', async () => {
+  it('findMatchingRules returns multiple matching rule from storage', async () => {
+    const rules: BlockRule[] = [
+      makeRule({ id: 'rule-1', pattern: 'news.ycombinator.com', matchType: 'prefix' }),
+      makeRule({ id: 'rule-2', pattern: 'reddit.com/r/all', matchType: 'prefix' }),
+      makeRule({ id: 'rule-3', pattern: 'https://old.reddit.com/r/all/comments/x', matchType: 'exact' }),
+    ];
+    vi.spyOn(StorageService, 'getRules').mockResolvedValue(rules);
+
+    const matches = await RulesService.findMatchingRules('https://old.reddit.com/r/all/comments/x');
+
+    expect(matches).toHaveLength(2);
+    expect(matches[0].id).toBe('rule-2');
+    expect(matches[1].id).toBe('rule-3');
+  });
+
+  it('findMatchingRules returns empty array for unsupported urls', async () => {
     const getRulesSpy = vi.spyOn(StorageService, 'getRules').mockResolvedValue([makeRule()]);
 
-    const match = await RulesService.findMatchingRule('chrome://extensions');
-
-    expect(match).toBeNull();
+    const matches = await RulesService.findMatchingRules('chrome://extensions');
+    expect(matches).toHaveLength(0);
     expect(getRulesSpy).not.toHaveBeenCalled();
   });
 });

@@ -82,7 +82,7 @@ export default class BlockingEngine implements BlockingStrategy {
     await this.activeStrategy.sync(rules, settings);
   }
 
-  async handleUnblock(ruleId: string, targetUrl: string, senderTabId?: number): Promise<UnblockResult> {
-    return await this.activeStrategy.handleUnblock(ruleId, targetUrl, senderTabId);
+  async handleUnblock(ruleIds: string[], targetUrl: string, senderTabId?: number): Promise<UnblockResult> {
+    return await this.activeStrategy.handleUnblock(ruleIds, targetUrl, senderTabId);
   }
 }
