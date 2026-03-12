@@ -1,7 +1,7 @@
 import type { BlockRule, Settings } from '../../types/schema';
 import { StorageService } from '../StorageService';
 
-import type { BlockingStrategy, UnblockResult } from './strategies/BlockingStrategy';
+import type { BlockingStrategy, SyncItems, UnblockResult } from './strategies/BlockingStrategy';
 import DnrStrategy from './strategies/DnrStrategy';
 import TabRedirectStrategy from './strategies/TabRedirectStrategy';
 
@@ -27,13 +27,13 @@ export default class BlockingEngine implements BlockingStrategy {
       const rules: BlockRule[] = await StorageService.getRules();
       const settings: Settings = await StorageService.getSettings();
       if (prev === next) {
-        await this.activeStrategy.sync(rules, settings);
+        await this.activeStrategy.sync({ rules, settings });
         return;
       }
       await prev.stop();
       this.activeStrategy = next;
       await this.activeStrategy.start();
-      await this.activeStrategy.sync(rules, settings);
+      await this.activeStrategy.sync({ rules, settings });
     })().catch(console.error);
   };
 
@@ -59,7 +59,7 @@ export default class BlockingEngine implements BlockingStrategy {
     this.activeStrategy = this.pickStrategyFromPermissions(permissions);
 
     await this.activeStrategy.start();
-    await this.activeStrategy.sync(rules, settings);
+    await this.activeStrategy.sync({ rules, settings });
     chrome.permissions.onAdded.addListener(this.handlePermissionChange);
 
     chrome.permissions.onRemoved.addListener(this.handlePermissionChange);
@@ -76,10 +76,11 @@ export default class BlockingEngine implements BlockingStrategy {
     chrome.permissions.onAdded.removeListener(this.handlePermissionChange);
     chrome.permissions.onRemoved.removeListener(this.handlePermissionChange);
     await this.activeStrategy.stop();
+    this.started = false;
   }
 
-  async sync(rules: BlockRule[], settings: Settings): Promise<void> {
-    await this.activeStrategy.sync(rules, settings);
+  async sync(items: SyncItems): Promise<void> {
+    await this.activeStrategy.sync(items);
   }
 
   async handleUnblock(ruleIds: string[], targetUrl: string, senderTabId?: number): Promise<UnblockResult> {

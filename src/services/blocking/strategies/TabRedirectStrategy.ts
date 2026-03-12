@@ -3,7 +3,7 @@ import { RulesService } from '../../RulesService';
 import { StorageService } from '../../StorageService';
 import { getBlockPageUrl } from '../getBlockPageUrl';
 
-import type { BlockingStrategy, UnblockResult } from './BlockingStrategy';
+import type { BlockingStrategy, SyncItems, UnblockResult } from './BlockingStrategy';
 
 type EnforceArgs = {
   tabId?: number;
@@ -101,9 +101,13 @@ export default class TabRedirectStrategy implements BlockingStrategy {
     this.started = false;
   }
 
-  async sync(rules: BlockRule[], settings: Settings) {
-    this.rules = rules;
-    this.settings = settings;
+  async sync({ rules, settings }: SyncItems) {
+    if (settings) {
+      this.settings = settings;
+    }
+    if (rules) {
+      this.rules = rules;
+    }
   }
 
   /**

@@ -78,7 +78,7 @@ describe('TabRedirectStrategy', () => {
 
   it('redirects matching navigations to block page after sync', async () => {
     const strategy = new TabRedirectStrategy();
-    await strategy.sync([makeRule()], defaultSettings);
+    await strategy.sync({ rules: [makeRule()], settings: defaultSettings });
     await strategy.start();
     startedStrategies.push(strategy);
 
@@ -94,7 +94,7 @@ describe('TabRedirectStrategy', () => {
 
   it('does not redirect when a matching rule is temporarily unblocked', async () => {
     const strategy = new TabRedirectStrategy();
-    await strategy.sync([makeRule({ unblockUntil: Date.now() + 60_000 })], defaultSettings);
+    await strategy.sync({ rules: [makeRule({ unblockUntil: Date.now() + 60_000 })], settings: defaultSettings });
     await strategy.start();
     startedStrategies.push(strategy);
 
@@ -106,7 +106,7 @@ describe('TabRedirectStrategy', () => {
 
   it('redirects again once unblock window has expired', async () => {
     const strategy = new TabRedirectStrategy();
-    await strategy.sync([makeRule({ unblockUntil: Date.now() - 1 })], defaultSettings);
+    await strategy.sync({ rules: [makeRule({ unblockUntil: Date.now() - 1 })], settings: defaultSettings });
     await strategy.start();
     startedStrategies.push(strategy);
 
@@ -119,7 +119,7 @@ describe('TabRedirectStrategy', () => {
   it('evaluates active tab url on tab activation events', async () => {
     tabsGet.mockResolvedValue({ id: 99, url: 'https://reddit.com/r/aita/comments/123' } as chrome.tabs.Tab);
     const strategy = new TabRedirectStrategy();
-    await strategy.sync([makeRule()], defaultSettings);
+    await strategy.sync({ rules: [makeRule()], settings: defaultSettings });
     await strategy.start();
     startedStrategies.push(strategy);
 
@@ -133,7 +133,7 @@ describe('TabRedirectStrategy', () => {
   it('handleUnblock updates unblock state and navigates sender tab back to target', async () => {
     const strategy = new TabRedirectStrategy();
     const updateRuleSpy = vi.spyOn(StorageService, 'updateRule').mockResolvedValue(makeRule());
-    await strategy.sync([makeRule()], defaultSettings);
+    await strategy.sync({ rules: [makeRule()], settings: defaultSettings });
 
     const result = await strategy.handleUnblock(['rule-1'], 'https://reddit.com/r/aita', 24);
 
@@ -146,7 +146,7 @@ describe('TabRedirectStrategy', () => {
   it('handleUnblock returns unsupported URL reason and does not mutate state', async () => {
     const strategy = new TabRedirectStrategy();
     const updateRuleSpy = vi.spyOn(StorageService, 'updateRule').mockResolvedValue(makeRule());
-    await strategy.sync([makeRule()], defaultSettings);
+    await strategy.sync({ rules: [makeRule()], settings: defaultSettings });
 
     const result = await strategy.handleUnblock(['rule-1'], 'chrome://extensions', 24);
 
@@ -176,7 +176,7 @@ describe('DnrStrategy', () => {
     const strategy = new DnrStrategy();
 
     await strategy.start();
-    await strategy.sync([makeRule(), makeRule({ id: 'rule-2', enabled: false })], defaultSettings);
+    await strategy.sync({ rules: [makeRule(), makeRule({ id: 'rule-2', enabled: false })], settings: defaultSettings });
 
     expect(updateDynamicRules).toHaveBeenCalled();
     const lastCall = updateDynamicRules.mock.calls[
@@ -191,7 +191,7 @@ describe('DnrStrategy', () => {
     const strategy = new DnrStrategy();
 
     await strategy.start();
-    await strategy.sync([makeRule()], defaultSettings);
+    await strategy.sync({ rules: [makeRule()], settings: defaultSettings });
     await strategy.stop();
 
     const stopCall = updateDynamicRules.mock.calls[

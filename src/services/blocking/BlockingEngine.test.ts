@@ -1,12 +1,12 @@
 import type { Mock } from 'vitest';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { BlockRule, Settings } from '../../types/schema';
+import type { BlockRule } from '../../types/schema';
 import defaultSettings from '../defaultSettings';
 import { StorageService } from '../StorageService';
 
 import BlockingEngine from './BlockingEngine';
-import type { UnblockResult } from './strategies/BlockingStrategy';
+import type { SyncItems, UnblockResult } from './strategies/BlockingStrategy';
 import DnrStrategy from './strategies/DnrStrategy';
 import TabRedirectStrategy from './strategies/TabRedirectStrategy';
 import type { Listener } from './test-utils';
@@ -40,11 +40,11 @@ describe('BlockingEngine', () => {
   let getAll: Mock<() => Promise<chrome.permissions.Permissions>>;
   let tabStart: Mock<() => Promise<void>>;
   let tabStop: Mock<() => Promise<void>>;
-  let tabSync: Mock<(rules: BlockRule[], settings: Settings) => Promise<void>>;
+  let tabSync: Mock<(items: SyncItems) => Promise<void>>;
   let tabHandleUnblock: Mock<(ruleId: string[], targetUrl: string, senderTabId?: number) => Promise<UnblockResult>>;
   let dnrStart: Mock<() => Promise<void>>;
   let dnrStop: Mock<() => Promise<void>>;
-  let dnrSync: Mock<(rules: BlockRule[], settings: Settings) => Promise<void>>;
+  let dnrSync: Mock<(items: SyncItems) => Promise<void>>;
   let dnrHandleUnblock: Mock<(ruleId: string[], targetUrl: string, senderTabId?: number) => Promise<UnblockResult>>;
 
   const onAddedFactory = () => createEvent<[chrome.permissions.Permissions]>();
@@ -97,7 +97,7 @@ describe('BlockingEngine', () => {
     await engine.start();
 
     expect(tabStart).toHaveBeenCalledTimes(1);
-    expect(tabSync).toHaveBeenCalledWith(rules, defaultSettings);
+    expect(tabSync).toHaveBeenCalledWith({ rules, settings: defaultSettings });
     expect(dnrStart).not.toHaveBeenCalled();
     expect(onAdded.addListener).toHaveBeenCalledTimes(1);
     expect(onRemoved.addListener).toHaveBeenCalledTimes(1);
@@ -110,7 +110,7 @@ describe('BlockingEngine', () => {
     await engine.start();
 
     expect(dnrStart).toHaveBeenCalledTimes(1);
-    expect(dnrSync).toHaveBeenCalledWith(rules, defaultSettings);
+    expect(dnrSync).toHaveBeenCalledWith({ rules, settings: defaultSettings });
     expect(tabStart).not.toHaveBeenCalled();
   });
 
@@ -124,7 +124,7 @@ describe('BlockingEngine', () => {
 
     expect(tabStop).toHaveBeenCalledTimes(1);
     expect(dnrStart).toHaveBeenCalledTimes(1);
-    expect(dnrSync).toHaveBeenCalledWith(rules, defaultSettings);
+    expect(dnrSync).toHaveBeenCalledWith({ rules, settings: defaultSettings });
   });
 
   it('stop unregisters permission listeners and stops active strategy', async () => {
@@ -144,10 +144,10 @@ describe('BlockingEngine', () => {
     const engine = new BlockingEngine();
 
     await engine.start();
-    await engine.sync(rules, defaultSettings);
+    await engine.sync({ rules, settings: defaultSettings });
     const result = await engine.handleUnblock(['rule-1'], 'https://reddit.com', 10);
 
-    expect(dnrSync).toHaveBeenCalledWith(rules, defaultSettings);
+    expect(dnrSync).toHaveBeenCalledWith({ rules, settings: defaultSettings });
     expect(dnrHandleUnblock).toHaveBeenCalledWith(['rule-1'], 'https://reddit.com', 10);
     expect(tabHandleUnblock).not.toHaveBeenCalled();
     expect(result).toEqual({ ok: true, reason: 'dnr' });

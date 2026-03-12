@@ -1,6 +1,4 @@
-import type { BlockRule, Settings } from '../../../types/schema';
-
-import type { BlockingStrategy, UnblockResult } from './BlockingStrategy';
+import type { BlockingStrategy, SyncItems, UnblockResult } from './BlockingStrategy';
 
 export default class DnrStrategy implements BlockingStrategy {
   /**
@@ -26,7 +24,7 @@ export default class DnrStrategy implements BlockingStrategy {
    * @param rules
    * @param settings
    */
-  async sync(rules: BlockRule[], settings: Settings) {}
+  async sync({ rules, settings }: SyncItems) {}
 
   /**
    * Since DNR blocks via Chrome rule tables, unblock means:
