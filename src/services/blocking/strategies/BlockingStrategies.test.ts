@@ -154,6 +154,21 @@ describe('TabRedirectStrategy', () => {
     expect(updateRuleSpy).not.toHaveBeenCalled();
     expect(tabsUpdate).not.toHaveBeenCalled();
   });
+
+  it('returns explicit failure and still navigates when at least one rule ID is missing', async () => {
+    const strategy = new TabRedirectStrategy();
+    const updateRuleSpy = vi
+      .spyOn(StorageService, 'updateRule')
+      .mockResolvedValueOnce(makeRule({ id: 'rule-1' }))
+      .mockResolvedValueOnce(null);
+    await strategy.sync({ rules: [makeRule()], settings: defaultSettings });
+
+    const result = await strategy.handleUnblock(['rule-1', 'missing-rule'], 'https://reddit.com/r/aita', 24);
+
+    expect(updateRuleSpy).toHaveBeenCalledTimes(2);
+    expect(result).toEqual({ ok: false, reason: 'One or more rules were not found.' });
+    expect(tabsUpdate).toHaveBeenCalledWith(24, { url: 'https://reddit.com/r/aita' });
+  });
 });
 
 describe('DnrStrategy', () => {

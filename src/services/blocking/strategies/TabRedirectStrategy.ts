@@ -125,12 +125,18 @@ export default class TabRedirectStrategy implements BlockingStrategy {
       return { ok: false, reason: 'Unsupported target URL.' };
     }
     const unblockUntil = this.getUnblockUntilTime();
+    let hasMissingRule;
     if (unblockUntil) {
       const promises = ruleIds.map((ruleId) => StorageService.updateRule(ruleId, { unblockUntil }));
-      await Promise.all(promises);
+      const results = await Promise.all(promises);
+      hasMissingRule = results.some((result) => result === null);
+      // Keep navigation aligned with unblock state: if any rule is missing, do not navigate as if unblock succeeded.
     }
     if (typeof senderTabId === 'number') {
       await chrome.tabs.update(senderTabId, { url: targetUrl });
+    }
+    if (hasMissingRule) {
+      return { ok: false, reason: 'One or more rules were not found.' };
     }
     return {
       ok: true,
