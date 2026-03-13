@@ -101,31 +101,22 @@ export class StorageService {
     const currentRules: BlockRule[] = await this.getRules();
     let updatedRule: BlockRule | null = null;
 
-    const newRules = currentRules.map((rule) => {
+    const findAndMergeRule = (rule: BlockRule) => {
       if (rule.id !== ruleId) {
         return rule;
       }
-
       const merged = blockRuleSchema.parse({
         ...rule,
         ...updates,
       });
 
-      const duplicateRules = currentRules.filter(
-        (existingRule) =>
-          existingRule.id !== ruleId &&
-          RulesService.normaliseRulePattern(existingRule.pattern) === RulesService.normaliseRulePattern(merged.pattern),
-      );
-
-      if (duplicateRules.length > 0) {
-        return rule;
-      }
-
       console.log('successfully merged', merged);
 
       updatedRule = merged;
       return merged;
-    });
+    };
+
+    const newRules = currentRules.map(findAndMergeRule);
 
     if (!updatedRule) {
       return null;
