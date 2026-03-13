@@ -5,6 +5,7 @@ import { blockRuleSchema, blockRulesSchema, settingsSchema } from '../types/sche
 import { deepMerge } from '../utils/deepMerge';
 
 import defaultSettings from './defaultSettings';
+import { RulesService } from './RulesService';
 
 const SETTINGS_KEY: keyof StorageSchema = 'settings';
 const RULES_KEY: keyof StorageSchema = 'rules';
@@ -13,6 +14,12 @@ export type StorageListener = (
   changes: { [p: string]: chrome.storage.StorageChange },
   areaName?: chrome.storage.AreaName,
 ) => void;
+
+export type AddRuleResult = {
+  ok: boolean;
+  reason?: string;
+  duplicateRules?: BlockRule[];
+};
 
 export class StorageService {
   static async getSettings(): Promise<Settings> {
@@ -65,13 +72,25 @@ export class StorageService {
 
     return [];
   }
-  static async addRule(newRule: BlockRule): Promise<void> {
+  static async addRule(newRule: BlockRule): Promise<AddRuleResult> {
+    const currentRules: BlockRule[] = await this.getRules();
     const validated = blockRuleSchema.parse(newRule);
 
-    const currentRules: BlockRule[] = await this.getRules();
+    const duplicateRules = await RulesService.findDuplicateRules(validated, currentRules);
+
+    if (duplicateRules.length > 0) {
+      return {
+        ok: false,
+        reason: 'Duplicate rule(s) exist',
+        duplicateRules,
+      };
+    }
+
     await chrome.storage.local.set({
       [RULES_KEY]: [...currentRules, validated],
     });
+
+    return { ok: true };
   }
 
   private static async setRules(newRules: BlockRule[]): Promise<void> {
@@ -91,6 +110,16 @@ export class StorageService {
         ...rule,
         ...updates,
       });
+
+      const duplicateRules = currentRules.filter(
+        (existingRule) =>
+          existingRule.id !== ruleId &&
+          RulesService.normaliseRulePattern(existingRule.pattern) === RulesService.normaliseRulePattern(merged.pattern),
+      );
+
+      if (duplicateRules.length > 0) {
+        return rule;
+      }
 
       console.log('successfully merged', merged);
 

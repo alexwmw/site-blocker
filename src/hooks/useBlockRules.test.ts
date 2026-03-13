@@ -89,7 +89,7 @@ describe('useBlockRules Hook', () => {
   });
 
   it('should call StorageService.addRule when addRule is called', async () => {
-    const spy = vi.spyOn(StorageService, 'addRule').mockResolvedValue();
+    const spy = vi.spyOn(StorageService, 'addRule').mockResolvedValue({ ok: true });
     const { result } = renderHook(() => useBlockRules());
 
     await act(async () => {
