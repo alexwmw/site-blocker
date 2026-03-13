@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 
+import type { StorageListener } from '../services/StorageService';
 import { StorageService } from '../services/StorageService';
 import type { BlockRule } from '../types/schema';
 
@@ -11,17 +12,17 @@ const useBlockRules = () => {
     StorageService.getRules().then(setBlockRules).catch(console.error);
 
     // Listen for Storage Changes
-    const listener = (changes: { [key: string]: chrome.storage.StorageChange }) => {
+    const listener: StorageListener = (changes) => {
       // If the 'rules' key was updated anywhere in the extension...
       if (changes.rules) {
         setBlockRules(changes.rules.newValue as BlockRule[]);
       }
     };
 
-    chrome.storage.onChanged.addListener(listener);
+    StorageService.addListener(listener);
 
     // Clean up the listener when the component unmounts
-    return () => chrome.storage.onChanged.removeListener(listener);
+    return () => StorageService.removeListener(listener);
   }, []);
 
   const addRule = async (rule: BlockRule) => {

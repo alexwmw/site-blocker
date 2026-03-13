@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { BlockService } from '../services/BlockService';
+import { RulesService } from '../services/RulesService';
 import type { BlockRule, MatchType } from '../types/schema';
-import { createRuleId } from '../utils/createRuleId';
+import { createUniqueId } from '../utils/createUniqueId';
 
 /**
  *
@@ -13,7 +13,7 @@ const useCreateRuleFromTab = (tab?: chrome.tabs.Tab | null) => {
 
   const isSupported = useMemo(() => {
     const url = activeTab?.url;
-    return Boolean(url && BlockService.isSupportedUrl(url));
+    return Boolean(url && RulesService.isSupportedUrl(url));
   }, [activeTab]);
 
   useEffect(() => {
@@ -35,14 +35,14 @@ const useCreateRuleFromTab = (tab?: chrome.tabs.Tab | null) => {
       }
 
       const pattern =
-        patternType === 'domain' ? BlockService.domainPatternFromUrl(url) : BlockService.pathPatternFromUrl(url);
+        patternType === 'domain' ? RulesService.domainPatternFromUrl(url) : RulesService.pathPatternFromUrl(url);
 
       if (!pattern) {
         return null;
       }
 
       return {
-        id: createRuleId(),
+        id: createUniqueId(),
         matchType,
         pattern,
         createdAt: new Date().toISOString(),

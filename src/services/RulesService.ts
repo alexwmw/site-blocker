@@ -2,7 +2,7 @@ import type { BlockRule } from '../types/schema';
 
 import { StorageService } from './StorageService';
 
-export class BlockService {
+export class RulesService {
   /**
    * Return true only for valid http: or https: URLs.
    * Return false for invalid URLs and everything else (chrome://, about:blank, etc).
@@ -164,22 +164,55 @@ export class BlockService {
     }
   }
 
+  static splitPattern(pattern: string): { host: string; path: string } {
+    const [host = '', ...pathParts] = RulesService.normaliseRulePattern(pattern).split('/');
+    const path = pathParts.length > 0 ? `/${pathParts.join('/')}` : '';
+    return { host, path };
+  }
+
+  static sortRulesBySpecificity(rules: BlockRule[]): BlockRule[] {
+    if (rules.length === 0) {
+      return [];
+    }
+
+    return [...rules].sort((a, b) => {
+      // 1. exact beats prefix
+      if (a.matchType !== b.matchType) {
+        return a.matchType === 'exact' ? -1 : 1;
+      }
+
+      const { host: hostA, path: pathA } = this.splitPattern(a.pattern);
+      const { host: hostB, path: pathB } = this.splitPattern(b.pattern);
+
+      // 2. deeper path beats shallower path
+      const pathDepthA = pathA.split('/').filter(Boolean).length;
+      const pathDepthB = pathB.split('/').filter(Boolean).length;
+
+      if (pathDepthA !== pathDepthB) {
+        return pathDepthB - pathDepthA;
+      }
+
+      // 3. longer host beats shorter host
+      if (hostA.length !== hostB.length) {
+        return hostB.length - hostA.length;
+      }
+
+      return 0;
+    });
+  }
+
   /**
    * Return null for unsupported URLs.
    * Load rules via StorageService.getRules().
    * Return the first matching rule using ruleMatchesUrl, else null.
    * @param targetUrl string
+   * @param localRules
    */
-  static async findMatchingRule(targetUrl: string): Promise<BlockRule | null> {
+  static async findMatchingRules(targetUrl: string, localRules?: BlockRule[]): Promise<BlockRule[]> {
     if (!this.isSupportedUrl(targetUrl)) {
-      return null;
+      return [];
     }
-    const rules = await StorageService.getRules();
-    for (const rule of rules) {
-      if (this.ruleMatchesUrl(rule, targetUrl)) {
-        return rule;
-      }
-    }
-    return null;
+    const rules = localRules ?? (await StorageService.getRules());
+    return rules.filter((rule) => this.ruleMatchesUrl(rule, targetUrl));
   }
 }

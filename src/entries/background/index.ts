@@ -1,5 +1,10 @@
+import BlockingEngine from '../../services/blocking/BlockingEngine';
+import type { SyncItems } from '../../services/blocking/strategies/BlockingStrategy';
 import { MigrationService } from '../../services/MigrationService';
 import { StorageService } from '../../services/StorageService';
+import { blockRulesSchema, settingsSchema } from '../../types/schema';
+
+const blockingEngine = new BlockingEngine();
 
 /** Migration and other install tasks **/
 
@@ -16,3 +21,20 @@ chrome.runtime.onInstalled.addListener((details) => {
     console.log('Block rules are:', blockRules);
   })(details).catch(console.error);
 });
+
+async function startTheEngine() {
+  StorageService.addListener((changes) => {
+    const items: SyncItems = {};
+    if ('settings' in changes) {
+      items.settings = settingsSchema.parse(changes.settings.newValue);
+    }
+    if ('rules' in changes) {
+      items.rules = blockRulesSchema.parse(changes.rules.newValue);
+    }
+    blockingEngine.sync(items).catch(console.error);
+  });
+
+  await blockingEngine.start();
+}
+
+startTheEngine().catch(console.error);

@@ -43,7 +43,7 @@ export const settingsSchema = z.object({
   holdDurationSeconds: z.number().min(3).max(99),
   isRated: z.boolean(),
   schedule: scheduleSchema,
-  revisit: z.object({
+  extendedUnblock: z.object({
     enabled: z.boolean(),
     durationMinutes: z.number(),
   }),

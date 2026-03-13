@@ -2,7 +2,7 @@ import type { LegacyOptions } from '../types/legacy-schema';
 import type { ActiveDays, BlockRule, Settings, StorageSchema, Theme } from '../types/schema';
 import { storageSchema, TIME_REGEX } from '../types/schema';
 import { isTheme } from '../types/schema-utils';
-import { createRuleId } from '../utils/createRuleId';
+import { createUniqueId } from '../utils/createUniqueId';
 
 import defaultSettings from './defaultSettings';
 
@@ -86,9 +86,9 @@ export class MigrationService {
     return {
       theme: this.toTheme(old.theme?.value, defaultSettings.theme),
       holdDurationSeconds: this.toNumber(old.unblockTimeout?.value, defaultSettings.holdDurationSeconds),
-      revisit: {
-        enabled: this.toBool(old.allowRevisits?.value, defaultSettings.revisit.enabled),
-        durationMinutes: this.toNumber(old.revisitLimit?.value, defaultSettings.revisit.durationMinutes),
+      extendedUnblock: {
+        enabled: this.toBool(old.allowRevisits?.value, defaultSettings.extendedUnblock.enabled),
+        durationMinutes: this.toNumber(old.revisitLimit?.value, defaultSettings.extendedUnblock.durationMinutes),
       },
       isRated: this.toBool(old.isRated?.value, defaultSettings.isRated),
       schedule: {
@@ -112,7 +112,7 @@ export class MigrationService {
         continue;
       }
       const newRule: BlockRule = {
-        id: createRuleId(),
+        id: createUniqueId(),
         pattern: rule.hostname,
         // Legacy semantics:
         // - isByPath=true  => match page and descendants (prefix)
@@ -153,7 +153,8 @@ export class MigrationService {
 
     if (result.success) {
       await chrome.storage.local.set(result.data);
-      await chrome.storage.sync.clear();
+      // -- do not clear, because data will be lost if using the extension on more than once device
+      // await chrome.storage.sync.clear();
       console.log('Migration complete:', result.data);
     } else {
       console.error('Migration failed validation:', result.error.flatten());
