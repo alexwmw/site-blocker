@@ -27,7 +27,6 @@ export default class BlockingEngine implements BlockingStrategy {
       const next = this.pickStrategyFromPermissions(permissions);
       const rules: BlockRule[] = await StorageService.getRules();
       const settings: Settings = await StorageService.getSettings();
-      console.log({ prev, next, permissions });
       if (prev === next) {
         await this.activeStrategy.sync({ rules, settings });
         return;
