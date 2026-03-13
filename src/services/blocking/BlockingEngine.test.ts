@@ -116,9 +116,11 @@ describe('BlockingEngine', () => {
 
   it('switches strategies on permission changes', async () => {
     getAll.mockResolvedValue({ permissions: ['storage'] });
+
     const engine = new BlockingEngine();
 
     await engine.start();
+    getAll.mockResolvedValue({ permissions: ['storage', 'declarativeNetRequest'] });
     onAdded.emit({ permissions: ['declarativeNetRequest'] });
     await new Promise((resolve) => setTimeout(resolve, 0));
 
