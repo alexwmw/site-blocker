@@ -74,6 +74,58 @@ describe('StorageService', () => {
     expect(setCall.rules[1]).toStrictEqual(rules[1]);
   });
 
+  it('should add a rule when no duplicate exists', async () => {
+    const rules: BlockRule[] = [
+      {
+        id: '1',
+        pattern: 'reddit.com/r/typescript',
+        matchType: 'prefix',
+        createdAt: new Date().toISOString(),
+        enabled: true,
+      },
+    ];
+    const newRule: BlockRule = {
+      id: '2',
+      pattern: 'news.ycombinator.com',
+      matchType: 'prefix',
+      createdAt: new Date().toISOString(),
+      enabled: true,
+    };
+    storageMock.local.get.mockResolvedValue({ rules });
+
+    const result = await StorageService.addRule(newRule);
+
+    expect(result).toStrictEqual({ ok: true });
+    const [[setCall]] = storageMock.local.set.mock.calls;
+    expect(setCall.rules).toHaveLength(2);
+    expect(setCall.rules[1]).toStrictEqual(newRule);
+  });
+
+  it('should reject a duplicate rule when canonical pattern already exists', async () => {
+    const existingRule: BlockRule = {
+      id: '1',
+      pattern: 'https://www.Reddit.com/r/typescript/?sort=top',
+      matchType: 'exact',
+      createdAt: new Date().toISOString(),
+      enabled: true,
+    };
+    const newRule: BlockRule = {
+      id: '2',
+      pattern: 'reddit.com/r/typescript',
+      matchType: 'prefix',
+      createdAt: new Date().toISOString(),
+      enabled: true,
+    };
+    storageMock.local.get.mockResolvedValue({ rules: [existingRule] });
+
+    const result = await StorageService.addRule(newRule);
+
+    expect(result.ok).toBe(false);
+    expect(result.reason).toBe('Duplicate rule(s) exist');
+    expect(result.duplicateRules).toStrictEqual([existingRule]);
+    expect(storageMock.local.set).not.toHaveBeenCalled();
+  });
+
   it('should filter out the correct rule when removing', async () => {
     const rules: BlockRule[] = [
       { id: '1', pattern: 'string', matchType: 'prefix', createdAt: new Date().toISOString(), enabled: true },

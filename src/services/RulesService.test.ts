@@ -138,4 +138,21 @@ describe('BlockService', () => {
     expect(matches).toHaveLength(0);
     expect(getRulesSpy).not.toHaveBeenCalled();
   });
+
+  it('findDuplicateRules returns canonical duplicates regardless of matchType', async () => {
+    const compareRule = makeRule({
+      id: 'rule-new',
+      pattern: 'https://www.Reddit.com/r/typescript/?sort=top#today',
+      matchType: 'prefix',
+    });
+    const rules: BlockRule[] = [
+      makeRule({ id: 'rule-1', pattern: 'reddit.com/r/typescript', matchType: 'exact' }),
+      makeRule({ id: 'rule-2', pattern: 'news.ycombinator.com', matchType: 'prefix' }),
+    ];
+
+    const duplicates = await RulesService.findDuplicateRules(compareRule, rules);
+
+    expect(duplicates).toHaveLength(1);
+    expect(duplicates[0].id).toBe('rule-1');
+  });
 });

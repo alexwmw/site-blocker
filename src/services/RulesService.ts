@@ -1,7 +1,5 @@
 import type { BlockRule } from '../types/schema';
 
-import { StorageService } from './StorageService';
-
 export class RulesService {
   /**
    * Return true only for valid http: or https: URLs.
@@ -212,7 +210,23 @@ export class RulesService {
     if (!this.isSupportedUrl(targetUrl)) {
       return [];
     }
-    const rules = localRules ?? (await StorageService.getRules());
+    let rules = localRules;
+    if (!rules) {
+      const { StorageService } = await import('./StorageService');
+      rules = await StorageService.getRules();
+    }
     return rules.filter((rule) => this.ruleMatchesUrl(rule, targetUrl));
+  }
+
+  static async findDuplicateRules(compareRule: BlockRule, localRules?: BlockRule[]): Promise<BlockRule[]> {
+    let rules = localRules;
+    if (!rules) {
+      const { StorageService } = await import('./StorageService');
+      rules = await StorageService.getRules();
+    }
+
+    const normalisedPattern = this.normaliseRulePattern(compareRule.pattern);
+
+    return rules.filter((rule) => this.normaliseRulePattern(rule.pattern) === normalisedPattern);
   }
 }
