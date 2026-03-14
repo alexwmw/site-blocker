@@ -8,7 +8,8 @@
     "tabs",
     "notifications",
     "alarms",
-    "contextMenus"
+    "contextMenus",
+    "declarativeNetRequest"
   ],
   "action": {
     "default_popup": "popup.html",
