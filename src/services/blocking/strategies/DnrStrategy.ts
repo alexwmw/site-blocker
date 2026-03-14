@@ -60,7 +60,10 @@ export default class DnrStrategy implements BlockingStrategy {
     return {
       id: ruleId,
       priority: 1,
-      action: { type: chrome.declarativeNetRequest.RuleActionType.BLOCK },
+      action: {
+        type: chrome.declarativeNetRequest.RuleActionType.REDIRECT,
+        redirect: { extensionPath: '/block-page.html' },
+      },
       condition: {
         regexFilter: this.buildRegexFilter(rule),
         resourceTypes: [chrome.declarativeNetRequest.ResourceType.MAIN_FRAME],

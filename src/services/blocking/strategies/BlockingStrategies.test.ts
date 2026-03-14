@@ -179,7 +179,7 @@ describe('DnrStrategy', () => {
     vi.clearAllMocks();
     vi.stubGlobal('chrome', {
       declarativeNetRequest: {
-        RuleActionType: { BLOCK: 'block' },
+        RuleActionType: { REDIRECT: 'redirect' },
         ResourceType: { MAIN_FRAME: 'main_frame' },
         getDynamicRules,
         updateDynamicRules,
@@ -203,6 +203,10 @@ describe('DnrStrategy', () => {
     ]?.[0] as chrome.declarativeNetRequest.UpdateRuleOptions;
     expect(lastCall.removeRuleIds).toContain(1000001);
     expect(lastCall.addRules).toHaveLength(1);
+    expect(lastCall.addRules?.[0]?.action).toEqual({
+      type: 'redirect',
+      redirect: { extensionPath: '/block-page.html' },
+    });
   });
 
   it('stop removes managed rules explicitly', async () => {
