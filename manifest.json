@@ -3,21 +3,15 @@
   "name": "Time Out: Page Blocker",
   "version": "3.0.0",
   "description": "Stay Focused & Mindful of Your Browsing.",
-  "permissions": [
-    "storage",
-    "tabs",
-    "notifications",
-    "alarms",
-    "contextMenus"
-  ],
+  "permissions": ["storage", "tabs", "contextMenus"],
   "action": {
     "default_popup": "popup.html",
     "default_title": "Time Out: Page Blocker",
     "default_icon": {
-      "16": "src/assets/icons/icon16.png",
-      "32": "src/assets/icons/icon32.png",
-      "48": "src/assets/icons/icon48.png",
-      "128": "src/assets/icons/icon128.png"
+      "16": "assets/icons/icon16.png",
+      "32": "assets/icons/icon32.png",
+      "48": "assets/icons/icon48.png",
+      "128": "assets/icons/icon128.png"
     }
   },
   "options_page": "options.html",
@@ -27,20 +21,12 @@
   },
   "web_accessible_resources": [
     {
-      "resources": [
-        "block-page.html"
-      ],
-      "matches": [
-        "<all_urls>"
-      ]
+      "resources": ["block-page.html"],
+      "matches": ["<all_urls>"]
     },
     {
-      "resources": [
-        "public/*"
-      ],
-      "matches": [
-        "<all_urls>"
-      ]
+      "resources": ["public/*"],
+      "matches": ["<all_urls>"]
     }
   ]
 }
