@@ -159,8 +159,9 @@ export default class DnrStrategy implements BlockingStrategy {
     }
 
     const updates = await Promise.all(ruleIds.map((ruleId) => StorageService.updateRule(ruleId, { unblockUntil })));
+    let reason: string = '';
     if (updates.some((result) => result === null)) {
-      return { ok: false, reason: 'One or more rules were not found.' };
+       reason = 'One or more rules were not found.';
     }
 
     this.rules = this.rules.map((rule) => (ruleIds.includes(rule.id) ? { ...rule, unblockUntil } : rule));
@@ -170,6 +171,6 @@ export default class DnrStrategy implements BlockingStrategy {
       await chrome.tabs.update(senderTabId, { url: targetUrl });
     }
 
-    return { ok: true };
+    return Boolean(reason) ? { ok: false, reason } : { ok: true };
   }
 }
