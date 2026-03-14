@@ -40,6 +40,13 @@ export default class DnrStrategy implements BlockingStrategy {
     if (!path) {
       return undefined;
     }
+    /* todo: Anchor prefix URL filter to the beginning of pathname
+        The generated filter |http*://*${path}^ is too permissive for prefix semantics
+        because DNR * matches any characters (including /).
+        For a rule path like /r/aita, this can also match URLs such as https://reddit.com/foo/r/aita,
+        even though prefix matching should only allow paths that start with /r/aita;
+        this leads to over-blocking on unrelated URLs.
+      */
     return `|http*://*${path}^`;
   }
 
@@ -174,6 +181,14 @@ export default class DnrStrategy implements BlockingStrategy {
         .filter((ruleId): ruleId is string => Boolean(ruleId)),
     );
 
+    /* todo: Reinstall DNR rules when temporary unblock expires
+        This updates in-memory rules with unblockUntil and reapplies DNR once,
+        but there is no follow-up re-sync at expiry time.
+        Because applyDynamicRules excludes rules while unblockUntil > Date.now(),
+        the matching dynamic rules are removed and will stay removed after
+        the timer elapses until some unrelated sync/restart happens,
+        so a “temporary” unblock can become effectively permanent in normal use.
+        */
     this.rules = this.rules.map((rule) => (updatedRuleIds.has(rule.id) ? { ...rule, unblockUntil } : rule));
     await this.applyDynamicRules();
 
