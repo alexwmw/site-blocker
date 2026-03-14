@@ -1,4 +1,4 @@
-import type { LegacyOptions } from '../types/legacy-schema';
+import type { LegacyOptions, LegacyProvider } from '../types/legacy-schema';
 import type { ActiveDays, BlockRule, Settings, StorageSchema, Theme } from '../types/schema';
 import { storageSchema, TIME_REGEX } from '../types/schema';
 import { isTheme } from '../types/schema-utils';
@@ -107,7 +107,7 @@ export class MigrationService {
     }
     const newRules: BlockRule[] = [];
 
-    for (const rule of oldRules) {
+    for (const rule of oldRules as LegacyProvider[]) {
       if (!rule.id || !rule.hostname) {
         continue;
       }

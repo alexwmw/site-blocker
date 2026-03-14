@@ -1,6 +1,7 @@
 {
   "manifest_version": 3,
-  "name": "Time Out: Page Blocker",
+  "name": "Hold - Mindful Website Blocking",
+  "short_name": "Hold",
   "version": "3.0.0",
   "description": "Stay Focused & Mindful of Your Browsing.",
   "permissions": ["storage", "tabs", "contextMenus"],

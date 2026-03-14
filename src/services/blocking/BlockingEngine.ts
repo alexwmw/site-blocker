@@ -2,7 +2,6 @@ import type { BlockRule, Settings } from '../../types/schema';
 import { StorageService } from '../StorageService';
 
 import type { BlockingStrategy, SyncItems, UnblockResult } from './strategies/BlockingStrategy';
-import DnrStrategy from './strategies/DnrStrategy';
 import TabRedirectStrategy from './strategies/TabRedirectStrategy';
 
 export default class BlockingEngine implements BlockingStrategy {
@@ -10,14 +9,13 @@ export default class BlockingEngine implements BlockingStrategy {
 
   private tabRedirectStrategy: TabRedirectStrategy = new TabRedirectStrategy();
 
-  private dnrStrategy: DnrStrategy = new DnrStrategy();
-
   constructor() {
     this.activeStrategy = this.tabRedirectStrategy;
   }
 
-  private pickStrategyFromPermissions(permissions?: chrome.runtime.ManifestPermission[]): BlockingStrategy {
-    return permissions?.includes('declarativeNetRequest') ? this.dnrStrategy : this.tabRedirectStrategy;
+  private pickStrategyFromPermissions(_permissions?: chrome.runtime.ManifestPermission[]): BlockingStrategy {
+    // search permissions if required
+    return this.tabRedirectStrategy;
   }
 
   private handlePermissionChange = () => {

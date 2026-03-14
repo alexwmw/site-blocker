@@ -6,8 +6,8 @@ import defaultSettings from '../defaultSettings';
 import { StorageService } from '../StorageService';
 
 import BlockingEngine from './BlockingEngine';
+import DnrStrategy from './strategies/archived/DnrStrategy';
 import type { SyncItems, UnblockResult } from './strategies/BlockingStrategy';
-import DnrStrategy from './strategies/DnrStrategy';
 import TabRedirectStrategy from './strategies/TabRedirectStrategy';
 import type { Listener } from './test-utils';
 import { createEvent } from './test-utils';
@@ -103,7 +103,8 @@ describe('BlockingEngine', () => {
     expect(onRemoved.addListener).toHaveBeenCalledTimes(1);
   });
 
-  it('starts dnr strategy when declarativeNetRequest permission is present', async () => {
+  // archived strategy - no strategy to switch to
+  it.fails('starts dnr strategy when declarativeNetRequest permission is present', async () => {
     getAll.mockResolvedValue({ permissions: ['declarativeNetRequest'] });
     const engine = new BlockingEngine();
 
@@ -114,7 +115,8 @@ describe('BlockingEngine', () => {
     expect(tabStart).not.toHaveBeenCalled();
   });
 
-  it('switches strategies on permission changes', async () => {
+  // archived strategy - no strategy to switch to
+  it.fails('switches strategies on permission changes', async () => {
     getAll.mockResolvedValue({ permissions: ['storage'] });
 
     const engine = new BlockingEngine();
@@ -129,7 +131,8 @@ describe('BlockingEngine', () => {
     expect(dnrSync).toHaveBeenCalledWith({ rules, settings: defaultSettings });
   });
 
-  it('stop unregisters permission listeners and stops active strategy', async () => {
+  // archived strategy - no strategy to switch to
+  it.fails('stop unregisters permission listeners and stops active strategy', async () => {
     getAll.mockResolvedValue({ permissions: ['declarativeNetRequest'] });
     const engine = new BlockingEngine();
 
@@ -142,16 +145,17 @@ describe('BlockingEngine', () => {
   });
 
   it('sync and handleUnblock delegate to active strategy', async () => {
-    getAll.mockResolvedValue({ permissions: ['declarativeNetRequest'] });
+    getAll.mockResolvedValue({ permissions: ['declarativeNetRequest'] }); // dnr strategy is archived
+
     const engine = new BlockingEngine();
 
     await engine.start();
     await engine.sync({ rules, settings: defaultSettings });
     const result = await engine.handleUnblock(['rule-1'], 'https://reddit.com', 10);
 
-    expect(dnrSync).toHaveBeenCalledWith({ rules, settings: defaultSettings });
-    expect(dnrHandleUnblock).toHaveBeenCalledWith(['rule-1'], 'https://reddit.com', 10);
-    expect(tabHandleUnblock).not.toHaveBeenCalled();
-    expect(result).toEqual({ ok: true, reason: 'dnr' });
+    expect(tabSync).toHaveBeenCalledWith({ rules, settings: defaultSettings });
+    expect(tabHandleUnblock).toHaveBeenCalledWith(['rule-1'], 'https://reddit.com', 10);
+    expect(dnrSync).not.toHaveBeenCalled();
+    expect(result).toEqual({ ok: true, reason: 'tab' });
   });
 });
