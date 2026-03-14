@@ -1,9 +1,7 @@
-import type { BlockRule, Settings } from '../../../types/schema';
-import { isScheduleActiveNow } from '../../../types/schema-utils';
-import { RulesService } from '../../RulesService';
-import { StorageService } from '../../StorageService';
-
-import type { BlockingStrategy, SyncItems, UnblockResult } from './BlockingStrategy';
+import type { BlockRule, Settings } from '../../../../types/schema';
+import { RulesService } from '../../../RulesService';
+import { StorageService } from '../../../StorageService';
+import type { BlockingStrategy, SyncItems, UnblockResult } from '../BlockingStrategy';
 
 const MANAGED_RULE_ID_MIN = 1_000_000;
 const MANAGED_RULE_ID_SPACE = 900_000_000;
@@ -49,15 +47,6 @@ export default class DnrStrategy implements BlockingStrategy {
         this leads to over-blocking on unrelated URLs.
       */
     return `|http*://*${path}^`;
-  }
-
-
-  private isBlockingActiveNow(): boolean {
-    if (!this.settings) {
-      return true;
-    }
-
-    return !this.settings.schedule.enabled || isScheduleActiveNow(this.settings.schedule);
   }
 
   private getUnblockUntilTime() {
@@ -130,10 +119,7 @@ export default class DnrStrategy implements BlockingStrategy {
       return;
     }
 
-    const isBlockingActive = this.isBlockingActiveNow();
-    const activeRules = isBlockingActive
-      ? this.rules.filter((rule) => rule.enabled && !((rule.unblockUntil ?? NaN) > Date.now()))
-      : [];
+    const activeRules = this.rules.filter((rule) => rule.enabled && !((rule.unblockUntil ?? NaN) > Date.now()));
     const idMap = this.buildRuleIdMap(activeRules);
     const desiredRules = activeRules.map((rule) => this.toDnrRule(rule, idMap.get(rule.id)!));
     const desiredRuleIds = desiredRules.map((rule) => rule.id);

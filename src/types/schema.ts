@@ -1,13 +1,21 @@
 import { z } from 'zod';
 
+/** 24-hour time in `HH:mm` format. */
 export const TIME_REGEX = /^([01][0-9]|2[0-3]):[0-5][0-9]$/;
 
+/** Supported UI themes. */
 export const THEMES = ['light', 'dark'] as const;
 
+/** User-selected UI theme. */
 export const themeSchema = z.enum(THEMES);
 
 export type Theme = z.infer<typeof themeSchema>;
 
+/**
+ * Day-of-week index used throughout the scheduling system.
+ *
+ * Monday starts at `0` so indices align with the `activeDays` tuple.
+ */
 export enum DayOfWeek {
   Monday = 0,
   Tuesday,
@@ -18,33 +26,70 @@ export enum DayOfWeek {
   Sunday,
 }
 
+/**
+ * A fixed Monday-to-Sunday tuple describing which days scheduled blocking
+ * should apply on.
+ */
 export const activeDaysSchema = z.tuple([
-  z.boolean(), // Mon
-  z.boolean(), // Tue
-  z.boolean(), // Wed
-  z.boolean(), // Thu
-  z.boolean(), // Fri
-  z.boolean(), // Sat
-  z.boolean(), // Sun
+  z.boolean(), // Monday
+  z.boolean(), // Tuesday
+  z.boolean(), // Wednesday
+  z.boolean(), // Thursday
+  z.boolean(), // Friday
+  z.boolean(), // Saturday
+  z.boolean(), // Sunday
 ]);
 
 export type ActiveDays = z.infer<typeof activeDaysSchema>;
 
+/**
+ * Scheduled blocking configuration.
+ *
+ * When `enabled` is `true`, blocking only applies on selected days and within
+ * the configured time range, unless `allDay` is enabled.
+ */
 export const scheduleSchema = z.object({
+  /** Whether scheduled blocking is enabled. */
   enabled: z.boolean(),
+
+  /** Monday-to-Sunday flags indicating which days blocking is active. */
   activeDays: activeDaysSchema,
+
+  /** Whether blocking should apply for the full day on active days. */
   allDay: z.boolean(),
+
+  /** Start time in 24-hour `HH:mm` format. */
   start: z.string().regex(TIME_REGEX),
+
+  /** End time in 24-hour `HH:mm` format. */
   end: z.string().regex(TIME_REGEX),
 });
 
+/**
+ * User-configurable extension settings.
+ */
 export const settingsSchema = z.object({
+  /** UI theme preference. */
   theme: themeSchema,
+
+  /** Number of seconds the unblock button must be held. */
   holdDurationSeconds: z.number().min(3).max(99),
+
+  /** Whether the user has rated or reviewed the extension. */
   isRated: z.boolean(),
+
+  /** Scheduled blocking configuration. */
   schedule: scheduleSchema,
+
+  /**
+   * Extended unblock behaviour allowing a site to remain unblocked
+   * for a limited time after a successful unblock.
+   */
   extendedUnblock: z.object({
+    /** Whether temporary extended unblocking is enabled. */
     enabled: z.boolean(),
+
+    /** How long a site remains unblocked, in minutes. */
     durationMinutes: z.number(),
   }),
 });
@@ -52,28 +97,56 @@ export const settingsSchema = z.object({
 export type Settings = z.infer<typeof settingsSchema>;
 export type Schedule = z.infer<typeof scheduleSchema>;
 
+/** Supported URL matching strategies for block rules. */
 export const MATCH_TYPES = ['exact', 'prefix'] as const;
 
+/** Match strategy used when comparing a URL against a rule pattern. */
 export const matchTypeSchema = z.enum(MATCH_TYPES);
 
 export type MatchType = z.infer<typeof matchTypeSchema>;
 
+/**
+ * A single blocking rule.
+ */
 export const blockRuleSchema = z.object({
+  /** Unique identifier for the rule. */
   id: z.string(),
+
+  /** URL, hostname, or path pattern to match against. */
   pattern: z.string(),
+
+  /** Whether the pattern must match exactly or by prefix. */
   matchType: matchTypeSchema,
+
+  /** ISO-8601 timestamp representing when the rule was created. */
   createdAt: z.string().datetime(), // Validates ISO string,
+
+  /** Whether the rule is currently active. */
   enabled: z.boolean(),
+
+  /**
+   * Unix timestamp in milliseconds until which the rule is temporarily unblocked.
+   * Omitted when the rule is currently blocked as normal.
+   */
   unblockUntil: z.number().optional(),
 });
 
+/** Collection of blocking rules stored by the extension. */
 export const blockRulesSchema = z.array(blockRuleSchema);
 
 export type BlockRule = z.infer<typeof blockRuleSchema>;
 
+/**
+ * Top-level persisted storage schema for the extension.
+ */
 export const storageSchema = z.object({
+  /** Schema version used for storage migrations. */
   version: z.number(),
+
+  /** Persisted user settings. */
   settings: settingsSchema,
+
+  /** Persisted block rules. */
   rules: blockRulesSchema,
 });
 
