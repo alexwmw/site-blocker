@@ -27,19 +27,24 @@ export default class DnrStrategy implements BlockingStrategy {
     const escapedHost = this.escapeRegex(host);
     const escapedPath = this.escapeRegex(path);
 
-    const hostPrefix = `^https?://(?:[^./]+\\.)*${escapedHost}`;
+    const hostPrefix = `^https?://(?:[^./]+\\.)*${escapedHost}(?::[0-9]{1,5})?`;
 
     if (rule.matchType === 'exact') {
       if (!path) {
+        // Matches host exactly with optional trailing slash and any query/hash
         return `${hostPrefix}/?(?:[?#].*)?$`;
       }
+      // Matches host and specific path exactly
       return `${hostPrefix}${escapedPath}/?(?:[?#].*)?$`;
     }
 
+    /* matchType === 'prefix' */
     if (!path) {
+      // Prefix match for host: matches domain and anything after it
       return `${hostPrefix}(?:/|[?#]|$)`;
     }
 
+    // Prefix match for path: ensures /path matches /path/sub but not /pathway
     return `${hostPrefix}${escapedPath}(?:/|[?#]|$)`;
   }
 
