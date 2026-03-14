@@ -1,4 +1,5 @@
 import type { BlockRule, Settings } from '../../../types/schema';
+import { isScheduleActiveNow } from '../../../types/schema-utils';
 import { RulesService } from '../../RulesService';
 import { StorageService } from '../../StorageService';
 import { getBlockPageUrl } from '../getBlockPageUrl';
@@ -20,7 +21,7 @@ export default class TabRedirectStrategy implements BlockingStrategy {
 
   private readonly handleTabUpdate = (tabId: number, changeInfo: chrome.tabs.OnUpdatedInfo) => {
     if (changeInfo.url) {
-      this.evaluate(tabId, changeInfo.url).then(this.enforce).catch(console.error);
+      this.evaluate(tabId, changeInfo.url).then((args) => this.enforce(args)).catch(console.error);
     }
   };
 
@@ -28,12 +29,20 @@ export default class TabRedirectStrategy implements BlockingStrategy {
     chrome.tabs
       .get(tabId)
       .then((tab) => this.evaluate(tab.id, tab.url))
-      .then(this.enforce)
+      .then((args) => this.enforce(args))
       .catch(console.error);
   };
 
+  private isBlockingActiveNow(): boolean {
+    if (!this.settings) {
+      return true;
+    }
+
+    return !this.settings.schedule.enabled || isScheduleActiveNow(this.settings.schedule);
+  }
+
   private async evaluate(tabId?: number, url?: string) {
-    if (!this.started) {
+    if (!this.started || !this.isBlockingActiveNow()) {
       return {};
     }
     if (typeof tabId !== 'number' || !url) {
@@ -51,7 +60,7 @@ export default class TabRedirectStrategy implements BlockingStrategy {
   }
 
   private async enforce({ tabId, url, rules }: EnforceArgs): Promise<void> {
-    if (typeof tabId !== 'number' || !url || !rules) {
+    if (!this.isBlockingActiveNow() || typeof tabId !== 'number' || !url || !rules) {
       return;
     }
     const destination = TabRedirectStrategy.buildBlockPageUrl(rules, url);

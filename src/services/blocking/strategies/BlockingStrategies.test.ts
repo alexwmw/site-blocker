@@ -13,7 +13,7 @@ const defaultSettings: Settings = {
   holdDurationSeconds: 20,
   isRated: false,
   schedule: {
-    enabled: true,
+    enabled: false,
     activeDays: [false, false, false, false, false, false, false],
     allDay: false,
     start: '00:00',
@@ -24,6 +24,19 @@ const defaultSettings: Settings = {
     durationMinutes: 10,
   },
 };
+
+const makeSettings = (overrides: Partial<Settings> = {}): Settings => ({
+  ...defaultSettings,
+  ...overrides,
+  schedule: {
+    ...defaultSettings.schedule,
+    ...overrides.schedule,
+  },
+  extendedUnblock: {
+    ...defaultSettings.extendedUnblock,
+    ...overrides.extendedUnblock,
+  },
+});
 
 const makeRule = (overrides: Partial<BlockRule> = {}): BlockRule => ({
   id: 'rule-1',
@@ -83,9 +96,9 @@ describe('TabRedirectStrategy', () => {
     startedStrategies.push(strategy);
 
     onUpdated.emit(11, { url: 'https://reddit.com/r/aita/comments/123' }, { id: 11 } as chrome.tabs.Tab);
-    await new Promise((resolve) => setTimeout(resolve, 0));
+    await Promise.resolve();
 
-    expect(tabsUpdate).toHaveBeenCalledTimes(1);
+    await vi.waitFor(() => expect(tabsUpdate).toHaveBeenCalledTimes(1));
     const [tabId, updateProperties] = tabsUpdate.mock.calls[0] as [number, chrome.tabs.UpdateProperties];
     expect(tabId).toBe(11);
     expect(updateProperties.url).toContain(getBlockPageUrl());
@@ -99,7 +112,7 @@ describe('TabRedirectStrategy', () => {
     startedStrategies.push(strategy);
 
     onUpdated.emit(11, { url: 'https://reddit.com/r/aita/comments/123' }, { id: 11 } as chrome.tabs.Tab);
-    await new Promise((resolve) => setTimeout(resolve, 0));
+    await Promise.resolve();
 
     expect(tabsUpdate).not.toHaveBeenCalled();
   });
@@ -111,9 +124,9 @@ describe('TabRedirectStrategy', () => {
     startedStrategies.push(strategy);
 
     onUpdated.emit(11, { url: 'https://reddit.com/r/aita/comments/123' }, { id: 11 } as chrome.tabs.Tab);
-    await new Promise((resolve) => setTimeout(resolve, 0));
+    await Promise.resolve();
 
-    expect(tabsUpdate).toHaveBeenCalledTimes(1);
+    await vi.waitFor(() => expect(tabsUpdate).toHaveBeenCalledTimes(1));
   });
 
   it('evaluates active tab url on tab activation events', async () => {
@@ -124,10 +137,86 @@ describe('TabRedirectStrategy', () => {
     startedStrategies.push(strategy);
 
     onActivated.emit({ tabId: 99, windowId: 1 });
-    await new Promise((resolve) => setTimeout(resolve, 0));
+    await Promise.resolve();
 
     expect(tabsGet).toHaveBeenCalledWith(99);
-    expect(tabsUpdate).toHaveBeenCalledTimes(1);
+    await vi.waitFor(() => expect(tabsUpdate).toHaveBeenCalledTimes(1));
+  });
+
+
+  it('does not redirect outside of scheduled active window when schedule is enabled', async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-01-05T10:00:00'));
+    const strategy = new TabRedirectStrategy();
+    await strategy.sync({
+      rules: [makeRule()],
+      settings: makeSettings({
+        schedule: {
+          enabled: true,
+          activeDays: [true, true, true, true, true, true, true],
+          allDay: false,
+          start: '11:00',
+          end: '12:00',
+        },
+      }),
+    });
+    await strategy.start();
+    startedStrategies.push(strategy);
+
+    onUpdated.emit(11, { url: 'https://reddit.com/r/aita/comments/123' }, { id: 11 } as chrome.tabs.Tab);
+    await Promise.resolve();
+
+    expect(tabsUpdate).not.toHaveBeenCalled();
+    vi.useRealTimers();
+  });
+
+  it('redirects inside overnight windows and carries activity across midnight from previous active day', async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-01-06T00:30:00'));
+    const strategy = new TabRedirectStrategy();
+    await strategy.sync({
+      rules: [makeRule()],
+      settings: makeSettings({
+        schedule: {
+          enabled: true,
+          activeDays: [true, false, false, false, false, false, false],
+          allDay: false,
+          start: '23:00',
+          end: '01:00',
+        },
+      }),
+    });
+    await strategy.start();
+    startedStrategies.push(strategy);
+
+    onUpdated.emit(11, { url: 'https://reddit.com/r/aita/comments/123' }, { id: 11 } as chrome.tabs.Tab);
+    await Promise.resolve();
+
+    await vi.waitFor(() => expect(tabsUpdate).toHaveBeenCalledTimes(1));
+    vi.useRealTimers();
+  });
+
+  it('treats disabled schedule as always-on blocking', async () => {
+    const strategy = new TabRedirectStrategy();
+    await strategy.sync({
+      rules: [makeRule()],
+      settings: makeSettings({
+        schedule: {
+          enabled: false,
+          activeDays: [false, false, false, false, false, false, false],
+          allDay: false,
+          start: '23:00',
+          end: '23:30',
+        },
+      }),
+    });
+    await strategy.start();
+    startedStrategies.push(strategy);
+
+    onUpdated.emit(11, { url: 'https://reddit.com/r/aita/comments/123' }, { id: 11 } as chrome.tabs.Tab);
+    await Promise.resolve();
+
+    await vi.waitFor(() => expect(tabsUpdate).toHaveBeenCalledTimes(1));
   });
 
   it('handleUnblock updates unblock state and navigates sender tab back to target', async () => {
@@ -190,6 +279,7 @@ describe('DnrStrategy', () => {
     });
   });
 
+
   it('sync replaces stale dynamic rules with current enabled rules', async () => {
     getDynamicRules.mockResolvedValue([{ id: 1000001 }, { id: 4 }]);
     const strategy = new DnrStrategy();
@@ -231,6 +321,72 @@ describe('DnrStrategy', () => {
     });
     expect(lastCall.addRules?.[0]?.condition).toHaveProperty('regexFilter');
     expect(lastCall.addRules?.[0]?.condition).not.toHaveProperty('urlFilter');
+  });
+
+
+  it('sync skips DNR rules outside active schedule window when schedule is enabled', async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-01-05T10:00:00'));
+    getDynamicRules.mockResolvedValue([]);
+    const strategy = new DnrStrategy();
+
+    await strategy.start();
+    await strategy.sync({
+      rules: [makeRule()],
+      settings: makeSettings({
+        schedule: {
+          enabled: true,
+          activeDays: [true, true, true, true, true, true, true],
+          allDay: false,
+          start: '11:00',
+          end: '12:00',
+        },
+      }),
+    });
+
+    const lastCall = updateDynamicRules.mock.calls[
+      updateDynamicRules.mock.calls.length - 1
+    ]?.[0] as chrome.declarativeNetRequest.UpdateRuleOptions;
+    expect(lastCall.addRules).toHaveLength(0);
+    vi.useRealTimers();
+  });
+
+  it('settings sync toggles DNR blocking behavior from active to inactive schedule', async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-01-05T10:00:00'));
+    getDynamicRules.mockResolvedValue([]);
+    const strategy = new DnrStrategy();
+
+    await strategy.start();
+    await strategy.sync({
+      rules: [makeRule()],
+      settings: makeSettings({
+        schedule: {
+          enabled: true,
+          activeDays: [true, true, true, true, true, true, true],
+          allDay: false,
+          start: '09:00',
+          end: '11:00',
+        },
+      }),
+    });
+    await strategy.sync({
+      settings: makeSettings({
+        schedule: {
+          enabled: true,
+          activeDays: [true, true, true, true, true, true, true],
+          allDay: false,
+          start: '11:00',
+          end: '12:00',
+        },
+      }),
+    });
+
+    const firstSyncCall = updateDynamicRules.mock.calls[1]?.[0] as chrome.declarativeNetRequest.UpdateRuleOptions;
+    const secondSyncCall = updateDynamicRules.mock.calls[2]?.[0] as chrome.declarativeNetRequest.UpdateRuleOptions;
+    expect(firstSyncCall.addRules).toHaveLength(1);
+    expect(secondSyncCall.addRules).toHaveLength(0);
+    vi.useRealTimers();
   });
 
   it('stop removes managed rules explicitly', async () => {

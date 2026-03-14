@@ -4,7 +4,7 @@ const defaultSettings: Settings = {
   theme: 'light',
   holdDurationSeconds: 20,
   schedule: {
-    enabled: true,
+    enabled: false,
     activeDays: [false, false, false, false, false, false, false],
     allDay: false,
     start: '00:00',
