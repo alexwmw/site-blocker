@@ -213,7 +213,6 @@ describe('DnrStrategy', () => {
     });
   });
 
-
   it('uses regexFilter for exact rules to preserve exact-path semantics with ports', async () => {
     getDynamicRules.mockResolvedValue([]);
     const strategy = new DnrStrategy();
@@ -253,7 +252,7 @@ describe('DnrStrategy', () => {
 
   it('handleUnblock unblocks matching rules and navigates sender tab', async () => {
     getDynamicRules.mockResolvedValue([{ id: 10001 }]);
-    const tabsUpdate = vi.spyOn(chrome.tabs, 'update').mockResolvedValue({} as chrome.tabs.Tab);
+    const tabsUpdate = vi.spyOn(chrome.tabs, 'update').mockResolvedValue();
     const updateRuleSpy = vi.spyOn(StorageService, 'updateRule').mockResolvedValue(makeRule());
     const strategy = new DnrStrategy();
 
@@ -269,7 +268,7 @@ describe('DnrStrategy', () => {
 
   it('handleUnblock does not abort when some rule IDs are missing', async () => {
     getDynamicRules.mockResolvedValue([{ id: 1000001 }]);
-    const tabsUpdate = vi.spyOn(chrome.tabs, 'update').mockResolvedValue({} as chrome.tabs.Tab);
+    const tabsUpdate = vi.spyOn(chrome.tabs, 'update').mockResolvedValue();
     const updateRuleSpy = vi
       .spyOn(StorageService, 'updateRule')
       .mockResolvedValueOnce(makeRule({ id: 'rule-1' }))

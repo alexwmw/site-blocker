@@ -112,7 +112,6 @@ export default class DnrStrategy implements BlockingStrategy {
     if (!this.started) {
       return;
     }
-    chrome.declarativeNetRequest.onRuleMatchedDebug.addListener(console.log);
 
     const activeRules = this.rules.filter((rule) => rule.enabled && !((rule.unblockUntil ?? NaN) > Date.now()));
     const idMap = this.buildRuleIdMap(activeRules);

@@ -38,6 +38,8 @@ export default class BlockingEngine implements BlockingStrategy {
     })().catch(console.error);
   };
 
+  private logMatchedRuleInfo = (info: chrome.declarativeNetRequest.MatchedRuleInfoDebug) => console.log(info);
+
   private started: boolean = false;
 
   /**
@@ -57,6 +59,12 @@ export default class BlockingEngine implements BlockingStrategy {
     const settings = await StorageService.getSettings();
 
     const { permissions } = await chrome.permissions.getAll();
+
+    // Start debugging
+    if (typeof chrome.declarativeNetRequest !== 'undefined' && chrome.declarativeNetRequest.onRuleMatchedDebug) {
+      chrome.declarativeNetRequest.onRuleMatchedDebug.addListener(this.logMatchedRuleInfo);
+    }
+
     this.activeStrategy = this.pickStrategyFromPermissions(permissions);
 
     await this.activeStrategy.start();
@@ -76,6 +84,11 @@ export default class BlockingEngine implements BlockingStrategy {
     }
     chrome.permissions.onAdded.removeListener(this.handlePermissionChange);
     chrome.permissions.onRemoved.removeListener(this.handlePermissionChange);
+
+    if (typeof chrome.declarativeNetRequest !== 'undefined' && chrome.declarativeNetRequest.onRuleMatchedDebug) {
+      chrome.declarativeNetRequest.onRuleMatchedDebug.removeListener(this.logMatchedRuleInfo);
+    }
+
     await this.activeStrategy.stop();
     this.started = false;
   }
