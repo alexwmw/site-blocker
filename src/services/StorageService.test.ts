@@ -19,20 +19,6 @@ describe('StorageService', () => {
     vi.clearAllMocks();
   });
 
-  it('should initialize and persist runtime-timezone settings if storage is empty', async () => {
-    storageMock.local.get.mockResolvedValue({});
-    const settings = await StorageService.getSettings();
-
-    expect(settings).toEqual({
-      ...defaultSettings,
-      schedule: {
-        ...defaultSettings.schedule,
-        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-      },
-    });
-    expect(storageMock.local.set).toHaveBeenCalledTimes(1);
-  });
-
   it('should correctly merge nested schedule updates', async () => {
     // 1. Initial State
     storageMock.local.get.mockResolvedValue({
