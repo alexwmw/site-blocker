@@ -11,7 +11,6 @@ const defaultSettings: Settings = {
   isRated: false,
   schedule: {
     enabled: true,
-    timezone: 'Europe/London',
     windows: [
       {
         days: [false, false, false, false, false, false, false],

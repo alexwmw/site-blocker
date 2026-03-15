@@ -160,7 +160,6 @@ export class MigrationService {
     return {
       enabled: this.toBool(old.scheduleBlocking?.value, defaultSettings.schedule.enabled),
       windows,
-      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     };
   }
 

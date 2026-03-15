@@ -6,7 +6,6 @@ import { SchedulingService } from './SchedulingService';
 
 const buildSchedule = (overrides: Partial<Schedule> = {}): Schedule => ({
   enabled: true,
-  timezone: 'UTC',
   windows: [
     {
       days: [true, true, true, true, true, true, true],
@@ -18,19 +17,17 @@ const buildSchedule = (overrides: Partial<Schedule> = {}): Schedule => ({
 });
 
 describe('SchedulingService', () => {
-  it('returns true when current timezone-adjusted time is inside an enabled window', () => {
-    const schedule = buildSchedule({ timezone: 'America/New_York' });
+  it('returns true when current time is inside an enabled window', () => {
+    const schedule = buildSchedule();
 
-    // Monday 10:30 in New York (UTC-5)
-    const now = new Date('2026-01-05T15:30:00.000Z');
+    const now = new Date('2026-01-05T10:30:00.000Z');
 
     expect(SchedulingService.isScheduleActiveNow(schedule, now)).toBe(true);
   });
 
-  it('returns false when current timezone-adjusted time is outside the active window', () => {
-    const schedule = buildSchedule({ timezone: 'America/New_York' });
+  it('returns false when current time is outside the active window', () => {
+    const schedule = buildSchedule();
 
-    // Monday 09:30 in New York
     const now = new Date('2026-01-05T14:30:00.000Z');
 
     expect(SchedulingService.isScheduleActiveNow(schedule, now)).toBe(false);

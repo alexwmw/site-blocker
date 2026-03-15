@@ -57,15 +57,6 @@ export const scheduleWindowSchema = z
 
 export type ScheduleWindow = z.infer<typeof scheduleWindowSchema>;
 
-export const isValidTimezone = (tz: string) => {
-  try {
-    new Intl.DateTimeFormat(undefined, { timeZone: tz });
-    return true;
-  } catch {
-    return false;
-  }
-};
-
 /**
  * Scheduled blocking configuration.
  *
@@ -75,10 +66,6 @@ export const isValidTimezone = (tz: string) => {
 export const scheduleSchema = z.object({
   /** Whether scheduled blocking is enabled. */
   enabled: z.boolean(),
-  /** IANA timezone (e.g. Europe/London). */
-  timezone: z.string().refine(isValidTimezone, {
-    message: 'Invalid IANA timezone',
-  }),
   windows: z.array(scheduleWindowSchema),
 });
 

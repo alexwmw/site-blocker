@@ -5,7 +5,6 @@ const defaultSettings: Settings = {
   holdDurationSeconds: 15,
   schedule: {
     enabled: false,
-    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     windows: [
       {
         days: [true, true, true, true, true, false, false],

@@ -7,7 +7,6 @@ describe('Schema Validation', () => {
   it('should accept valid military time', () => {
     const schedule: Schedule = {
       enabled: true,
-      timezone: 'Europe/London',
       windows: [
         {
           days: [true, true, true, true, true, true, true],
@@ -23,7 +22,6 @@ describe('Schema Validation', () => {
   it('should reject invalid time formats', () => {
     const schedule: Schedule = {
       enabled: true,
-      timezone: 'Europe/London',
       windows: [
         {
           days: [true, true, true, true, true, true, true],
@@ -39,7 +37,6 @@ describe('Schema Validation', () => {
   it('should enforce exactly 7 days in a window', () => {
     const schedule: Schedule = {
       enabled: true,
-      timezone: 'Europe/London',
       windows: [
         {
           // @ts-expect-error
@@ -56,7 +53,6 @@ describe('Schema Validation', () => {
   it('should enforce end times always be later than start times', () => {
     const schedule: Schedule = {
       enabled: true,
-      timezone: 'Europe/London',
       windows: [
         {
           days: [true, true, true, true, true, true, true],

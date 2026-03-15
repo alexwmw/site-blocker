@@ -13,7 +13,6 @@ const defaultSettings: Settings = {
   isRated: false,
   schedule: {
     enabled: false,
-    timezone: 'Europe/London',
     windows: [
       {
         days: [false, false, false, false, false, false, false],
@@ -155,7 +154,6 @@ describe('TabRedirectStrategy', () => {
       settings: makeSettings({
         schedule: {
           enabled: true,
-          timezone: 'Europe/London',
           windows: [
             {
               days: [true, true, true, true, true, true, true],
@@ -183,7 +181,6 @@ describe('TabRedirectStrategy', () => {
       settings: makeSettings({
         schedule: {
           enabled: false,
-          timezone: 'Europe/London',
           windows: [
             {
               days: [false, false, false, false, false, false, false],

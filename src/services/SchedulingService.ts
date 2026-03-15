@@ -11,50 +11,13 @@ export class SchedulingService {
     return h * 60 + m;
   }
 
-  private static getCurrentDayAndMinutes(
-    schedule: Schedule,
-    now: Date,
-  ): {
+  private static getCurrentDayAndMinutes(now: Date): {
     day: DayOfWeek;
     minutes: number;
   } {
-    const formatter = new Intl.DateTimeFormat('en-US', {
-      timeZone: schedule.timezone,
-      weekday: 'short',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false,
-    });
-
-    const parts = formatter.formatToParts(now);
-    const weekdayPart = parts.find((part) => part.type === 'weekday')?.value;
-    const hourPart = parts.find((part) => part.type === 'hour')?.value;
-    const minutePart = parts.find((part) => part.type === 'minute')?.value;
-
-    const weekdayMap: Record<string, DayOfWeek> = {
-      Mon: 0,
-      Tue: 1,
-      Wed: 2,
-      Thu: 3,
-      Fri: 4,
-      Sat: 5,
-      Sun: 6,
-    };
-
-    const day = weekdayPart ? weekdayMap[weekdayPart] : undefined;
-    const hours = Number(hourPart);
-    const minutes = Number(minutePart);
-
-    if (day === undefined || Number.isNaN(hours) || Number.isNaN(minutes)) {
-      return {
-        day: this.getDayOfWeek(now),
-        minutes: now.getHours() * 60 + now.getMinutes(),
-      };
-    }
-
     return {
-      day,
-      minutes: hours * 60 + minutes,
+      day: this.getDayOfWeek(now),
+      minutes: now.getHours() * 60 + now.getMinutes(),
     };
   }
 
@@ -75,7 +38,7 @@ export class SchedulingService {
       return false;
     }
 
-    const { day, minutes } = this.getCurrentDayAndMinutes(schedule, now);
+    const { day, minutes } = this.getCurrentDayAndMinutes(now);
 
     return schedule.windows.some((window) => window.days[day] && this.isWindowActiveAtThisTime(window, minutes));
   }
