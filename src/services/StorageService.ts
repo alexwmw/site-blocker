@@ -4,7 +4,7 @@ import type { BlockRule, Settings, StorageSchema } from '../types/schema';
 import { blockRuleSchema, blockRulesSchema, settingsSchema } from '../types/schema';
 import { deepMerge } from '../utils/deepMerge';
 
-import defaultSettings from './defaultSettings';
+import { createInitialSettings } from './defaultSettings';
 import { RulesService } from './RulesService';
 
 const SETTINGS_KEY: keyof StorageSchema = 'settings';
@@ -36,7 +36,9 @@ export class StorageService {
       console.error('Zod Validation Failed for Rules:', validated.error.format());
     }
 
-    return defaultSettings;
+    const initialSettings = createInitialSettings();
+    await chrome.storage.local.set({ [SETTINGS_KEY]: initialSettings });
+    return initialSettings;
   }
 
   static async updateSettings(updates: Partial<Settings>): Promise<void> {
