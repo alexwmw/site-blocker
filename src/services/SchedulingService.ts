@@ -11,49 +11,73 @@ export class SchedulingService {
     return h * 60 + m;
   }
 
-  private static isScheduleActiveToday(schedule: Schedule, day: DayOfWeek): boolean {
-    if (!schedule.enabled) {
-      return false;
+  private static getCurrentDayAndMinutes(
+    schedule: Schedule,
+    now: Date,
+  ): {
+    day: DayOfWeek;
+    minutes: number;
+  } {
+    const formatter = new Intl.DateTimeFormat('en-US', {
+      timeZone: schedule.timezone,
+      weekday: 'short',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    });
+
+    const parts = formatter.formatToParts(now);
+    const weekdayPart = parts.find((part) => part.type === 'weekday')?.value;
+    const hourPart = parts.find((part) => part.type === 'hour')?.value;
+    const minutePart = parts.find((part) => part.type === 'minute')?.value;
+
+    const weekdayMap: Record<string, DayOfWeek> = {
+      Mon: 0,
+      Tue: 1,
+      Wed: 2,
+      Thu: 3,
+      Fri: 4,
+      Sat: 5,
+      Sun: 6,
+    };
+
+    const day = weekdayPart ? weekdayMap[weekdayPart] : undefined;
+    const hours = Number(hourPart);
+    const minutes = Number(minutePart);
+
+    if (day === undefined || Number.isNaN(hours) || Number.isNaN(minutes)) {
+      return {
+        day: this.getDayOfWeek(now),
+        minutes: now.getHours() * 60 + now.getMinutes(),
+      };
     }
-    return schedule.windows.some((w) => w.days[day]);
+
+    return {
+      day,
+      minutes: hours * 60 + minutes,
+    };
   }
 
-  private static isWindowActiveAtThisTime(window: ScheduleWindow, now: Date) {
-    const currentMinutes = now.getHours() * 60 + now.getMinutes();
-
+  private static isWindowActiveAtThisTime(window: ScheduleWindow, currentMinutes: number) {
     const start = this.timeToMinutes(window.start);
     const end = this.timeToMinutes(window.end);
 
-    // Normal range: 09:00 → 17:00
     if (start <= end) {
       return currentMinutes >= start && currentMinutes < end;
     }
 
-    // Overnight range: 22:00 → 06:00 - should be disabled by the UI.
-    // Warn and return anyway.
     console.warn('A window with an impossible range was found.', window);
     return false;
   }
 
-  private static isScheduleActiveAtThisTime(schedule: Schedule, now: Date): boolean {
-    if (!schedule.enabled) {
-      return false;
-    }
-    return schedule.windows.some((w) => this.isWindowActiveAtThisTime(w, now));
-  }
-
   static isScheduleActiveNow(schedule: Schedule, now: Date = new Date()): boolean {
-    if (!schedule.enabled) {
+    if (!schedule.enabled || schedule.windows.length === 0) {
       return false;
     }
-    if (schedule.windows.length === 0) {
-      return false;
-    }
-    const day: DayOfWeek = this.getDayOfWeek(now);
-    const isActiveToday = this.isScheduleActiveToday(schedule, day);
-    const isActiveAtThisTime = this.isScheduleActiveNow(schedule, now);
 
-    return isActiveToday && isActiveAtThisTime;
+    const { day, minutes } = this.getCurrentDayAndMinutes(schedule, now);
+
+    return schedule.windows.some((window) => window.days[day] && this.isWindowActiveAtThisTime(window, minutes));
   }
 
   static isBlockingActiveNow(schedule: Schedule | undefined, now: Date = new Date()): boolean {
