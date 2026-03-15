@@ -20,12 +20,12 @@ export default class TabRedirectStrategy implements BlockingStrategy {
 
   private started = false;
 
-  private readonly handleTabUpdate = (tabId: number, changeInfo: chrome.tabs.OnUpdatedInfo) => {
-    if (changeInfo.url) {
-      this.evaluate(tabId, changeInfo.url)
-        .then((args) => this.enforce(args))
-        .catch(console.error);
-    }
+  private readonly handleTabUpdate = (tabId: number, _changeInfo: chrome.tabs.OnUpdatedInfo) => {
+    const evaluateAndEnforce = async (tab: chrome.tabs.Tab) => {
+      const args = await this.evaluate(tabId, tab.url);
+      await this.enforce(args);
+    };
+    chrome.tabs.get(tabId).then(evaluateAndEnforce).catch(console.error);
   };
 
   private readonly handleTabActivated = ({ tabId }: chrome.tabs.OnActivatedInfo) => {
