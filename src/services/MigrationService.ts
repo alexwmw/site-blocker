@@ -11,6 +11,7 @@ import type {
 import { storageSchema, THEMES, TIME_REGEX } from '../types/schema';
 import { createUniqueId } from '../utils/createUniqueId';
 
+import { createInitialSettings } from './defaultSettings';
 import defaultSettings from './defaultSettings';
 
 export class MigrationService {
@@ -221,7 +222,7 @@ export class MigrationService {
 
     const rawMigratedData: StorageSchema = {
       version: 3,
-      settings: legacy.options ? this.mapSettings(legacy.options) : defaultSettings,
+      settings: legacy.options ? this.mapSettings(legacy.options) : createInitialSettings(),
       rules: legacy.providers ? this.mapRules(legacy.providers) : [],
     };
 
@@ -236,7 +237,7 @@ export class MigrationService {
       console.error('Migration failed validation:', result.error.flatten());
       await chrome.storage.local.set({
         version: 3,
-        settings: defaultSettings,
+        settings: createInitialSettings(),
         rules: [],
       });
     }

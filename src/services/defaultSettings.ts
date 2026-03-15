@@ -21,4 +21,20 @@ const defaultSettings: Settings = {
   isRated: false,
 };
 
+export const resolveRuntimeTimezone = (): string => {
+  try {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone || defaultSettings.schedule.timezone;
+  } catch {
+    return defaultSettings.schedule.timezone;
+  }
+};
+
+export const createInitialSettings = (): Settings => ({
+  ...defaultSettings,
+  schedule: {
+    ...defaultSettings.schedule,
+    timezone: resolveRuntimeTimezone(),
+  },
+});
+
 export default defaultSettings;
