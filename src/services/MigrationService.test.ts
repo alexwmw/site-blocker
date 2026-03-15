@@ -122,6 +122,31 @@ describe('MigrationService - Deep Logic Tests', () => {
         },
       ]);
     });
+
+
+    it('should map equal 23:59 times to an all-day valid window', () => {
+      const old = {
+        ...LEGACY_DATA_2.options,
+        activeTimes: {
+          value: {
+            allDay: { value: false },
+            start: { value: '23:59' },
+            end: { value: '23:59' },
+          },
+        },
+      };
+
+      // @ts-expect-error - testing private method directly
+      const result = MigrationService.mapStartAndEndToWindows(old);
+
+      expect(result).toEqual([
+        {
+          days: [false, false, false, false, false, true, true],
+          start: '00:00',
+          end: '23:59',
+        },
+      ]);
+    });
   });
 
   describe('Rule Mapping (mapRules)', () => {
