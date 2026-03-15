@@ -104,40 +104,40 @@ describe('BlockService', () => {
     expect(RulesService.domainPatternFromUrl('chrome://extensions')).toBeNull();
   });
 
-  it('findMatchingRules returns first matching rule from storage', async () => {
+  it('findMatchingRules returns first matching rule from storage', () => {
     const rules: BlockRule[] = [
       makeRule({ id: 'rule-1', pattern: 'news.ycombinator.com', matchType: 'prefix' }),
       makeRule({ id: 'rule-2', pattern: 'reddit.com/r/all', matchType: 'prefix' }),
     ];
 
-    const matches = await RulesService.findMatchingRules('https://old.reddit.com/r/all/comments/x', rules);
+    const matches = RulesService.findMatchingRules('https://old.reddit.com/r/all/comments/x', rules);
 
     expect(matches[0].id).toBe('rule-2');
   });
 
-  it('findMatchingRules returns multiple matching rule from storage', async () => {
+  it('findMatchingRules returns multiple matching rule from storage', () => {
     const rules: BlockRule[] = [
       makeRule({ id: 'rule-1', pattern: 'news.ycombinator.com', matchType: 'prefix' }),
       makeRule({ id: 'rule-2', pattern: 'reddit.com/r/all', matchType: 'prefix' }),
       makeRule({ id: 'rule-3', pattern: 'https://old.reddit.com/r/all/comments/x', matchType: 'exact' }),
     ];
 
-    const matches = await RulesService.findMatchingRules('https://old.reddit.com/r/all/comments/x', rules);
+    const matches = RulesService.findMatchingRules('https://old.reddit.com/r/all/comments/x', rules);
 
     expect(matches).toHaveLength(2);
     expect(matches[0].id).toBe('rule-2');
     expect(matches[1].id).toBe('rule-3');
   });
 
-  it('findMatchingRules returns empty array for unsupported urls', async () => {
+  it('findMatchingRules returns empty array for unsupported urls', () => {
     const getRulesSpy = vi.spyOn(StorageService, 'getRules').mockResolvedValue([makeRule()]);
 
-    const matches = await RulesService.findMatchingRules('chrome://extensions', []);
+    const matches = RulesService.findMatchingRules('chrome://extensions', []);
     expect(matches).toHaveLength(0);
     expect(getRulesSpy).not.toHaveBeenCalled();
   });
 
-  it('findDuplicateRules returns canonical duplicates regardless of matchType', async () => {
+  it('findDuplicateRules returns canonical duplicates regardless of matchType', () => {
     const compareRule = makeRule({
       id: 'rule-new',
       pattern: 'https://www.Reddit.com/r/typescript/?sort=top#today',
@@ -148,7 +148,7 @@ describe('BlockService', () => {
       makeRule({ id: 'rule-2', pattern: 'news.ycombinator.com', matchType: 'prefix' }),
     ];
 
-    const duplicates = await RulesService.findDuplicateRules(compareRule, rules);
+    const duplicates = RulesService.findDuplicateRules(compareRule, rules);
 
     expect(duplicates).toHaveLength(1);
     expect(duplicates[0].id).toBe('rule-1');
