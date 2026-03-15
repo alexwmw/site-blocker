@@ -7,7 +7,7 @@ import { blockRulesSchema, settingsSchema } from '../../types/schema';
 
 const blockingEngine = new BlockingEngine();
 
-/** Migration and other install tasks **/
+/** Migration and storage setup **/
 chrome.runtime.onInstalled.addListener((details) => {
   (async (details) => {
     console.log('Extension installed/updated. Reason:', details.reason);
