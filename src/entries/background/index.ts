@@ -1,5 +1,6 @@
 import BlockingEngine from '../../services/blocking/BlockingEngine';
 import type { SyncItems } from '../../services/blocking/strategies/BlockingStrategy';
+import { MessagesService } from '../../services/MessagesService';
 import { MigrationService } from '../../services/MigrationService';
 import { StorageService } from '../../services/StorageService';
 import { blockRulesSchema, settingsSchema } from '../../types/schema';
@@ -7,7 +8,6 @@ import { blockRulesSchema, settingsSchema } from '../../types/schema';
 const blockingEngine = new BlockingEngine();
 
 /** Migration and other install tasks **/
-
 chrome.runtime.onInstalled.addListener((details) => {
   (async (details) => {
     console.log('Extension installed/updated. Reason:', details.reason);
@@ -22,6 +22,10 @@ chrome.runtime.onInstalled.addListener((details) => {
   })(details).catch(console.error);
 });
 
+/** Main runtime listener - handle requests as per messages.ts  */
+const _stopListening = MessagesService.startListening(blockingEngine);
+
+/** Start blocking */
 async function startTheEngine() {
   StorageService.addListener((changes) => {
     const items: SyncItems = {};

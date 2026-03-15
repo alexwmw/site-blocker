@@ -1,10 +1,11 @@
+import type { UnblockResponse } from '../../../types/messages';
 import type { BlockRule, Settings } from '../../../types/schema';
 import { RulesService } from '../../RulesService';
 import { SchedulingService } from '../../SchedulingService';
 import { StorageService } from '../../StorageService';
 import { getBlockPageUrl } from '../getBlockPageUrl';
 
-import type { BlockingStrategy, SyncItems, UnblockResult } from './BlockingStrategy';
+import type { BlockingStrategy, SyncItems } from './BlockingStrategy';
 
 type EnforceArgs = {
   tabId?: number;
@@ -127,7 +128,7 @@ export default class TabRedirectStrategy implements BlockingStrategy {
    * @param targetUrl
    * @param senderTabId
    */
-  async handleUnblock(ruleIds: string[], targetUrl: string, senderTabId?: number): Promise<UnblockResult> {
+  async handleUnblock(ruleIds: string[], targetUrl: string, senderTabId?: number): Promise<UnblockResponse> {
     if (!RulesService.isSupportedUrl(targetUrl)) {
       return { ok: false, reason: 'Unsupported target URL.' };
     }
