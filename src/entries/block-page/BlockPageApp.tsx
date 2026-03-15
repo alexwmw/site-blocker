@@ -18,7 +18,7 @@ const BlockPageApp = () => {
   return (
     <div>
       <h1>Block Page</h1>
-      <button onClick={handleUnblock}></button>
+      <button onClick={handleUnblock}>Unblock</button>
     </div>
   );
 };
