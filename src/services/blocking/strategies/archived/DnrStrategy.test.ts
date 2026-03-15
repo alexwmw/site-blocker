@@ -11,10 +11,14 @@ const defaultSettings: Settings = {
   isRated: false,
   schedule: {
     enabled: true,
-    activeDays: [false, false, false, false, false, false, false],
-    allDay: false,
-    start: '00:00',
-    end: '23:59',
+    timezone: 'Europe/London',
+    windows: [
+      {
+        days: [false, false, false, false, false, false, false],
+        start: '00:00',
+        end: '23:59',
+      },
+    ],
   },
   extendedUnblock: {
     enabled: true,

@@ -14,7 +14,7 @@ export type Theme = z.infer<typeof themeSchema>;
 /**
  * Day-of-week index used throughout the scheduling system.
  *
- * Monday starts at `0` so indices align with the `activeDays` tuple.
+ * Monday starts at `0` so indices align with the `scheduleDaysSchema` tuple.
  */
 export enum DayOfWeek {
   Monday = 0,
@@ -42,13 +42,18 @@ export const scheduleDaysSchema = z.tuple([
 
 export type ScheduleDays = z.infer<typeof scheduleDaysSchema>;
 
-export const scheduleWindowSchema = z.object({
-  days: scheduleDaysSchema,
-  /** Start time in 24-hour `HH:mm` format. */
-  start: z.string().regex(TIME_REGEX),
-  /** End time in 24-hour `HH:mm` format. */
-  end: z.string().regex(TIME_REGEX),
-});
+export const scheduleWindowSchema = z
+  .object({
+    days: scheduleDaysSchema,
+    /** Start time in 24-hour `HH:mm` format. */
+    start: z.string().regex(TIME_REGEX),
+    /** End time in 24-hour `HH:mm` format. */
+    end: z.string().regex(TIME_REGEX),
+  })
+  .refine((data) => data.end > data.start, {
+    message: 'End time cannot be earlier than start time.',
+    path: ['end'], // Sets the error path to 'end'
+  });
 
 export type ScheduleWindow = z.infer<typeof scheduleWindowSchema>;
 

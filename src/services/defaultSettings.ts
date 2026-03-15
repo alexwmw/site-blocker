@@ -2,10 +2,10 @@ import type { Settings } from '../types/schema';
 
 const defaultSettings: Settings = {
   theme: 'light',
-  holdDurationSeconds: 20,
+  holdDurationSeconds: 15,
   schedule: {
     enabled: false,
-    timezone: '',
+    timezone: 'Europe/London',
     windows: [
       {
         days: [true, true, true, true, true, false, false],

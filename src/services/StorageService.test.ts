@@ -40,7 +40,7 @@ describe('StorageService', () => {
     const [[setCall]] = storageMock.local.set.mock.calls;
     expect(setCall.settings.theme).toBe('light'); // Preserved
     expect(setCall.settings.schedule.enabled).toBe(false); // Updated
-    expect(setCall.settings.schedule.activeDays).toEqual(defaultSettings.schedule.activeDays); // Preserved!
+    expect(setCall.settings.schedule.windows[0].days).toEqual(defaultSettings.schedule.windows[0].days); // Preserved!
   });
 
   it('should throw an error if updateSettings receives invalid types', async () => {

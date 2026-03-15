@@ -13,10 +13,14 @@ const defaultSettings: Settings = {
   isRated: false,
   schedule: {
     enabled: false,
-    activeDays: [false, false, false, false, false, false, false],
-    allDay: false,
-    start: '00:00',
-    end: '23:59',
+    timezone: 'Europe/London',
+    windows: [
+      {
+        days: [false, false, false, false, false, false, false],
+        start: '00:00',
+        end: '23:59',
+      },
+    ],
   },
   extendedUnblock: {
     enabled: true,
@@ -151,10 +155,14 @@ describe('TabRedirectStrategy', () => {
       settings: makeSettings({
         schedule: {
           enabled: true,
-          activeDays: [true, true, true, true, true, true, true],
-          allDay: false,
-          start: '11:00',
-          end: '12:00',
+          timezone: 'Europe/London',
+          windows: [
+            {
+              days: [true, true, true, true, true, true, true],
+              start: '11:00',
+              end: '12:00',
+            },
+          ],
         },
       }),
     });
@@ -168,32 +176,6 @@ describe('TabRedirectStrategy', () => {
     vi.useRealTimers();
   });
 
-  it('redirects inside overnight windows and carries activity across midnight from previous active day', async () => {
-    vi.useFakeTimers();
-    vi.setSystemTime(new Date('2026-01-06T00:30:00'));
-    const strategy = new TabRedirectStrategy();
-    await strategy.sync({
-      rules: [makeRule()],
-      settings: makeSettings({
-        schedule: {
-          enabled: true,
-          activeDays: [true, false, false, false, false, false, false],
-          allDay: false,
-          start: '23:00',
-          end: '01:00',
-        },
-      }),
-    });
-    await strategy.start();
-    startedStrategies.push(strategy);
-
-    onUpdated.emit(11, { url: 'https://reddit.com/r/aita/comments/123' }, { id: 11 } as chrome.tabs.Tab);
-    await Promise.resolve();
-
-    await vi.waitFor(() => expect(tabsUpdate).toHaveBeenCalledTimes(1));
-    vi.useRealTimers();
-  });
-
   it('treats disabled schedule as always-on blocking', async () => {
     const strategy = new TabRedirectStrategy();
     await strategy.sync({
@@ -201,10 +183,14 @@ describe('TabRedirectStrategy', () => {
       settings: makeSettings({
         schedule: {
           enabled: false,
-          activeDays: [false, false, false, false, false, false, false],
-          allDay: false,
-          start: '23:00',
-          end: '23:30',
+          timezone: 'Europe/London',
+          windows: [
+            {
+              days: [false, false, false, false, false, false, false],
+              start: '23:00',
+              end: '23:30',
+            },
+          ],
         },
       }),
     });

@@ -93,21 +93,73 @@ export class MigrationService {
     }
   }
 
-  private static mapSchedule(old: LegacyOptions): Schedule {
+  private static shiftDaysForward(days: ScheduleDays): ScheduleDays {
+    return [
+      days[6], // Sunday -> Monday
+      days[0], // Monday -> Tuesday
+      days[1], // Tuesday -> Wednesday
+      days[2], // Wednesday -> Thursday
+      days[3], // Thursday -> Friday
+      days[4], // Friday -> Saturday
+      days[5], // Saturday -> Sunday
+    ];
+  }
+
+  private static addOneMinute(time: string): string {
+    const [h, m] = time.split(':').map(Number);
+
+    const total = (h * 60 + m + 1) % (24 * 60);
+
+    const hours = Math.floor(total / 60)
+      .toString()
+      .padStart(2, '0');
+
+    const minutes = (total % 60).toString().padStart(2, '0');
+
+    return `${hours}:${minutes}`;
+  }
+
+  private static mapStartAndEndToWindows(old: LegacyOptions): ScheduleWindow[] {
     const allDay = this.toBool(old.activeTimes?.value?.allDay?.value, false);
-    const weeklyWindow: ScheduleWindow = {
-      days: this.parseLegacyActiveDays(old, defaultSettings.schedule.windows[0].days),
-      start: allDay
-        ? '00:00'
-        : this.toHoursMinutesString(old.activeTimes?.value?.start?.value, defaultSettings.schedule.windows[0].start),
-      end: allDay
-        ? '23:59'
-        : this.toHoursMinutesString(old.activeTimes?.value?.end?.value, defaultSettings.schedule.windows[0].end),
-    };
+    const days = this.parseLegacyActiveDays(old, defaultSettings.schedule.windows[0].days);
+    if (allDay) {
+      return [
+        {
+          start: '00:00',
+          end: '23:59',
+          days,
+        },
+      ];
+    }
+    const start = this.toHoursMinutesString(
+      old.activeTimes?.value?.start?.value,
+      defaultSettings.schedule.windows[0].start,
+    );
+    const end = this.toHoursMinutesString(old.activeTimes?.value?.end?.value, defaultSettings.schedule.windows[0].end);
+    if (end > start) {
+      return [{ days, end, start }];
+    }
+    if (end === start) {
+      return [
+        {
+          start,
+          end: this.addOneMinute(end),
+          days,
+        },
+      ];
+    }
+    return [
+      { days, start, end: '23:59' },
+      { days: this.shiftDaysForward(days), start: '00:00', end },
+    ];
+  }
+
+  private static mapSchedule(old: LegacyOptions): Schedule {
+    const windows: ScheduleWindow[] = this.mapStartAndEndToWindows(old);
 
     return {
       enabled: this.toBool(old.scheduleBlocking?.value, defaultSettings.schedule.enabled),
-      windows: [weeklyWindow],
+      windows,
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     };
   }

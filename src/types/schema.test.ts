@@ -1,31 +1,71 @@
 import { describe, expect, it } from 'vitest';
 
+import type { Schedule } from './schema';
 import { settingsSchema } from './schema';
 
 describe('Schema Validation', () => {
   it('should accept valid military time', () => {
-    const result = settingsSchema.shape.schedule.safeParse({
+    const schedule: Schedule = {
       enabled: true,
-      activeDays: [true, true, true, true, true, true, true],
-      allDay: false,
-      start: '09:00',
-      end: '17:30',
-    });
+      timezone: 'Europe/London',
+      windows: [
+        {
+          days: [true, true, true, true, true, true, true],
+          start: '09:00',
+          end: '17:30',
+        },
+      ],
+    };
+    const result = settingsSchema.shape.schedule.safeParse(schedule);
     expect(result.success).toBe(true);
   });
 
   it('should reject invalid time formats', () => {
-    const result = settingsSchema.shape.schedule.safeParse({
-      start: '9:00 AM', // Wrong format
-      end: '25:00', // Impossible hour
-    });
+    const schedule: Schedule = {
+      enabled: true,
+      timezone: 'Europe/London',
+      windows: [
+        {
+          days: [true, true, true, true, true, true, true],
+          start: '9:00 AM', // Wrong format
+          end: '25:00', // Impossible hour
+        },
+      ],
+    };
+    const result = settingsSchema.shape.schedule.safeParse(schedule);
     expect(result.success).toBe(false);
   });
 
-  it('should enforce exactly 7 days in activeDays', () => {
-    const result = settingsSchema.shape.schedule.safeParse({
-      activeDays: [true, true], // Too short
-    });
+  it('should enforce exactly 7 days in a window', () => {
+    const schedule: Schedule = {
+      enabled: true,
+      timezone: 'Europe/London',
+      windows: [
+        {
+          // @ts-expect-error
+          days: [true, true],
+          start: '09:00',
+          end: '17:30',
+        },
+      ],
+    };
+    const result = settingsSchema.shape.schedule.safeParse(schedule);
+    expect(result.success).toBe(false);
+  });
+
+  it('should enforce end times always be later than start times', () => {
+    const schedule: Schedule = {
+      enabled: true,
+      timezone: 'Europe/London',
+      windows: [
+        {
+          days: [true, true, true, true, true, true, true],
+          start: '19:00',
+          end: '07:30',
+        },
+      ],
+    };
+    const result = settingsSchema.shape.schedule.safeParse(schedule);
     expect(result.success).toBe(false);
   });
 });
