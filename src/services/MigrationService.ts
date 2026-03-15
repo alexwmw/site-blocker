@@ -148,6 +148,9 @@ export class MigrationService {
         },
       ];
     }
+    if (end === '00:00') {
+      return [{ days, start, end: '23:59' }];
+    }
     return [
       { days, start, end: '23:59' },
       { days: this.shiftDaysForward(days), start: '00:00', end },
