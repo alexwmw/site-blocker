@@ -1,7 +1,6 @@
 import type { LegacyOptions, LegacyProvider } from '../types/legacy-schema';
 import type { ActiveDays, BlockRule, Settings, StorageSchema, Theme } from '../types/schema';
-import { storageSchema, TIME_REGEX } from '../types/schema';
-import { isTheme } from '../types/schema-utils';
+import { storageSchema, THEMES, TIME_REGEX } from '../types/schema';
 import { createUniqueId } from '../utils/createUniqueId';
 
 import defaultSettings from './defaultSettings';
@@ -33,12 +32,16 @@ export class MigrationService {
     return Boolean(value.trim().match(TIME_REGEX)) ? value.trim() : fallback;
   }
 
+  private static isTheme(value: unknown): value is Theme {
+    return typeof value === 'string' && (THEMES as readonly string[]).includes(value);
+  }
+
   private static toTheme(value: string | undefined, fallback: Theme): Theme {
     if (typeof value !== 'string') {
       return fallback;
     }
     const stringValue = value.toLowerCase(); // Legacy values are capitalised
-    return isTheme(stringValue) ? stringValue : fallback;
+    return this.isTheme(stringValue) ? stringValue : fallback;
   }
 
   private static parseLegacyActiveDays(old: LegacyOptions, fallback: ActiveDays): ActiveDays {

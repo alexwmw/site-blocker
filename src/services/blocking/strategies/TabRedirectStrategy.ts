@@ -1,6 +1,6 @@
 import type { BlockRule, Settings } from '../../../types/schema';
-import { isScheduleActiveNow } from '../../../types/schema-utils';
 import { RulesService } from '../../RulesService';
+import { SchedulingService } from '../../SchedulingService';
 import { StorageService } from '../../StorageService';
 import { getBlockPageUrl } from '../getBlockPageUrl';
 
@@ -21,7 +21,9 @@ export default class TabRedirectStrategy implements BlockingStrategy {
 
   private readonly handleTabUpdate = (tabId: number, changeInfo: chrome.tabs.OnUpdatedInfo) => {
     if (changeInfo.url) {
-      this.evaluate(tabId, changeInfo.url).then((args) => this.enforce(args)).catch(console.error);
+      this.evaluate(tabId, changeInfo.url)
+        .then((args) => this.enforce(args))
+        .catch(console.error);
     }
   };
 
@@ -34,11 +36,7 @@ export default class TabRedirectStrategy implements BlockingStrategy {
   };
 
   private isBlockingActiveNow(): boolean {
-    if (!this.settings) {
-      return true;
-    }
-
-    return !this.settings.schedule.enabled || isScheduleActiveNow(this.settings.schedule);
+    return SchedulingService.isBlockingActiveNow(this.settings?.schedule);
   }
 
   private async evaluate(tabId?: number, url?: string) {

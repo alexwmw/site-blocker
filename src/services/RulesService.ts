@@ -204,27 +204,17 @@ export class RulesService {
    * Load rules via StorageService.getRules().
    * Return the first matching rule using ruleMatchesUrl, else null.
    * @param targetUrl string
-   * @param localRules
+   * @param rules
    */
-  static async findMatchingRules(targetUrl: string, localRules?: BlockRule[]): Promise<BlockRule[]> {
+  static async findMatchingRules(targetUrl: string, rules: BlockRule[]): Promise<BlockRule[]> {
     if (!this.isSupportedUrl(targetUrl)) {
       return [];
     }
-    let rules = localRules;
-    if (!rules) {
-      const { StorageService } = await import('./StorageService');
-      rules = await StorageService.getRules();
-    }
+
     return rules.filter((rule) => this.ruleMatchesUrl(rule, targetUrl));
   }
 
-  static async findDuplicateRules(compareRule: BlockRule, localRules?: BlockRule[]): Promise<BlockRule[]> {
-    let rules = localRules;
-    if (!rules) {
-      const { StorageService } = await import('./StorageService');
-      rules = await StorageService.getRules();
-    }
-
+  static async findDuplicateRules(compareRule: BlockRule, rules: BlockRule[]): Promise<BlockRule[]> {
     const normalisedPattern = this.normaliseRulePattern(compareRule.pattern);
 
     return rules.filter((rule) => this.normaliseRulePattern(rule.pattern) === normalisedPattern);
