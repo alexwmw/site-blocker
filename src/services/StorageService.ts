@@ -33,7 +33,7 @@ export class StorageService {
     }
 
     if (data) {
-      console.error('Zod Validation Failed for Rules:', validated.error.format());
+      console.error('Zod Validation Failed for Settings:', validated.error.format());
     }
 
     await chrome.storage.local.set({ [SETTINGS_KEY]: defaultSettings });
@@ -77,7 +77,7 @@ export class StorageService {
     const currentRules: BlockRule[] = await this.getRules();
     const validated = blockRuleSchema.parse(newRule);
 
-    const duplicateRules = await RulesService.findDuplicateRules(validated, currentRules);
+    const duplicateRules = RulesService.findDuplicateRules(validated, currentRules);
 
     if (duplicateRules.length > 0) {
       return {
@@ -87,9 +87,7 @@ export class StorageService {
       };
     }
 
-    await chrome.storage.local.set({
-      [RULES_KEY]: [...currentRules, validated],
-    });
+    await this.setRules([...currentRules, validated]);
 
     return { ok: true };
   }
@@ -100,39 +98,27 @@ export class StorageService {
 
   static async updateRule(ruleId: string, updates: Partial<BlockRule>): Promise<BlockRule | null> {
     const currentRules: BlockRule[] = await this.getRules();
-    let updatedRule: BlockRule | null = null;
+    const ruleIndex = currentRules.findIndex((rule) => rule.id === ruleId);
 
-    const findAndMergeRule = (rule: BlockRule) => {
-      if (rule.id !== ruleId) {
-        return rule;
-      }
-      const merged = blockRuleSchema.parse({
-        ...rule,
-        ...updates,
-      });
-
-      console.log('successfully merged', merged);
-
-      updatedRule = merged;
-      return merged;
-    };
-
-    const newRules = currentRules.map(findAndMergeRule);
-
-    if (!updatedRule) {
+    if (ruleIndex === -1) {
       return null;
     }
 
-    await this.setRules(newRules);
+    const updatedRule = blockRuleSchema.parse({
+      ...currentRules[ruleIndex],
+      ...updates,
+    });
+
+    const nextRules = [...currentRules];
+    nextRules[ruleIndex] = updatedRule;
+
+    await this.setRules(nextRules);
     return updatedRule;
   }
 
   static async removeRule(ruleId: string): Promise<void> {
     const currentRules: BlockRule[] = await this.getRules();
-
-    const ruleDoesNotHaveId = ({ id }: { id: string }) => id !== ruleId;
-
-    const newRules: BlockRule[] = [...currentRules.filter(ruleDoesNotHaveId)];
+    const newRules = currentRules.filter((rule) => rule.id !== ruleId);
 
     await this.setRules(newRules);
   }

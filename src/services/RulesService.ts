@@ -7,14 +7,19 @@ export class RulesService {
    * @param url string
    */
   static isSupportedUrl(url: string): boolean {
+    const parsedUrl = this.parseSupportedUrl(url);
+    return parsedUrl !== null;
+  }
+
+  private static parseSupportedUrl(url: string): URL | null {
     try {
       const urlObj: URL = new URL(url);
       if (urlObj.protocol !== 'http:' && urlObj.protocol !== 'https:') {
-        return false;
+        return null;
       }
-      return true;
+      return urlObj;
     } catch {
-      return false;
+      return null;
     }
   }
 
@@ -78,8 +83,9 @@ export class RulesService {
   static normaliseRulePattern(patternInput: string): string {
     const trimmedInput = patternInput.trim();
 
-    if (this.isSupportedUrl(trimmedInput)) {
-      const parsed = new URL(trimmedInput);
+    const parsed = this.parseSupportedUrl(trimmedInput);
+
+    if (parsed) {
       return this.normalisePathComparable(parsed.hostname, parsed.pathname);
     }
 
@@ -99,10 +105,13 @@ export class RulesService {
    * Convert a supported URL to a normalised path pattern.
    */
   static pathPatternFromUrl(targetUrl: string): string | null {
-    if (!this.isSupportedUrl(targetUrl)) {
+    const parsedUrl = this.parseSupportedUrl(targetUrl);
+
+    if (!parsedUrl) {
       return null;
     }
-    return this.normaliseRulePattern(targetUrl);
+
+    return this.normalisePathComparable(parsedUrl.hostname, parsedUrl.pathname);
   }
 
   /**
@@ -110,11 +119,13 @@ export class RulesService {
    * This matches the legacy "Block reddit.com" action.
    */
   static domainPatternFromUrl(targetUrl: string): string | null {
-    if (!this.isSupportedUrl(targetUrl)) {
+    const parsedUrl = this.parseSupportedUrl(targetUrl);
+
+    if (!parsedUrl) {
       return null;
     }
-    const parsed = new URL(targetUrl);
-    return this.normaliseHost(parsed.hostname);
+
+    return this.normaliseHost(parsedUrl.hostname);
   }
 
   /**
@@ -137,29 +148,25 @@ export class RulesService {
       return false;
     }
 
-    try {
-      const target = this.normalisedTargetParts(targetUrl);
-      const pattern = this.normalisePatternParts(rule.pattern);
+    const target = this.normalisedTargetParts(targetUrl);
+    const pattern = this.normalisePatternParts(rule.pattern);
 
-      if (!this.isHostMatch(target.host, pattern.host)) {
-        return false;
-      }
-
-      if (rule.matchType === 'exact') {
-        return target.path === pattern.path;
-      }
-
-      if (rule.matchType === 'prefix') {
-        if (pattern.path === '') {
-          return true;
-        }
-        return target.path === pattern.path || target.path.startsWith(`${pattern.path}/`);
-      }
-
-      return false;
-    } catch {
+    if (!this.isHostMatch(target.host, pattern.host)) {
       return false;
     }
+
+    if (rule.matchType === 'exact') {
+      return target.path === pattern.path;
+    }
+
+    if (rule.matchType === 'prefix') {
+      if (pattern.path === '') {
+        return true;
+      }
+      return target.path === pattern.path || target.path.startsWith(`${pattern.path}/`);
+    }
+
+    return false;
   }
 
   static splitPattern(pattern: string): { host: string; path: string } {
@@ -206,7 +213,7 @@ export class RulesService {
    * @param targetUrl string
    * @param rules
    */
-  static async findMatchingRules(targetUrl: string, rules: BlockRule[]): Promise<BlockRule[]> {
+  static findMatchingRules(targetUrl: string, rules: BlockRule[]): BlockRule[] {
     if (!this.isSupportedUrl(targetUrl)) {
       return [];
     }
@@ -214,7 +221,7 @@ export class RulesService {
     return rules.filter((rule) => this.ruleMatchesUrl(rule, targetUrl));
   }
 
-  static async findDuplicateRules(compareRule: BlockRule, rules: BlockRule[]): Promise<BlockRule[]> {
+  static findDuplicateRules(compareRule: BlockRule, rules: BlockRule[]): BlockRule[] {
     const normalisedPattern = this.normaliseRulePattern(compareRule.pattern);
 
     return rules.filter((rule) => this.normaliseRulePattern(rule.pattern) === normalisedPattern);
