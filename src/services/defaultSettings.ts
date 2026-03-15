@@ -5,10 +5,14 @@ const defaultSettings: Settings = {
   holdDurationSeconds: 20,
   schedule: {
     enabled: false,
-    activeDays: [false, false, false, false, false, false, false],
-    allDay: false,
-    start: '00:00',
-    end: '23:59',
+    timezone: '',
+    windows: [
+      {
+        days: [true, true, true, true, true, false, false],
+        start: '09:00',
+        end: '16:59',
+      },
+    ],
   },
   extendedUnblock: {
     enabled: true,

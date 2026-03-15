@@ -1,76 +1,59 @@
-import type { Schedule } from '../types/schema';
-import type { DayOfWeek } from '../types/schema';
+import type { DayOfWeek, Schedule, ScheduleWindow } from '../types/schema';
 
 export class SchedulingService {
+  static getDayOfWeek(day: number | Date = new Date()): DayOfWeek {
+    const n = typeof day === 'number' ? day : day.getDay();
+    return (n + 6) % 7;
+  }
+
   private static timeToMinutes(time: string): number {
     const [h, m] = time.split(':').map(Number);
     return h * 60 + m;
   }
 
-  private static isDayActive(schedule: Schedule, day: DayOfWeek): boolean {
+  private static isScheduleActiveToday(schedule: Schedule, day: DayOfWeek): boolean {
     if (!schedule.enabled) {
       return false;
     }
-    return schedule.activeDays[day];
+    return schedule.windows.some((w) => w.days[day]);
   }
 
-  private static isTimeActive(schedule: Schedule, now: Date = new Date()): boolean {
-    if (!schedule.enabled) {
-      return false;
-    }
-    if (schedule.allDay) {
-      return true;
-    }
-
+  private static isWindowActiveAtThisTime(window: ScheduleWindow, now: Date) {
     const currentMinutes = now.getHours() * 60 + now.getMinutes();
 
-    const start = this.timeToMinutes(schedule.start);
-    const end = this.timeToMinutes(schedule.end);
+    const start = this.timeToMinutes(window.start);
+    const end = this.timeToMinutes(window.end);
 
     // Normal range: 09:00 → 17:00
     if (start <= end) {
       return currentMinutes >= start && currentMinutes < end;
     }
 
-    // Overnight range: 22:00 → 06:00
-    return currentMinutes >= start || currentMinutes < end;
+    // Overnight range: 22:00 → 06:00 - should be disabled by the UI.
+    // Warn and return anyway.
+    console.warn('A window with an impossible range was found.', window);
+    return false;
   }
 
-  /** Fix Sunday-indexed day integer */
-  static getDayOfWeek(day: number | Date = new Date()): DayOfWeek {
-    const n = typeof day === 'number' ? day : day.getDay();
-    return (n + 6) % 7;
+  private static isScheduleActiveAtThisTime(schedule: Schedule, now: Date): boolean {
+    if (!schedule.enabled) {
+      return false;
+    }
+    return schedule.windows.some((w) => this.isWindowActiveAtThisTime(w, now));
   }
 
   static isScheduleActiveNow(schedule: Schedule, now: Date = new Date()): boolean {
     if (!schedule.enabled) {
       return false;
     }
-
-    const day: DayOfWeek = this.getDayOfWeek(now);
-    if (schedule.allDay) {
-      return this.isDayActive(schedule, day);
-    }
-
-    if (!this.isTimeActive(schedule, now)) {
+    if (schedule.windows.length === 0) {
       return false;
     }
+    const day: DayOfWeek = this.getDayOfWeek(now);
+    const isActiveToday = this.isScheduleActiveToday(schedule, day);
+    const isActiveAtThisTime = this.isScheduleActiveNow(schedule, now);
 
-    const currentMinutes = now.getHours() * 60 + now.getMinutes();
-    const start = this.timeToMinutes(schedule.start);
-    const end = this.timeToMinutes(schedule.end);
-
-    // Same-day range: use current day settings.
-    if (start <= end) {
-      return this.isDayActive(schedule, day);
-    }
-
-    // Overnight range: after midnight uses previous day's schedule window.
-    if (currentMinutes >= start) {
-      return this.isDayActive(schedule, day);
-    }
-    const previousDay = ((day + 6) % 7) as DayOfWeek;
-    return this.isDayActive(schedule, previousDay);
+    return isActiveToday && isActiveAtThisTime;
   }
 
   static isBlockingActiveNow(schedule: Schedule | undefined, now: Date = new Date()): boolean {

@@ -1,5 +1,13 @@
 import type { LegacyOptions, LegacyProvider } from '../types/legacy-schema';
-import type { ActiveDays, BlockRule, Settings, StorageSchema, Theme } from '../types/schema';
+import type {
+  BlockRule,
+  Schedule,
+  ScheduleDays,
+  ScheduleWindow,
+  Settings,
+  StorageSchema,
+  Theme,
+} from '../types/schema';
 import { storageSchema, THEMES, TIME_REGEX } from '../types/schema';
 import { createUniqueId } from '../utils/createUniqueId';
 
@@ -44,10 +52,10 @@ export class MigrationService {
     return this.isTheme(stringValue) ? stringValue : fallback;
   }
 
-  private static parseLegacyActiveDays(old: LegacyOptions, fallback: ActiveDays): ActiveDays {
+  private static parseLegacyActiveDays(old: LegacyOptions, fallback: ScheduleDays): ScheduleDays {
     const oldActiveDays = old.activeDays?.value ?? [];
     if (oldActiveDays.length === 7) {
-      return oldActiveDays.map((day) => this.toBool(day.value, false)) as ActiveDays;
+      return oldActiveDays.map((day) => this.toBool(day.value, false)) as ScheduleDays;
     }
     return fallback;
   }
@@ -85,6 +93,25 @@ export class MigrationService {
     }
   }
 
+  private static mapSchedule(old: LegacyOptions): Schedule {
+    const allDay = this.toBool(old.activeTimes?.value?.allDay?.value, false);
+    const weeklyWindow: ScheduleWindow = {
+      days: this.parseLegacyActiveDays(old, defaultSettings.schedule.windows[0].days),
+      start: allDay
+        ? '00:00'
+        : this.toHoursMinutesString(old.activeTimes?.value?.start?.value, defaultSettings.schedule.windows[0].start),
+      end: allDay
+        ? '23:59'
+        : this.toHoursMinutesString(old.activeTimes?.value?.end?.value, defaultSettings.schedule.windows[0].end),
+    };
+
+    return {
+      enabled: this.toBool(old.scheduleBlocking?.value, defaultSettings.schedule.enabled),
+      windows: [weeklyWindow],
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    };
+  }
+
   private static mapSettings(old: LegacyOptions): Settings {
     return {
       theme: this.toTheme(old.theme?.value, defaultSettings.theme),
@@ -94,13 +121,7 @@ export class MigrationService {
         durationMinutes: this.toNumber(old.revisitLimit?.value, defaultSettings.extendedUnblock.durationMinutes),
       },
       isRated: this.toBool(old.isRated?.value, defaultSettings.isRated),
-      schedule: {
-        enabled: this.toBool(old.scheduleBlocking?.value, defaultSettings.schedule.enabled),
-        activeDays: this.parseLegacyActiveDays(old, defaultSettings.schedule.activeDays),
-        allDay: this.toBool(old.activeTimes?.value?.allDay?.value, defaultSettings.schedule.allDay),
-        start: this.toHoursMinutesString(old.activeTimes?.value?.start?.value, defaultSettings.schedule.start),
-        end: this.toHoursMinutesString(old.activeTimes?.value?.end?.value, defaultSettings.schedule.end),
-      },
+      schedule: this.mapSchedule(old),
     };
   }
 
