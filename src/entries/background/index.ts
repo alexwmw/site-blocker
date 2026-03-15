@@ -22,9 +22,6 @@ chrome.runtime.onInstalled.addListener((details) => {
   })(details).catch(console.error);
 });
 
-/** Main runtime listener - handle requests as per messages.ts  */
-const _stopListening = MessagesService.startListening(blockingEngine);
-
 /** Start blocking */
 async function startTheEngine() {
   StorageService.addListener((changes) => {
@@ -39,6 +36,11 @@ async function startTheEngine() {
   });
 
   await blockingEngine.start();
+
+  return blockingEngine;
 }
 
-startTheEngine().catch(console.error);
+/** Main runtime listener - handle requests as per messages.ts  */
+const startMessaging = MessagesService.startListening;
+
+startTheEngine().then(startMessaging).catch(console.error);
