@@ -132,6 +132,17 @@ describe('MigrationService - Deep Logic Tests', () => {
       expect(chromeMock.storage.sync.get).not.toHaveBeenCalled();
     });
 
+
+    it('should initialize runtime timezone when no legacy options exist', async () => {
+      chromeMock.storage.local.get.mockResolvedValue({});
+      chromeMock.storage.sync.get.mockResolvedValue({});
+
+      await MigrationService.migrate();
+
+      const [calls] = chromeMock.storage.local.set.mock.calls[0];
+      expect(calls.settings.schedule.timezone).toBe(Intl.DateTimeFormat().resolvedOptions().timeZone);
+    });
+
     it('should migrate complex legacy object to clean types (1)', async () => {
       const realLegacyData = LEGACY_DATA_1;
       chromeMock.storage.local.get.mockResolvedValue({});
@@ -146,6 +157,7 @@ describe('MigrationService - Deep Logic Tests', () => {
       expect(calls.settings.schedule.windows[0].days[1]).toBe(true); // Tuesday was string true
       expect(calls.settings.schedule.windows[0].days[2]).toBe(false); // Wednesday was boolean false
       expect(calls.settings.schedule.windows[0].start).toBe('09:00');
+      expect(calls.settings.schedule.timezone).toBe(Intl.DateTimeFormat().resolvedOptions().timeZone);
 
       // Check Rules
       expect(calls.rules).toHaveLength(2);
