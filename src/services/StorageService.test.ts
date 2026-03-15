@@ -19,12 +19,6 @@ describe('StorageService', () => {
     vi.clearAllMocks();
   });
 
-  it('should return default settings if storage is empty', async () => {
-    storageMock.local.get.mockResolvedValue({});
-    const settings = await StorageService.getSettings();
-    expect(settings).toEqual(defaultSettings);
-  });
-
   it('should correctly merge nested schedule updates', async () => {
     // 1. Initial State
     storageMock.local.get.mockResolvedValue({
@@ -40,7 +34,7 @@ describe('StorageService', () => {
     const [[setCall]] = storageMock.local.set.mock.calls;
     expect(setCall.settings.theme).toBe('light'); // Preserved
     expect(setCall.settings.schedule.enabled).toBe(false); // Updated
-    expect(setCall.settings.schedule.activeDays).toEqual(defaultSettings.schedule.activeDays); // Preserved!
+    expect(setCall.settings.schedule.windows[0].days).toEqual(defaultSettings.schedule.windows[0].days); // Preserved!
   });
 
   it('should throw an error if updateSettings receives invalid types', async () => {

@@ -14,7 +14,7 @@ export type Theme = z.infer<typeof themeSchema>;
 /**
  * Day-of-week index used throughout the scheduling system.
  *
- * Monday starts at `0` so indices align with the `activeDays` tuple.
+ * Monday starts at `0` so indices align with the `scheduleDaysSchema` tuple.
  */
 export enum DayOfWeek {
   Monday = 0,
@@ -30,7 +30,7 @@ export enum DayOfWeek {
  * A fixed Monday-to-Sunday tuple describing which days scheduled blocking
  * should apply on.
  */
-export const activeDaysSchema = z.tuple([
+export const scheduleDaysSchema = z.tuple([
   z.boolean(), // Monday
   z.boolean(), // Tuesday
   z.boolean(), // Wednesday
@@ -40,29 +40,33 @@ export const activeDaysSchema = z.tuple([
   z.boolean(), // Sunday
 ]);
 
-export type ActiveDays = z.infer<typeof activeDaysSchema>;
+export type ScheduleDays = z.infer<typeof scheduleDaysSchema>;
+
+export const scheduleWindowSchema = z
+  .object({
+    days: scheduleDaysSchema,
+    /** Start time in 24-hour `HH:mm` format. */
+    start: z.string().regex(TIME_REGEX),
+    /** End time in 24-hour `HH:mm` format. */
+    end: z.string().regex(TIME_REGEX),
+  })
+  .refine((data) => data.end > data.start, {
+    message: 'End time cannot be earlier than start time.',
+    path: ['end'], // Sets the error path to 'end'
+  });
+
+export type ScheduleWindow = z.infer<typeof scheduleWindowSchema>;
 
 /**
  * Scheduled blocking configuration.
  *
  * When `enabled` is `true`, blocking only applies on selected days and within
- * the configured time range, unless `allDay` is enabled.
+ * the configured time range.
  */
 export const scheduleSchema = z.object({
   /** Whether scheduled blocking is enabled. */
   enabled: z.boolean(),
-
-  /** Monday-to-Sunday flags indicating which days blocking is active. */
-  activeDays: activeDaysSchema,
-
-  /** Whether blocking should apply for the full day on active days. */
-  allDay: z.boolean(),
-
-  /** Start time in 24-hour `HH:mm` format. */
-  start: z.string().regex(TIME_REGEX),
-
-  /** End time in 24-hour `HH:mm` format. */
-  end: z.string().regex(TIME_REGEX),
+  windows: z.array(scheduleWindowSchema),
 });
 
 /**

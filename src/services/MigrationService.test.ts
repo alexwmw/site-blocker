@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { MigrationService } from './MigrationService';
 import LEGACY_DATA_1 from './test-data/example-legacy-data_1.json';
+import LEGACY_DATA_2 from './test-data/example-legacy-data_2.json';
 
 // Mock the Chrome API
 const chromeMock = {
@@ -79,6 +80,75 @@ describe('MigrationService - Deep Logic Tests', () => {
     });
   });
 
+  describe('Schedule Parsing (mapStartAndEndToWindows)', () => {
+    it('should map overnight times to multiple windows (enforce end > start)', () => {
+      // @ts-expect-error
+      const spy = vi.spyOn(MigrationService, 'shiftDaysForward');
+      const old = LEGACY_DATA_2.options;
+      // @ts-expect-error
+      const result = MigrationService.mapStartAndEndToWindows(old);
+      expect(result).length(2);
+      expect(spy).toHaveBeenCalledTimes(1);
+
+      expect(result[0].days[0]).toBe(false);
+      expect(result[0].days[6]).toBe(true);
+      expect(result[0].days[5]).toBe(true);
+
+      expect(result[1].days[0]).toBe(true);
+      expect(result[1].days[6]).toBe(true);
+      expect(result[1].days[5]).toBe(false);
+    });
+
+    it('should map overnight windows ending at midnight to one valid window', () => {
+      const old = {
+        ...LEGACY_DATA_2.options,
+        activeTimes: {
+          value: {
+            allDay: { value: false },
+            start: { value: '23:00' },
+            end: { value: '00:00' },
+          },
+        },
+      };
+
+      // @ts-expect-error - testing private method directly
+      const result = MigrationService.mapStartAndEndToWindows(old);
+
+      expect(result).toEqual([
+        {
+          days: [false, false, false, false, false, true, true],
+          start: '23:00',
+          end: '23:59',
+        },
+      ]);
+    });
+
+
+    it('should map equal 23:59 times to an all-day valid window', () => {
+      const old = {
+        ...LEGACY_DATA_2.options,
+        activeTimes: {
+          value: {
+            allDay: { value: false },
+            start: { value: '23:59' },
+            end: { value: '23:59' },
+          },
+        },
+      };
+
+      // @ts-expect-error - testing private method directly
+      const result = MigrationService.mapStartAndEndToWindows(old);
+
+      expect(result).toEqual([
+        {
+          days: [false, false, false, false, false, true, true],
+          start: '00:00',
+          end: '23:59',
+        },
+      ]);
+    });
+  });
+
   describe('Rule Mapping (mapRules)', () => {
     it('should map legacy isByPath=true to prefix and false to exact', () => {
       const oldRules = [
@@ -111,7 +181,7 @@ describe('MigrationService - Deep Logic Tests', () => {
       expect(chromeMock.storage.sync.get).not.toHaveBeenCalled();
     });
 
-    it('should migrate complex legacy object to clean types', async () => {
+    it('should migrate complex legacy object to clean types (1)', async () => {
       const realLegacyData = LEGACY_DATA_1;
       chromeMock.storage.local.get.mockResolvedValue({});
       chromeMock.storage.sync.get.mockResolvedValue(realLegacyData);
@@ -122,9 +192,9 @@ describe('MigrationService - Deep Logic Tests', () => {
       // Check Settings
       expect(calls.settings.holdDurationSeconds).toBe(6);
       expect(calls.settings.extendedUnblock.enabled).toBe(true);
-      expect(calls.settings.schedule.activeDays[1]).toBe(true); // Tuesday was string true
-      expect(calls.settings.schedule.activeDays[2]).toBe(false); // Wednesday was boolean false
-      expect(calls.settings.schedule.start).toBe('09:00');
+      expect(calls.settings.schedule.windows[0].days[1]).toBe(true); // Tuesday was string true
+      expect(calls.settings.schedule.windows[0].days[2]).toBe(false); // Wednesday was boolean false
+      expect(calls.settings.schedule.windows[0].start).toBe('09:00');
 
       // Check Rules
       expect(calls.rules).toHaveLength(2);

@@ -36,6 +36,7 @@ export class StorageService {
       console.error('Zod Validation Failed for Rules:', validated.error.format());
     }
 
+    await chrome.storage.local.set({ [SETTINGS_KEY]: defaultSettings });
     return defaultSettings;
   }
 

@@ -1,7 +1,14 @@
 import type { LegacyOptions, LegacyProvider } from '../types/legacy-schema';
-import type { ActiveDays, BlockRule, Settings, StorageSchema, Theme } from '../types/schema';
-import { storageSchema, TIME_REGEX } from '../types/schema';
-import { isTheme } from '../types/schema-utils';
+import type {
+  BlockRule,
+  Schedule,
+  ScheduleDays,
+  ScheduleWindow,
+  Settings,
+  StorageSchema,
+  Theme,
+} from '../types/schema';
+import { storageSchema, THEMES, TIME_REGEX } from '../types/schema';
 import { createUniqueId } from '../utils/createUniqueId';
 
 import defaultSettings from './defaultSettings';
@@ -33,18 +40,22 @@ export class MigrationService {
     return Boolean(value.trim().match(TIME_REGEX)) ? value.trim() : fallback;
   }
 
+  private static isTheme(value: unknown): value is Theme {
+    return typeof value === 'string' && (THEMES as readonly string[]).includes(value);
+  }
+
   private static toTheme(value: string | undefined, fallback: Theme): Theme {
     if (typeof value !== 'string') {
       return fallback;
     }
     const stringValue = value.toLowerCase(); // Legacy values are capitalised
-    return isTheme(stringValue) ? stringValue : fallback;
+    return this.isTheme(stringValue) ? stringValue : fallback;
   }
 
-  private static parseLegacyActiveDays(old: LegacyOptions, fallback: ActiveDays): ActiveDays {
+  private static parseLegacyActiveDays(old: LegacyOptions, fallback: ScheduleDays): ScheduleDays {
     const oldActiveDays = old.activeDays?.value ?? [];
     if (oldActiveDays.length === 7) {
-      return oldActiveDays.map((day) => this.toBool(day.value, false)) as ActiveDays;
+      return oldActiveDays.map((day) => this.toBool(day.value, false)) as ScheduleDays;
     }
     return fallback;
   }
@@ -82,6 +93,103 @@ export class MigrationService {
     }
   }
 
+  private static shiftDaysForward(days: ScheduleDays): ScheduleDays {
+    return [
+      days[6], // Sunday -> Monday
+      days[0], // Monday -> Tuesday
+      days[1], // Tuesday -> Wednesday
+      days[2], // Wednesday -> Thursday
+      days[3], // Thursday -> Friday
+      days[4], // Friday -> Saturday
+      days[5], // Saturday -> Sunday
+    ];
+  }
+
+  private static addOneMinute(time: string): string {
+    if (time === '23:59') {
+      return '23:59';
+    }
+
+    const [h, m] = time.split(':').map(Number);
+
+    const total = h * 60 + m + 1;
+
+    const hours = Math.floor(total / 60)
+      .toString()
+      .padStart(2, '0');
+
+    const minutes = (total % 60).toString().padStart(2, '0');
+
+    return `${hours}:${minutes}`;
+  }
+
+  private static mapStartAndEndToWindows(old: LegacyOptions): ScheduleWindow[] {
+    const allDay = this.toBool(old.activeTimes?.value?.allDay?.value, false);
+    const days = this.parseLegacyActiveDays(old, defaultSettings.schedule.windows[0].days);
+
+    // Legacy "all day" flag maps directly to a single full-day window.
+    if (allDay) {
+      return [
+        {
+          start: '00:00',
+          end: '23:59',
+          days,
+        },
+      ];
+    }
+
+    // Parse and sanitize start/end values (fallbacks come from default settings).
+    const start = this.toHoursMinutesString(
+      old.activeTimes?.value?.start?.value,
+      defaultSettings.schedule.windows[0].start,
+    );
+    const end = this.toHoursMinutesString(old.activeTimes?.value?.end?.value, defaultSettings.schedule.windows[0].end);
+
+    // Normal daytime window: same-day range that already satisfies end > start.
+    if (end > start) {
+      return [{ days, end, start }];
+    }
+
+    // Equal start/end needs normalization to avoid invalid zero-length windows.
+    if (end === start) {
+      // 23:59 -> 23:59 is treated as effectively full-day for migration purposes.
+      if (start === '23:59') {
+        return [{ days, start: '00:00', end: '23:59' }];
+      }
+
+      // Any other equal time is expanded to a minimal 1-minute valid window.
+      return [
+        {
+          start,
+          end: this.addOneMinute(end),
+          days,
+        },
+      ];
+    }
+
+    // Overnight window ending exactly at midnight should not produce a second
+    // split segment of 00:00 -> 00:00 (invalid under schema end > start).
+    if (end === '00:00') {
+      return [{ days, start, end: '23:59' }];
+    }
+
+    // General overnight case: split into [start..23:59] on current days and
+    // [00:00..end] on the following day set.
+    return [
+      { days, start, end: '23:59' },
+      { days: this.shiftDaysForward(days), start: '00:00', end },
+    ];
+  }
+
+  private static mapSchedule(old: LegacyOptions): Schedule {
+    const windows: ScheduleWindow[] = this.mapStartAndEndToWindows(old);
+
+    return {
+      enabled: this.toBool(old.scheduleBlocking?.value, defaultSettings.schedule.enabled),
+      windows,
+    };
+  }
+
   private static mapSettings(old: LegacyOptions): Settings {
     return {
       theme: this.toTheme(old.theme?.value, defaultSettings.theme),
@@ -91,13 +199,7 @@ export class MigrationService {
         durationMinutes: this.toNumber(old.revisitLimit?.value, defaultSettings.extendedUnblock.durationMinutes),
       },
       isRated: this.toBool(old.isRated?.value, defaultSettings.isRated),
-      schedule: {
-        enabled: this.toBool(old.scheduleBlocking?.value, defaultSettings.schedule.enabled),
-        activeDays: this.parseLegacyActiveDays(old, defaultSettings.schedule.activeDays),
-        allDay: this.toBool(old.activeTimes?.value?.allDay?.value, defaultSettings.schedule.allDay),
-        start: this.toHoursMinutesString(old.activeTimes?.value?.start?.value, defaultSettings.schedule.start),
-        end: this.toHoursMinutesString(old.activeTimes?.value?.end?.value, defaultSettings.schedule.end),
-      },
+      schedule: this.mapSchedule(old),
     };
   }
 

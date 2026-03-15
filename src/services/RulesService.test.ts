@@ -109,9 +109,8 @@ describe('BlockService', () => {
       makeRule({ id: 'rule-1', pattern: 'news.ycombinator.com', matchType: 'prefix' }),
       makeRule({ id: 'rule-2', pattern: 'reddit.com/r/all', matchType: 'prefix' }),
     ];
-    vi.spyOn(StorageService, 'getRules').mockResolvedValue(rules);
 
-    const matches = await RulesService.findMatchingRules('https://old.reddit.com/r/all/comments/x');
+    const matches = await RulesService.findMatchingRules('https://old.reddit.com/r/all/comments/x', rules);
 
     expect(matches[0].id).toBe('rule-2');
   });
@@ -122,9 +121,8 @@ describe('BlockService', () => {
       makeRule({ id: 'rule-2', pattern: 'reddit.com/r/all', matchType: 'prefix' }),
       makeRule({ id: 'rule-3', pattern: 'https://old.reddit.com/r/all/comments/x', matchType: 'exact' }),
     ];
-    vi.spyOn(StorageService, 'getRules').mockResolvedValue(rules);
 
-    const matches = await RulesService.findMatchingRules('https://old.reddit.com/r/all/comments/x');
+    const matches = await RulesService.findMatchingRules('https://old.reddit.com/r/all/comments/x', rules);
 
     expect(matches).toHaveLength(2);
     expect(matches[0].id).toBe('rule-2');
@@ -134,7 +132,7 @@ describe('BlockService', () => {
   it('findMatchingRules returns empty array for unsupported urls', async () => {
     const getRulesSpy = vi.spyOn(StorageService, 'getRules').mockResolvedValue([makeRule()]);
 
-    const matches = await RulesService.findMatchingRules('chrome://extensions');
+    const matches = await RulesService.findMatchingRules('chrome://extensions', []);
     expect(matches).toHaveLength(0);
     expect(getRulesSpy).not.toHaveBeenCalled();
   });

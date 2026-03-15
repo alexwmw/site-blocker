@@ -2,13 +2,16 @@ import type { Settings } from '../types/schema';
 
 const defaultSettings: Settings = {
   theme: 'light',
-  holdDurationSeconds: 20,
+  holdDurationSeconds: 15,
   schedule: {
-    enabled: true,
-    activeDays: [false, false, false, false, false, false, false],
-    allDay: false,
-    start: '00:00',
-    end: '23:59',
+    enabled: false,
+    windows: [
+      {
+        days: [true, true, true, true, true, false, false],
+        start: '09:00',
+        end: '16:59',
+      },
+    ],
   },
   extendedUnblock: {
     enabled: true,
