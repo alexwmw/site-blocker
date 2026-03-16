@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import type { BlockRule, Settings } from '../../../types/schema';
+import { RulesService } from '../../RulesService';
 import { StorageService } from '../../StorageService';
 import { getBlockPageUrl } from '../getBlockPageUrl';
 import { createEvent } from '../test-utils';
@@ -51,6 +52,7 @@ const makeRule = (overrides: Partial<BlockRule> = {}): BlockRule => ({
 
 describe('TabRedirectStrategy', () => {
   const onUpdated = createEvent<[number, chrome.tabs.OnUpdatedInfo, chrome.tabs.Tab]>();
+  const onRemoved = createEvent<[number, chrome.tabs.OnUpdatedInfo]>();
   const onActivated = createEvent<[chrome.tabs.OnActivatedInfo]>();
 
   const tabsUpdate = vi.fn();
@@ -65,11 +67,17 @@ describe('TabRedirectStrategy', () => {
       tabs: {
         onUpdated,
         onActivated,
+        onRemoved,
         update: tabsUpdate,
         get: tabsGet,
       },
       runtime: {
         getURL: vi.fn((path: string) => `chrome-extension://test/${path}`),
+      },
+      storage: {
+        local: {
+          get: vi.fn(() => ({})),
+        },
       },
     });
   });
@@ -85,9 +93,10 @@ describe('TabRedirectStrategy', () => {
     startedStrategies.push(strategy);
     await strategy.stop();
 
-    expect(onUpdated.addListener).toHaveBeenCalledTimes(1);
+    expect(onUpdated.addListener).toHaveBeenCalledTimes(2);
     expect(onActivated.addListener).toHaveBeenCalledTimes(1);
-    expect(onUpdated.removeListener).toHaveBeenCalledTimes(1);
+    expect(onRemoved.addListener).toHaveBeenCalledTimes(1);
+    expect(onUpdated.removeListener).toHaveBeenCalledTimes(2);
     expect(onActivated.removeListener).toHaveBeenCalledTimes(1);
   });
 
@@ -203,7 +212,7 @@ describe('TabRedirectStrategy', () => {
     await vi.waitFor(() => expect(tabsUpdate).toHaveBeenCalledTimes(1));
   });
 
-  it('handleUnblock updates unblock state and navigates sender tab back to target', async () => {
+  it('handleUnblock updates unblockUntil state when required and navigates sender tab back to target', async () => {
     const strategy = new TabRedirectStrategy();
     const updateRuleSpy = vi.spyOn(StorageService, 'updateRule').mockResolvedValue(makeRule());
     await strategy.sync({ rules: [makeRule()], settings: defaultSettings });
@@ -214,6 +223,51 @@ describe('TabRedirectStrategy', () => {
     expect(updateRuleSpy).toHaveBeenCalledTimes(1);
     expect(updateRuleSpy.mock.calls[0]?.[0]).toBe('rule-1');
     expect(tabsUpdate).toHaveBeenCalledWith(24, { url: 'https://reddit.com/r/aita' });
+  });
+
+  it('handleUnblock navigates sender tab back to target - without extendedUnblock', async () => {
+    const strategy = new TabRedirectStrategy();
+    await strategy.sync({
+      rules: [makeRule()],
+      settings: {
+        ...defaultSettings,
+        extendedUnblock: {
+          enabled: false,
+          durationMinutes: NaN,
+        },
+      },
+    });
+    const updateRuleSpy = vi.spyOn(StorageService, 'updateRule').mockResolvedValue(makeRule());
+
+    const result = await strategy.handleUnblock(['rule-1'], 'https://reddit.com/r/aita', 24);
+    expect(updateRuleSpy).toHaveBeenCalledTimes(0);
+    expect(result).toEqual({ ok: true });
+    expect(tabsUpdate).toHaveBeenCalledWith(24, { url: 'https://reddit.com/r/aita' });
+  });
+
+  it('does not re-block the sender tab while it is temporarily exempt', async () => {
+    const strategy = new TabRedirectStrategy();
+    await strategy.sync({ rules: [makeRule()], settings: defaultSettings });
+    await strategy.start();
+
+    tabsUpdate.mockResolvedValue(undefined);
+    tabsGet.mockResolvedValue({ id: 123, url: 'https://example.com' });
+
+    const findMatchingRulesSpy = vi.spyOn(RulesService, 'findMatchingRules');
+    findMatchingRulesSpy.mockReturnValue([{ id: 'rule-1', pattern: 'example.com', matchType: 'exact' } as BlockRule]);
+
+    await strategy.handleUnblock(['rule-1'], 'https://example.com', 123);
+
+    expect(tabsUpdate).toHaveBeenCalledWith(123, { url: 'https://example.com' });
+
+    tabsUpdate.mockClear();
+
+    onUpdated.emit(123, { status: 'loading' }, {} as chrome.tabs.Tab);
+
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(tabsUpdate).not.toHaveBeenCalled();
   });
 
   it('handleUnblock returns unsupported URL reason and does not mutate state', async () => {
