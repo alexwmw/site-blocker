@@ -29,6 +29,11 @@ export const useButtonEvents = (player: RefObject<RefCurrentProps | null>) => {
     if (!settings) {
       return;
     }
+
+    if (interval.current) {
+      return;
+    }
+
     setTimeRemaining(settings.holdDurationSeconds);
     setHeld(true);
     player.current?.play();

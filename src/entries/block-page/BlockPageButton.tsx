@@ -23,7 +23,6 @@ const HoldButton = (props: HoldButtonProps) => {
         onKeyDown={onKeyDown}
         onMouseDown={onMouseDown}
         className='hold-button'
-        tabIndex={1}
       >
         {buttonText}
       </button>
