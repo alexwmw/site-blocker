@@ -13,6 +13,8 @@ type EnforceArgs = {
   rules?: BlockRule[];
 };
 
+const TAB_EXEMPTION_TIMEOUT = 10000;
+
 export default class TabRedirectStrategy implements BlockingStrategy {
   private rules: BlockRule[] = [];
 
@@ -20,12 +22,33 @@ export default class TabRedirectStrategy implements BlockingStrategy {
 
   private started = false;
 
-  private readonly handleTabUpdate = (tabId: number, changeInfo: chrome.tabs.OnUpdatedInfo) => {
-    if (changeInfo.url) {
-      this.evaluate(tabId, changeInfo.url)
-        .then((args) => this.enforce(args))
-        .catch(console.error);
+  private temporarilyExemptTabs: Set<number> = new Set<number>();
+
+  private exemptTabWhileLoading(tabId: number) {
+    this.temporarilyExemptTabs.add(tabId);
+
+    // fallback -- remove exemption after a set amount of time
+    setTimeout(() => {
+      this.temporarilyExemptTabs.delete(tabId);
+    }, TAB_EXEMPTION_TIMEOUT);
+  }
+
+  private readonly handleTabCompletion = (tabId: number, changeInfo: chrome.tabs.OnUpdatedInfo) => {
+    if (changeInfo.status === 'complete') {
+      this.temporarilyExemptTabs.delete(tabId);
     }
+  };
+
+  private readonly handleTabRemoved = (tabId: number): void => {
+    this.temporarilyExemptTabs.delete(tabId);
+  };
+
+  private readonly handleTabUpdate = (tabId: number, _changeInfo: chrome.tabs.OnUpdatedInfo) => {
+    const evaluateAndEnforce = async (tab: chrome.tabs.Tab) => {
+      const args = await this.evaluate(tabId, tab.url);
+      await this.enforce(args);
+    };
+    chrome.tabs.get(tabId).then(evaluateAndEnforce).catch(console.error);
   };
 
   private readonly handleTabActivated = ({ tabId }: chrome.tabs.OnActivatedInfo) => {
@@ -47,7 +70,11 @@ export default class TabRedirectStrategy implements BlockingStrategy {
     if (typeof tabId !== 'number' || !url) {
       return {};
     }
+    if (this.temporarilyExemptTabs.has(tabId)) {
+      return {};
+    }
     const matchingRules: BlockRule[] = RulesService.findMatchingRules(url, this.rules);
+    console.log({ matchingRules });
     if (matchingRules.length === 0) {
       return {};
     }
@@ -96,7 +123,10 @@ export default class TabRedirectStrategy implements BlockingStrategy {
       return;
     }
     this.started = true;
+    this.temporarilyExemptTabs.clear();
     chrome.tabs.onUpdated.addListener(this.handleTabUpdate);
+    chrome.tabs.onUpdated.addListener(this.handleTabCompletion);
+    chrome.tabs.onRemoved.addListener(this.handleTabRemoved);
     chrome.tabs.onActivated.addListener(this.handleTabActivated);
   }
 
@@ -106,6 +136,9 @@ export default class TabRedirectStrategy implements BlockingStrategy {
     }
     chrome.tabs.onUpdated.removeListener(this.handleTabUpdate);
     chrome.tabs.onActivated.removeListener(this.handleTabActivated);
+    chrome.tabs.onUpdated.removeListener(this.handleTabCompletion);
+    chrome.tabs.onRemoved.removeListener(this.handleTabRemoved);
+
     this.started = false;
   }
 
@@ -138,9 +171,9 @@ export default class TabRedirectStrategy implements BlockingStrategy {
       const promises = ruleIds.map((ruleId) => StorageService.updateRule(ruleId, { unblockUntil }));
       const results = await Promise.all(promises);
       hasMissingRule = results.some((result) => result === null);
-      // Keep navigation aligned with unblock state: if any rule is missing, do not navigate as if unblock succeeded.
     }
     if (typeof senderTabId === 'number') {
+      this.exemptTabWhileLoading(senderTabId);
       await chrome.tabs.update(senderTabId, { url: targetUrl });
     }
     if (hasMissingRule) {
