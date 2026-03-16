@@ -60,6 +60,5 @@ describe('useButtonEvents', () => {
     });
 
     expect(result.current.timeRemaining).toBe(0);
-    expect(result.current.complete).toBe(true);
   });
 });

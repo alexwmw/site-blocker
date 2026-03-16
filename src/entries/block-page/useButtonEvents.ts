@@ -4,8 +4,12 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import useSettings from '../../hooks/useSettings';
 
-export const useButtonEvents = (player: RefObject<LottieRefCurrentProps | null>) => {
-  const [complete, setComplete] = useState<boolean>(false);
+type RefCurrentProps = {
+  play: () => void;
+  stop: () => void;
+} & Partial<LottieRefCurrentProps>;
+
+export const useButtonEvents = (player: RefObject<RefCurrentProps | null>) => {
   const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
   const [held, setHeld] = useState<boolean>(false);
   const interval = useRef<NodeJS.Timeout | null>(null);
@@ -66,13 +70,7 @@ export const useButtonEvents = (player: RefObject<LottieRefCurrentProps | null>)
     };
   }, [onRelease]);
 
-  useEffect(() => {
-    if (timeRemaining === 0) {
-      setComplete(true);
-    }
-  }, [timeRemaining]);
-
-  return { onMouseDown, onKeyDown, complete, timeRemaining, timeTotal: settings?.holdDurationSeconds };
+  return { onMouseDown, onKeyDown, timeRemaining, timeTotal: settings?.holdDurationSeconds };
 };
 
 export default useButtonEvents;

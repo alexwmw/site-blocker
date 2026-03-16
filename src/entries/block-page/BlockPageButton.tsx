@@ -9,12 +9,12 @@ export type HoldButtonProps = {
   remainingTime: number | null;
   onMouseDown: MouseEventHandler;
   onKeyDown: KeyboardEventHandler;
-  holdComplete: boolean;
 };
 
 const HoldButton = (props: HoldButtonProps) => {
-  const { player, remainingTime, holdComplete, onKeyDown, onMouseDown } = props;
-  const RelevantLottie = holdComplete ? LottieSuccess : LottieHold;
+  const { player, remainingTime, onKeyDown, onMouseDown } = props;
+  const RelevantLottie = remainingTime === 0 ? LottieSuccess : LottieHold;
+  const buttonText = String(remainingTime === null ? 'Hold' : remainingTime);
 
   return (
     <div>
@@ -25,7 +25,7 @@ const HoldButton = (props: HoldButtonProps) => {
         className='hold-button'
         tabIndex={1}
       >
-        {remainingTime ?? 'Hold'}
+        {buttonText}
       </button>
     </div>
   );
