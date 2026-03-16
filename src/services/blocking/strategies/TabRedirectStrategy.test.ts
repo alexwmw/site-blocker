@@ -92,6 +92,7 @@ describe('TabRedirectStrategy', () => {
   });
 
   it('redirects matching navigations to block page after sync', async () => {
+    tabsGet.mockResolvedValue({ id: 99, url: 'https://reddit.com/r/aita/comments/123' } as chrome.tabs.Tab);
     const strategy = new TabRedirectStrategy();
     await strategy.sync({ rules: [makeRule()], settings: defaultSettings });
     await strategy.start();
@@ -108,6 +109,7 @@ describe('TabRedirectStrategy', () => {
   });
 
   it('does not redirect when a matching rule is temporarily unblocked', async () => {
+    tabsGet.mockResolvedValue({ id: 99, url: 'https://reddit.com/r/aita/comments/123' } as chrome.tabs.Tab);
     const strategy = new TabRedirectStrategy();
     await strategy.sync({ rules: [makeRule({ unblockUntil: Date.now() + 60_000 })], settings: defaultSettings });
     await strategy.start();
@@ -120,6 +122,7 @@ describe('TabRedirectStrategy', () => {
   });
 
   it('redirects again once unblock window has expired', async () => {
+    tabsGet.mockResolvedValue({ id: 99, url: 'https://reddit.com/r/aita/comments/123' } as chrome.tabs.Tab);
     const strategy = new TabRedirectStrategy();
     await strategy.sync({ rules: [makeRule({ unblockUntil: Date.now() - 1 })], settings: defaultSettings });
     await strategy.start();
