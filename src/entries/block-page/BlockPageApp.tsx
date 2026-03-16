@@ -1,24 +1,37 @@
+import type { LottieRefCurrentProps } from 'lottie-react';
+import { useEffect, useRef } from 'react';
+
 import useBlockPageParams from '../../hooks/useBlockPageParams';
 import { MessagesService } from '../../services/MessagesService';
-import type { UnblockRequestMessage } from '../../types/messages';
+
+import BlockPageButton from './BlockPageButton';
+import useButtonEvents from './useButtonEvents';
 
 const BlockPageApp = () => {
   const { ruleIds, targetUrl } = useBlockPageParams();
+  const lottieRef = useRef<LottieRefCurrentProps>(null);
+  const { onMouseDown, onKeyDown, complete, timeRemaining, timeTotal } = useButtonEvents(lottieRef);
 
-  const handleUnblock = () => {
-    if (ruleIds && targetUrl) {
-      const message: UnblockRequestMessage = {
+  useEffect(() => {
+    if (complete && ruleIds && targetUrl) {
+      MessagesService.sendMessage({
         type: 'UNBLOCK_REQUEST',
         payload: { ruleIds, targetUrl },
-      };
-      MessagesService.sendMessage(message).catch(console.error);
+      }).catch(console.error);
     }
-  };
+  }, [complete, ruleIds, targetUrl]);
 
   return (
     <div>
       <h1>Block Page</h1>
-      <button onClick={handleUnblock}>Unblock</button>
+      <p>Hold for {timeTotal} seconds</p>
+      <BlockPageButton
+        player={lottieRef}
+        remainingTime={timeRemaining}
+        onMouseDown={onMouseDown}
+        onKeyDown={onKeyDown}
+        holdComplete={complete}
+      />
     </div>
   );
 };
