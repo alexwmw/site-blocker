@@ -1,13 +1,14 @@
 import type { Mock } from 'vitest';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
+import type { UnblockResponse } from '../../types/messages';
 import type { BlockRule } from '../../types/schema';
 import defaultSettings from '../defaultSettings';
 import { StorageService } from '../StorageService';
 
 import BlockingEngine from './BlockingEngine';
 import DnrStrategy from './strategies/archived/DnrStrategy';
-import type { SyncItems, UnblockResult } from './strategies/BlockingStrategy';
+import type { SyncItems } from './strategies/BlockingStrategy';
 import TabRedirectStrategy from './strategies/TabRedirectStrategy';
 import type { Listener } from './test-utils';
 import { createEvent } from './test-utils';
@@ -41,11 +42,11 @@ describe('BlockingEngine', () => {
   let tabStart: Mock<() => Promise<void>>;
   let tabStop: Mock<() => Promise<void>>;
   let tabSync: Mock<(items: SyncItems) => Promise<void>>;
-  let tabHandleUnblock: Mock<(ruleId: string[], targetUrl: string, senderTabId?: number) => Promise<UnblockResult>>;
+  let tabHandleUnblock: Mock<(ruleId: string[], targetUrl: string, senderTabId?: number) => Promise<UnblockResponse>>;
   let dnrStart: Mock<() => Promise<void>>;
   let dnrStop: Mock<() => Promise<void>>;
   let dnrSync: Mock<(items: SyncItems) => Promise<void>>;
-  let dnrHandleUnblock: Mock<(ruleId: string[], targetUrl: string, senderTabId?: number) => Promise<UnblockResult>>;
+  let dnrHandleUnblock: Mock<(ruleId: string[], targetUrl: string, senderTabId?: number) => Promise<UnblockResponse>>;
 
   const onAddedFactory = () => createEvent<[chrome.permissions.Permissions]>();
   const onRemovedFactory = () => createEvent<[chrome.permissions.Permissions]>();
