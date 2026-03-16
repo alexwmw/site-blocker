@@ -74,7 +74,6 @@ export default class TabRedirectStrategy implements BlockingStrategy {
       return {};
     }
     const matchingRules: BlockRule[] = RulesService.findMatchingRules(url, this.rules);
-    console.log({ matchingRules });
     if (matchingRules.length === 0) {
       return {};
     }
