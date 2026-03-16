@@ -1,20 +1,20 @@
 import type { LottieRefCurrentProps } from 'lottie-react';
 import type { KeyboardEventHandler, MouseEventHandler, RefObject } from 'react';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import useSettings from '../../hooks/useSettings';
 
 export const useButtonEvents = (player: RefObject<LottieRefCurrentProps | null>) => {
   const [complete, setComplete] = useState<boolean>(false);
   const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
-  const [held, setHeld] = useState<boolean>(true);
+  const [held, setHeld] = useState<boolean>(false);
   const interval = useRef<NodeJS.Timeout | null>(null);
 
   const { settings } = useSettings();
 
   const countdown = () => {
     setTimeRemaining((t: number | null) => {
-      if (!t) {
+      if (t === null) {
         return null;
       }
       return t > 0 ? t - 1 : 0;
@@ -47,14 +47,15 @@ export const useButtonEvents = (player: RefObject<LottieRefCurrentProps | null>)
     onButtonPress();
   };
 
-  const onRelease = () => {
+  const onRelease = useCallback(() => {
     setTimeRemaining(null);
     setHeld(false);
     player.current?.stop();
     if (interval.current) {
       clearInterval(interval.current);
+      interval.current = null;
     }
-  };
+  }, [player]);
 
   useEffect(() => {
     document.addEventListener('mouseup', onRelease);
@@ -63,10 +64,10 @@ export const useButtonEvents = (player: RefObject<LottieRefCurrentProps | null>)
       document.removeEventListener('mouseup', onRelease);
       document.removeEventListener('keyup', onRelease);
     };
-  });
+  }, [onRelease]);
 
   useEffect(() => {
-    if (timeRemaining === 1) {
+    if (timeRemaining === 0) {
       setComplete(true);
     }
   }, [timeRemaining]);
