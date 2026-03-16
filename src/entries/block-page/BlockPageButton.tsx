@@ -13,19 +13,22 @@ export type HoldButtonProps = {
 
 const HoldButton = (props: HoldButtonProps) => {
   const { player, remainingTime, onKeyDown, onMouseDown } = props;
-  const RelevantLottie = remainingTime === 0 ? LottieSuccess : LottieHold;
-  const buttonText = String(remainingTime === null ? 'Hold' : remainingTime);
+  const holdIsComplete = remainingTime === 0;
+  const RelevantLottie = holdIsComplete ? LottieSuccess : LottieHold;
+  const buttonText = String(remainingTime === null ? 'Hold to unblock' : remainingTime);
 
   return (
-    <div>
+    <div className='hold-action'>
       <RelevantLottie lottieRef={player} />
       <button
         onKeyDown={onKeyDown}
         onMouseDown={onMouseDown}
         className='hold-button'
+        aria-live='polite'
       >
         {buttonText}
       </button>
+      <p className='hold-caption'>{holdIsComplete ? 'Success! Redirecting…' : 'Click and hold or press Space.'}</p>
     </div>
   );
 };
