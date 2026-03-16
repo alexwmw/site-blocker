@@ -1,7 +1,8 @@
+import type { UnblockResponse } from '../../types/messages';
 import type { BlockRule, Settings } from '../../types/schema';
 import { StorageService } from '../StorageService';
 
-import type { BlockingStrategy, SyncItems, UnblockResult } from './strategies/BlockingStrategy';
+import type { BlockingStrategy, SyncItems } from './strategies/BlockingStrategy';
 import TabRedirectStrategy from './strategies/TabRedirectStrategy';
 
 export default class BlockingEngine implements BlockingStrategy {
@@ -95,7 +96,7 @@ export default class BlockingEngine implements BlockingStrategy {
     await this.activeStrategy.sync(items);
   }
 
-  async handleUnblock(ruleIds: string[], targetUrl: string, senderTabId?: number): Promise<UnblockResult> {
+  async handleUnblock(ruleIds: string[], targetUrl: string, senderTabId?: number): Promise<UnblockResponse> {
     return await this.activeStrategy.handleUnblock(ruleIds, targetUrl, senderTabId);
   }
 }
