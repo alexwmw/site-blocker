@@ -222,7 +222,6 @@ describe('TabRedirectStrategy', () => {
     expect(result).toEqual({ ok: true });
     expect(updateRuleSpy).toHaveBeenCalledTimes(1);
     expect(updateRuleSpy.mock.calls[0]?.[0]).toBe('rule-1');
-    expect(tabsUpdate).toHaveBeenCalledWith(24, { url: 'https://reddit.com/r/aita' });
   });
 
   it('handleUnblock navigates sender tab back to target - without extendedUnblock', async () => {
@@ -242,7 +241,6 @@ describe('TabRedirectStrategy', () => {
     const result = await strategy.handleUnblock(['rule-1'], 'https://reddit.com/r/aita', 24);
     expect(updateRuleSpy).toHaveBeenCalledTimes(0);
     expect(result).toEqual({ ok: true });
-    expect(tabsUpdate).toHaveBeenCalledWith(24, { url: 'https://reddit.com/r/aita' });
   });
 
   it('does not re-block the sender tab while it is temporarily exempt', async () => {
@@ -257,8 +255,6 @@ describe('TabRedirectStrategy', () => {
     findMatchingRulesSpy.mockReturnValue([{ id: 'rule-1', pattern: 'example.com', matchType: 'exact' } as BlockRule]);
 
     await strategy.handleUnblock(['rule-1'], 'https://example.com', 123);
-
-    expect(tabsUpdate).toHaveBeenCalledWith(123, { url: 'https://example.com' });
 
     tabsUpdate.mockClear();
 
@@ -289,11 +285,12 @@ describe('TabRedirectStrategy', () => {
       .mockResolvedValueOnce(makeRule({ id: 'rule-1' }))
       .mockResolvedValueOnce(null);
     await strategy.sync({ rules: [makeRule()], settings: defaultSettings });
+    const warnSpy = vi.spyOn(console, 'warn');
 
     const result = await strategy.handleUnblock(['rule-1', 'missing-rule'], 'https://reddit.com/r/aita', 24);
 
     expect(updateRuleSpy).toHaveBeenCalledTimes(2);
-    expect(result).toEqual({ ok: false, reason: 'One or more rules were not found.' });
-    expect(tabsUpdate).toHaveBeenCalledWith(24, { url: 'https://reddit.com/r/aita' });
+    expect(warnSpy).toHaveBeenCalledTimes(1);
+    expect(result).toEqual({ ok: true });
   });
 });

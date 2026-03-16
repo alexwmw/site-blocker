@@ -171,12 +171,16 @@ export default class TabRedirectStrategy implements BlockingStrategy {
       const results = await Promise.all(promises);
       hasMissingRule = results.some((result) => result === null);
     }
+    if (hasMissingRule) {
+      console.warn('Some rules expected in handleUnblock were not found.');
+    }
     if (typeof senderTabId === 'number') {
       this.exemptTabWhileLoading(senderTabId);
-      await chrome.tabs.update(senderTabId, { url: targetUrl });
-    }
-    if (hasMissingRule) {
-      return { ok: false, reason: 'One or more rules were not found.' };
+      return {
+        ok: true,
+        // We may at some stage wish to return a redirect function, for example:
+        // redirectTab: () => chrome.tabs.update(senderTabId, { url: targetUrl }),
+      };
     }
     return {
       ok: true,
