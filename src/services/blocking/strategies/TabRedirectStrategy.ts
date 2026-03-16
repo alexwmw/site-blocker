@@ -137,6 +137,8 @@ export default class TabRedirectStrategy implements BlockingStrategy {
     chrome.tabs.onUpdated.removeListener(this.handleTabUpdate);
     chrome.tabs.onActivated.removeListener(this.handleTabActivated);
     chrome.tabs.onUpdated.removeListener(this.handleTabCompletion);
+    chrome.tabs.onRemoved.removeListener(this.handleTabRemoved);
+
     this.started = false;
   }
 
