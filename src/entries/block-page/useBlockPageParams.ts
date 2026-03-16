@@ -15,7 +15,10 @@ const useBlockPageParams = () => {
     const p = new URLSearchParams(queryString);
 
     setParams({
-      ruleIds: p.get('ruleIds')?.split(',') ?? null,
+      ruleIds: p
+        .get('ruleIds')
+        ?.split(',')
+        .filter((ruleId) => ruleId.length > 0) ?? null,
       patternHost: p.get('patternHost'),
       patternPath: p.get('patternPath'),
       matchType: p.get('matchType'),
