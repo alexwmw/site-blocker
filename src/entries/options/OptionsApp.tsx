@@ -114,6 +114,7 @@ const OptionsApp = () => {
             >
               <option value='light'>Light</option>
               <option value='dark'>Dark</option>
+              <option value='mindful'>Mindful</option>
             </select>
           </label>
 
