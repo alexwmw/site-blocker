@@ -9,6 +9,7 @@ import { createEvent } from '../test-utils';
 import TabRedirectStrategy from './TabRedirectStrategy';
 
 const defaultSettings: Settings = {
+  blockPageHeadline: 'Stay on track',
   theme: 'light',
   holdDurationSeconds: 20,
   isRated: false,

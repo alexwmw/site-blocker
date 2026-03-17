@@ -7,6 +7,7 @@ import DnrStrategy from './DnrStrategy';
 
 const defaultSettings: Settings = {
   theme: 'light',
+  blockPageHeadline: 'Stay on track',
   holdDurationSeconds: 20,
   isRated: false,
   schedule: {
