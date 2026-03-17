@@ -33,7 +33,7 @@ const BlockPageApp = () => {
   return (
     <main className='block-page'>
       <section className='blocked-card'>
-        <p className='eyebrow'>Site Blocked</p>
+        <p className='eyebrow'>Hold to Unblock</p>
         <h1>Stay on track</h1>
         <p className='subtitle'>
           You tried to open <strong>{urlLabel}</strong>. This page is blocked by your focus rules.
@@ -59,6 +59,7 @@ const BlockPageApp = () => {
         </p>
 
         <BlockPageButton
+          autoFocus
           player={player}
           remainingTime={timeRemaining}
           onMouseDown={onMouseDown}
