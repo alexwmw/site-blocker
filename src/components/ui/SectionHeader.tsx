@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react';
 
+import styles from './SectionHeader.module.css';
+
 type SectionHeaderProps = {
   title: ReactNode;
   status?: ReactNode;
@@ -7,7 +9,7 @@ type SectionHeaderProps = {
 
 const SectionHeader = ({ title, status }: SectionHeaderProps) => {
   return (
-    <div className='ui-section-header'>
+    <div className={styles.sectionHeader}>
       <h2>{title}</h2>
       {status}
     </div>

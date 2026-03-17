@@ -8,6 +8,8 @@ import useSettings from '../../hooks/useSettings';
 import useThemeEffect from '../../hooks/useThemeEffect';
 import type { BlockRule, Theme } from '../../types/schema';
 
+import styles from './OptionsApp.module.css';
+
 const readableDate = (dateIso: string) => {
   const date = new Date(dateIso);
   return Number.isNaN(date.valueOf()) ? 'Unknown date' : date.toLocaleString();
@@ -52,16 +54,16 @@ const OptionsApp = () => {
 
     return (
       <li key={rule.id}>
-        <Card className='rule-card'>
+        <Card className={styles.ruleCard}>
           <div>
-            <p className='rule-pattern'>{rule.pattern}</p>
-            <p className='rule-meta'>
+            <p className={styles.rulePattern}>{rule.pattern}</p>
+            <p className={styles.ruleMeta}>
               Match: <strong>{rule.matchType}</strong> · Added {readableDate(rule.createdAt)}
             </p>
-            <p className='rule-meta'>{unblockState}</p>
+            <p className={styles.ruleMeta}>{unblockState}</p>
           </div>
           <button
-            className='danger-button'
+            className={styles.dangerButton}
             onClick={() => {
               handleRemove(rule.id).catch(console.error);
             }}
@@ -75,36 +77,37 @@ const OptionsApp = () => {
   };
 
   return (
-    <main className='options-page'>
-      <header className='hero'>
+    <main className={styles.page}>
+      <header className={styles.hero}>
         <EyebrowLabel>Site Blocker</EyebrowLabel>
-        <h1>Focus controls</h1>
-        <p className='subtle'>
+        <h1 className={styles.heroTitle}>Focus controls</h1>
+        <p className={styles.subtle}>
           Keep your rules clear, adjust unblock friction, and tune the extension for long-term focus.
         </p>
       </header>
 
-      <section className='stats-grid'>
-        <Card as='article' className='stat'>
-          <p>Total rules</p>
-          <strong>{blockRules?.length ?? 0}</strong>
+      <section className={styles.statsGrid}>
+        <Card as='article' className={styles.stat}>
+          <p className={styles.statText}>Total rules</p>
+          <strong className={styles.statValue}>{blockRules?.length ?? 0}</strong>
         </Card>
-        <Card as='article' className='stat'>
-          <p>Active rules</p>
-          <strong>{activeRuleCount}</strong>
+        <Card as='article' className={styles.stat}>
+          <p className={styles.statText}>Active rules</p>
+          <strong className={styles.statValue}>{activeRuleCount}</strong>
         </Card>
-        <Card as='article' className='stat'>
-          <p>Temporarily allowed</p>
-          <strong>{pausedRuleCount}</strong>
+        <Card as='article' className={styles.stat}>
+          <p className={styles.statText}>Temporarily allowed</p>
+          <strong className={styles.statValue}>{pausedRuleCount}</strong>
         </Card>
       </section>
 
-      <section className='section'>
-        <SectionHeader title='Preferences' status={isSettingsLoading ? <span className='subtle'>Loading…</span> : null} />
-        <Card className='settings-grid'>
-          <label>
+      <section className={styles.section}>
+        <SectionHeader title='Preferences' status={isSettingsLoading ? <span className={styles.subtle}>Loading…</span> : null} />
+        <Card className={styles.settingsGrid}>
+          <label className={styles.settingsLabel}>
             Theme
             <select
+              className={styles.settingsInput}
               value={settings?.theme ?? 'light'}
               onChange={(event) => {
                 handleThemeChange(event.target.value as Theme);
@@ -117,9 +120,10 @@ const OptionsApp = () => {
             </select>
           </label>
 
-          <label>
+          <label className={styles.settingsLabel}>
             Hold to unblock (seconds)
             <input
+              className={styles.settingsInput}
               type='number'
               min={3}
               max={99}
@@ -133,15 +137,15 @@ const OptionsApp = () => {
         </Card>
       </section>
 
-      <section className='section'>
-        <SectionHeader title='Rules' status={isRulesLoading ? <span className='subtle'>Syncing…</span> : null} />
+      <section className={styles.section}>
+        <SectionHeader title='Rules' status={isRulesLoading ? <span className={styles.subtle}>Syncing…</span> : null} />
         {!blockRules?.length ? (
-          <Card className='empty-state'>
+          <Card className={styles.emptyState}>
             <p>No rules yet.</p>
-            <p className='subtle'>Add rules from the popup to start blocking distracting sites.</p>
+            <p className={styles.subtle}>Add rules from the popup to start blocking distracting sites.</p>
           </Card>
         ) : (
-          <ul className='rules-list'>{blockRules.map(renderRule)}</ul>
+          <ul className={styles.rulesList}>{blockRules.map(renderRule)}</ul>
         )}
       </section>
     </main>

@@ -6,6 +6,7 @@ import EyebrowLabel from '../../components/ui/EyebrowLabel';
 import useSettings from '../../hooks/useSettings';
 import useThemeEffect from '../../hooks/useThemeEffect';
 
+import styles from './BlockPageApp.module.css';
 import BlockPageButton from './BlockPageButton';
 import useBlockPageParams from './useBlockPageParams';
 import useButtonEvents from './useButtonEvents';
@@ -35,33 +36,33 @@ const BlockPageApp = () => {
   }, [targetUrl]);
 
   return (
-    <main className='block-page'>
+    <main className={styles.page}>
       <Card
         as='section'
-        className='blocked-card'
+        className={styles.blockedCard}
       >
         <EyebrowLabel>Hold to Unblock</EyebrowLabel>
-        <h1>{settings?.blockPageHeadline ?? 'Stay on track'}</h1>
-        <p className='subtitle'>
+        <h1 className={styles.title}>{settings?.blockPageHeadline ?? 'Stay on track'}</h1>
+        <p className={styles.subtitle}>
           You tried to open <strong>{urlLabel}</strong>. This page is blocked by your focus rules.
         </p>
 
-        <dl className='details'>
-          <div>
-            <dt>Match type</dt>
-            <dd>{matchType ?? 'Not provided'}</dd>
+        <dl className={styles.details}>
+          <div className={styles.detailsItem}>
+            <dt className={styles.detailTerm}>Match type</dt>
+            <dd className={styles.detailValue}>{matchType ?? 'Not provided'}</dd>
           </div>
-          <div>
-            <dt>Rule host</dt>
-            <dd>{patternHost ?? 'Not provided'}</dd>
+          <div className={styles.detailsItem}>
+            <dt className={styles.detailTerm}>Rule host</dt>
+            <dd className={styles.detailValue}>{patternHost ?? 'Not provided'}</dd>
           </div>
-          <div>
-            <dt>Rule path</dt>
-            <dd>{patternPath ?? 'Not provided'}</dd>
+          <div className={styles.detailsItem}>
+            <dt className={styles.detailTerm}>Rule path</dt>
+            <dd className={styles.detailValue}>{patternPath ?? 'Not provided'}</dd>
           </div>
         </dl>
 
-        <p className='hold-help'>
+        <p className={styles.holdHelp}>
           Hold to continue for {timeTotal ?? '...'} seconds. Releasing early will reset the timer.
         </p>
 
