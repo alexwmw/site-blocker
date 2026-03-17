@@ -36,7 +36,7 @@ describe('useSettings Hook', () => {
   });
 
   it('should load initial settings from StorageService', async () => {
-    const mockSettings: Settings = { ...defaultSettings, theme: 'light' };
+    const mockSettings: Settings = { ...defaultSettings, theme: 'mindful-light' };
     vi.spyOn(StorageService, 'getSettings').mockResolvedValue(mockSettings);
 
     const { result } = renderHook(() => useSettings());
@@ -45,7 +45,7 @@ describe('useSettings Hook', () => {
       expect(result.current.isLoading).toBe(false);
     });
 
-    expect(result.current.settings?.theme).toBe('light');
+    expect(result.current.settings?.theme).toBe('mindful-light');
     expect(result.current.isLoading).toBe(false);
   });
 
@@ -60,13 +60,13 @@ describe('useSettings Hook', () => {
       expect(listeners).toHaveLength(1);
       listeners[0]({
         settings: {
-          newValue: { ...defaultSettings, theme: 'dark' },
+          newValue: { ...defaultSettings, theme: 'mindful-dark' },
           oldValue: defaultSettings,
         },
       });
     });
 
-    expect(result.current.settings?.theme).toBe('dark');
+    expect(result.current.settings?.theme).toBe('mindful-dark');
   });
 
   it('should call StorageService.updateSettings when updateSettings is called', async () => {
@@ -74,9 +74,9 @@ describe('useSettings Hook', () => {
     const { result } = renderHook(() => useSettings());
 
     await act(async () => {
-      await result.current.updateSettings({ theme: 'dark' });
+      await result.current.updateSettings({ theme: 'mindful-dark' });
     });
 
-    expect(spy).toHaveBeenCalledWith({ theme: 'dark' });
+    expect(spy).toHaveBeenCalledWith({ theme: 'mindful-dark' });
   });
 });

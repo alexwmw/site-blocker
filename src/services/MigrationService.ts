@@ -48,8 +48,22 @@ export class MigrationService {
     if (typeof value !== 'string') {
       return fallback;
     }
-    const stringValue = value.toLowerCase(); // Legacy values are capitalised
-    return this.isTheme(stringValue) ? stringValue : fallback;
+
+    const normalizedTheme = value.toLowerCase().trim(); // Legacy values are capitalised
+
+    if (normalizedTheme === 'light') {
+      return 'mindful-light';
+    }
+
+    if (normalizedTheme === 'dark') {
+      return 'mindful-dark';
+    }
+
+    if (normalizedTheme === 'mindful') {
+      return 'mindful-light';
+    }
+
+    return this.isTheme(normalizedTheme) ? normalizedTheme : fallback;
   }
 
   private static parseLegacyActiveDays(old: LegacyOptions, fallback: ScheduleDays): ScheduleDays {
@@ -194,8 +208,8 @@ export class MigrationService {
     return {
       ...defaultSettings,
 
-      // Ignored migratable settings
-      theme: defaultSettings.theme,
+      // Migrated theme (legacy light/dark values are mapped to the new set).
+      theme: this._toTheme(old.theme?.value, defaultSettings.theme),
 
       // All other migratable settings
       holdDurationSeconds: this.toNumber(old.unblockTimeout?.value, defaultSettings.holdDurationSeconds),

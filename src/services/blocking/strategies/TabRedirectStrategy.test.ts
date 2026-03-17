@@ -10,7 +10,7 @@ import TabRedirectStrategy from './TabRedirectStrategy';
 
 const defaultSettings: Settings = {
   blockPageHeadline: 'Stay on track',
-  theme: 'light',
+  theme: 'mindful-light',
   holdDurationSeconds: 20,
   isRated: false,
   schedule: {

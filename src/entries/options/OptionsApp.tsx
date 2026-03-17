@@ -209,15 +209,16 @@ const OptionsApp = () => {
               Theme
               <select
                 className={styles.settingsInput}
-                value={settings?.theme ?? 'light'}
+                value={settings?.theme ?? 'mindful-light'}
                 onChange={(event) => {
                   handleThemeChange(event.target.value as Theme);
                 }}
                 disabled={!settings}
               >
-                <option value='light'>Light</option>
-                <option value='dark'>Dark</option>
-                <option value='mindful'>Mindful</option>
+                <option value='mindful-light'>Mindful light</option>
+                <option value='mindful-dark'>Mindful dark</option>
+                <option value='focus-light'>Focus light</option>
+                <option value='focus-dark'>Focus dark</option>
               </select>
             </label>
 

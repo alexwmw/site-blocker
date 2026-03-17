@@ -1,7 +1,7 @@
 import type { Settings } from '../types/schema';
 
 const defaultSettings: Settings = {
-  theme: 'light',
+  theme: 'mindful-light',
   blockPageHeadline: 'Stay on track',
   holdDurationSeconds: 15,
   schedule: {
