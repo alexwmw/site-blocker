@@ -94,6 +94,11 @@
   font-size: 0.92rem;
 }
 
+
+.ruleSwitch {
+  margin-top: 10px;
+}
+
 .dangerButton {
   border: 0;
   border-radius: var(--radius-sm);
@@ -112,4 +117,31 @@
 
 .emptyState {
   padding: 18px;
+}
+
+
+.tabs {
+  margin-top: 20px;
+}
+
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+}
+
+.dayGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.dayChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
 }

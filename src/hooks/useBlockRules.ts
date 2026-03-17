@@ -33,10 +33,15 @@ const useBlockRules = () => {
     await StorageService.removeRule(id);
   };
 
+  const updateRule = async (id: string, updates: Partial<BlockRule>) => {
+    await StorageService.updateRule(id, updates);
+  };
+
   return {
     blockRules,
     addRule,
     removeRule,
+    updateRule,
     isLoading: blockRules === null,
   };
 };
