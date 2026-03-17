@@ -6,7 +6,7 @@ import { StorageService } from '../../../StorageService';
 import DnrStrategy from './DnrStrategy';
 
 const defaultSettings: Settings = {
-  theme: 'light',
+  theme: 'mindful-light',
   blockPageHeadline: 'Stay on track',
   holdDurationSeconds: 20,
   isRated: false,
