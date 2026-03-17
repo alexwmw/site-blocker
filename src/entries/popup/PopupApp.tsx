@@ -1,3 +1,5 @@
+import { useEffect, useMemo, useState } from 'react';
+
 import Button from '../../components/ui/Button';
 import Card from '../../components/ui/Card';
 import EyebrowLabel from '../../components/ui/EyebrowLabel';
@@ -22,15 +24,37 @@ const formatRemainingTime = (milliseconds: number) => {
   return `${minutes}m ${seconds}s`;
 };
 
+type StatusTone = 'good' | 'bad' | 'neutral';
+
+type StatusItemProps = {
+  label: string;
+  value: string;
+  tone?: StatusTone;
+};
+
+const StatusItem = ({ label, value, tone = 'neutral' }: StatusItemProps) => {
+  return (
+    <div className={styles.statusItem}>
+      <dt className={styles.statusLabel}>{label}</dt>
+      <dd className={styles.statusValue}>
+        <span className={styles[`pill${tone[0].toUpperCase()}${tone.slice(1)}`]}>{value}</span>
+      </dd>
+    </div>
+  );
+};
+
 const PopupApp = () => {
   const { activeTab, url, isSupported, createDomainPrefixRule, createPrefixUrlRule } = useCreateRuleFromTab();
   const { blockRules, addRule, isLoading: isRulesLoading } = useBlockRules();
   const { settings, isLoading: isSettingsLoading } = useSettings();
+  const [tickNow, setTickNow] = useState(Date.now());
 
-  const now = Date.now();
-  const matchingRules = url && blockRules ? RulesService.findMatchingRules(url, blockRules) : [];
-  const matchingTemporarilyUnblockedRules = matchingRules.filter((rule) => (rule.unblockUntil ?? 0) > now);
-  const activeBlockingRules = matchingRules.filter((rule) => (rule.unblockUntil ?? 0) <= now);
+  const matchingRules = useMemo(() => {
+    return url && blockRules ? RulesService.findMatchingRules(url, blockRules) : [];
+  }, [url, blockRules]);
+
+  const matchingTemporarilyUnblockedRules = matchingRules.filter((rule) => (rule.unblockUntil ?? 0) > tickNow);
+  const activeBlockingRules = matchingRules.filter((rule) => (rule.unblockUntil ?? 0) <= tickNow);
 
   const isScheduleEnabled = Boolean(settings?.schedule.enabled);
   const isBlockingTime = SchedulingService.isBlockingActiveNow(settings?.schedule);
@@ -47,6 +71,20 @@ const PopupApp = () => {
     }
     return soonest;
   }, null);
+
+  useEffect(() => {
+    if (!nextUnblockExpiration) {
+      return;
+    }
+
+    const intervalId = window.setInterval(() => {
+      setTickNow(Date.now());
+    }, 1000);
+
+    return () => {
+      window.clearInterval(intervalId);
+    };
+  }, [nextUnblockExpiration]);
 
   const notBlockedReason = (() => {
     if (!isSupported) {
@@ -94,23 +132,21 @@ const PopupApp = () => {
 
       <Card as='section' className={styles.section}>
         <SectionHeader title='Blocking' />
-        <ul className={styles.statusList}>
-          <li>
-            Blocked by rule:{' '}
-            <strong className={isBlockedNow ? styles.warning : styles.positive}>{isBlockedNow ? 'Yes' : 'No'}</strong>
-          </li>
-          <li>
-            Scheduling enabled:{' '}
-            <strong>{isScheduleEnabled ? 'Yes' : 'No'}</strong>
-          </li>
-          {notBlockedReason ? <li>{notBlockedReason}</li> : null}
+        <dl className={styles.statusGrid}>
+          <StatusItem label='Blocked by rule' value={isBlockedNow ? 'Yes' : 'No'} tone={isBlockedNow ? 'bad' : 'good'} />
+          <StatusItem label='Scheduling enabled' value={isScheduleEnabled ? 'Yes' : 'No'} tone={isScheduleEnabled ? 'neutral' : 'good'} />
+          <StatusItem label='URL supported' value={isSupported ? 'Yes' : 'No'} tone={isSupported ? 'good' : 'bad'} />
           {nextUnblockExpiration ? (
-            <li>
-              Temporary unblock remaining: <strong>{formatRemainingTime(nextUnblockExpiration - now)}</strong>
-            </li>
+            <StatusItem
+              label='Temporary unblock remaining'
+              value={formatRemainingTime(nextUnblockExpiration - tickNow)}
+              tone='neutral'
+            />
           ) : null}
-          {isRulesLoading || isSettingsLoading ? <li>Loading latest settings…</li> : null}
-        </ul>
+        </dl>
+
+        {notBlockedReason ? <p className={styles.reasonBanner}>{notBlockedReason}</p> : null}
+        {isRulesLoading || isSettingsLoading ? <p className={styles.subtle}>Loading latest settings…</p> : null}
       </Card>
 
       <Card as='section' className={styles.section}>

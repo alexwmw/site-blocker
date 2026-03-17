@@ -21,21 +21,71 @@
   padding: 12px;
 }
 
-.statusList {
+.statusGrid {
   margin: 10px 0 0;
-  padding-left: 18px;
   display: grid;
-  gap: 6px;
+  gap: 8px;
+}
+
+.statusItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border-muted);
+  background: var(--color-bg-muted);
+}
+
+.statusLabel {
+  margin: 0;
   color: var(--color-text-secondary);
-  font-size: 0.9rem;
+  font-size: 0.85rem;
 }
 
-.positive {
+.statusValue {
+  margin: 0;
+}
+
+.pillBase {
+  display: inline-block;
+  border-radius: var(--radius-pill);
+  padding: 3px 10px;
+  font-weight: 700;
+  font-size: 0.78rem;
+  border: 1px solid transparent;
+}
+
+.pillGood {
+  composes: pillBase;
   color: var(--color-accent);
+  background: var(--color-bg-elevated);
+  border-color: var(--color-accent-soft);
 }
 
-.warning {
+.pillBad {
+  composes: pillBase;
   color: var(--color-danger);
+  background: var(--color-bg-elevated);
+  border-color: var(--color-danger);
+}
+
+.pillNeutral {
+  composes: pillBase;
+  color: var(--color-text-primary);
+  background: var(--color-bg-elevated);
+  border-color: var(--color-border-strong);
+}
+
+.reasonBanner {
+  margin: 10px 0 0;
+  padding: 9px 10px;
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-input);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+  font-size: 0.88rem;
 }
 
 .actions {
