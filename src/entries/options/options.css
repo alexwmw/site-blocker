@@ -1,0 +1,135 @@
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text-primary);
+}
+
+.options-page {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 32px 20px 48px;
+}
+
+.hero h1 {
+  margin: 0;
+}
+
+.eyebrow {
+  margin: 0;
+  color: var(--color-accent);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.75rem;
+}
+
+.subtle {
+  color: var(--color-text-secondary);
+}
+
+.section {
+  margin-top: 28px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.stats-grid {
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+}
+
+.card {
+  background: var(--color-bg-elevated);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-soft);
+}
+
+.stat {
+  padding: 14px;
+}
+
+.stat p {
+  margin: 0;
+  color: var(--color-text-secondary);
+}
+
+.stat strong {
+  font-size: 1.8rem;
+}
+
+.settings-grid {
+  padding: 16px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+}
+
+.settings-grid label {
+  display: grid;
+  gap: 8px;
+  font-weight: 600;
+}
+
+.settings-grid select,
+.settings-grid input {
+  color: var(--color-text-primary);
+  font: inherit;
+  padding: 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border-strong);
+  background: var(--color-bg-input);
+}
+
+.rules-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.rule-card {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px;
+}
+
+.rule-pattern {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.rule-meta {
+  margin: 6px 0 0;
+  color: var(--color-text-secondary);
+  font-size: 0.92rem;
+}
+
+.danger-button {
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: var(--color-danger);
+  color: var(--color-text-inverse);
+  padding: 10px 14px;
+  font-weight: 600;
+  cursor: pointer;
+  height: fit-content;
+}
+
+.danger-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.75;
+}
+
+.empty-state {
+  padding: 18px;
+}
