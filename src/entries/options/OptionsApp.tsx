@@ -104,7 +104,6 @@ const OptionsApp = () => {
     }).catch(console.error);
   };
 
-
   const handleMatchTypeToggle = async (rule: BlockRule, shouldBlockSubpages: boolean) => {
     setPendingMatchTypeRuleId(rule.id);
     try {
@@ -132,6 +131,7 @@ const OptionsApp = () => {
             </p>
             <p className={styles.ruleMeta}>{unblockState}</p>
             <Switch
+              id={rule.id + '-switch'}
               className={styles.ruleSwitch}
               label='Block subpages'
               description={rule.matchType === 'prefix' ? 'On · Prefix match' : 'Off · Exact match'}
@@ -167,15 +167,24 @@ const OptionsApp = () => {
       </header>
 
       <section className={styles.statsGrid}>
-        <Card as='article' className={styles.stat}>
+        <Card
+          as='article'
+          className={styles.stat}
+        >
           <p className={styles.statText}>Total rules</p>
           <strong className={styles.statValue}>{blockRules?.length ?? 0}</strong>
         </Card>
-        <Card as='article' className={styles.stat}>
+        <Card
+          as='article'
+          className={styles.stat}
+        >
           <p className={styles.statText}>Active rules</p>
           <strong className={styles.statValue}>{activeRuleCount}</strong>
         </Card>
-        <Card as='article' className={styles.stat}>
+        <Card
+          as='article'
+          className={styles.stat}
+        >
           <p className={styles.statText}>Temporarily allowed</p>
           <strong className={styles.statValue}>{pausedRuleCount}</strong>
         </Card>
@@ -191,7 +200,10 @@ const OptionsApp = () => {
 
       {activeTab === 'preferences' ? (
         <section className={styles.section}>
-          <SectionHeader title='Preferences' status={isSettingsLoading ? <span className={styles.subtle}>Loading…</span> : null} />
+          <SectionHeader
+            title='Preferences'
+            status={isSettingsLoading ? <span className={styles.subtle}>Loading…</span> : null}
+          />
           <Card className={styles.settingsGrid}>
             <label className={styles.settingsLabel}>
               Theme
@@ -229,7 +241,10 @@ const OptionsApp = () => {
 
       {activeTab === 'scheduling' ? (
         <section className={styles.section}>
-          <SectionHeader title='Scheduling' status={isSettingsLoading ? <span className={styles.subtle}>Loading…</span> : null} />
+          <SectionHeader
+            title='Scheduling'
+            status={isSettingsLoading ? <span className={styles.subtle}>Loading…</span> : null}
+          />
           <Card className={styles.settingsGrid}>
             <label className={styles.checkboxLabel}>
               <input
@@ -247,7 +262,10 @@ const OptionsApp = () => {
               Active days
               <div className={styles.dayGrid}>
                 {SCHEDULE_DAY_LABELS.map((day, index) => (
-                  <label key={day} className={styles.dayChip}>
+                  <label
+                    key={day}
+                    className={styles.dayChip}
+                  >
                     <input
                       type='checkbox'
                       checked={Boolean(settings?.schedule.windows[0]?.days[index])}
@@ -293,7 +311,10 @@ const OptionsApp = () => {
 
       {activeTab === 'rules' ? (
         <section className={styles.section}>
-          <SectionHeader title='Rules' status={isRulesLoading ? <span className={styles.subtle}>Syncing…</span> : null} />
+          <SectionHeader
+            title='Rules'
+            status={isRulesLoading ? <span className={styles.subtle}>Syncing…</span> : null}
+          />
           {!blockRules?.length ? (
             <Card className={styles.emptyState}>
               <p>No rules yet.</p>

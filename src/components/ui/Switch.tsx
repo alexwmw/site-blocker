@@ -6,11 +6,10 @@ import styles from './Switch.module.css';
 type SwitchProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> & {
   label: string;
   description?: string;
+  id: string;
 };
 
-const Switch = ({ label, description, className, id, ...rest }: SwitchProps) => {
-  const switchId = id ?? label.toLowerCase().replaceAll(/[^a-z0-9]+/g, '-');
-
+const Switch = ({ label, description, className, id: switchId, ...rest }: SwitchProps) => {
   return (
     <label
       htmlFor={switchId}
@@ -27,7 +26,10 @@ const Switch = ({ label, description, className, id, ...rest }: SwitchProps) => 
           type='checkbox'
           {...rest}
         />
-        <span className={styles.slider} aria-hidden='true' />
+        <span
+          className={styles.slider}
+          aria-hidden='true'
+        />
       </span>
     </label>
   );
