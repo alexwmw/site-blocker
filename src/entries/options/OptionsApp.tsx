@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import useBlockRules from '../../hooks/useBlockRules';
 import useSettings from '../../hooks/useSettings';
@@ -18,6 +18,13 @@ const OptionsApp = () => {
     () => blockRules?.filter((rule) => rule.enabled).length ?? 0,
     [blockRules],
   );
+
+
+  useEffect(() => {
+    if (settings?.theme) {
+      document.documentElement.dataset.theme = settings.theme;
+    }
+  }, [settings?.theme]);
 
   const pausedRuleCount = useMemo(
     () => blockRules?.filter((rule) => rule.unblockUntil && rule.unblockUntil > Date.now()).length ?? 0,
