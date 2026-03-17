@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import useBlockRules from '../../hooks/useBlockRules';
 import useSettings from '../../hooks/useSettings';
+import useThemeEffect from '../../hooks/useThemeEffect';
 import type { BlockRule, Theme } from '../../types/schema';
 
 const readableDate = (dateIso: string) => {
@@ -10,21 +11,12 @@ const readableDate = (dateIso: string) => {
 };
 
 const OptionsApp = () => {
+  useThemeEffect();
   const { blockRules, removeRule, isLoading: isRulesLoading } = useBlockRules();
   const { settings, updateSettings, isLoading: isSettingsLoading } = useSettings();
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
 
-  const activeRuleCount = useMemo(
-    () => blockRules?.filter((rule) => rule.enabled).length ?? 0,
-    [blockRules],
-  );
-
-
-  useEffect(() => {
-    if (settings?.theme) {
-      document.documentElement.dataset.theme = settings.theme;
-    }
-  }, [settings?.theme]);
+  const activeRuleCount = useMemo(() => blockRules?.filter((rule) => rule.enabled).length ?? 0, [blockRules]);
 
   const pausedRuleCount = useMemo(
     () => blockRules?.filter((rule) => rule.unblockUntil && rule.unblockUntil > Date.now()).length ?? 0,

@@ -1,12 +1,15 @@
 import type { LottieRefCurrentProps } from 'lottie-react';
 import { useMemo, useRef } from 'react';
 
+import useThemeEffect from '../../hooks/useThemeEffect';
+
 import BlockPageButton from './BlockPageButton';
 import useBlockPageParams from './useBlockPageParams';
 import useButtonEvents from './useButtonEvents';
 import useNavigateOnUnblock from './useNavigateOnUnblock';
 
 const BlockPageApp = () => {
+  useThemeEffect();
   const player = useRef<LottieRefCurrentProps>(null);
   const { onMouseDown, onKeyDown, timeRemaining, timeTotal } = useButtonEvents(player);
   const { ruleIds, targetUrl, patternHost, patternPath, matchType } = useBlockPageParams();
