@@ -94,6 +94,11 @@
   font-size: 0.92rem;
 }
 
+
+.ruleSwitch {
+  margin-top: 10px;
+}
+
 .dangerButton {
   border: 0;
   border-radius: var(--radius-sm);

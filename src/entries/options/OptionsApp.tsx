@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react';
 import Card from '../../components/ui/Card';
 import EyebrowLabel from '../../components/ui/EyebrowLabel';
 import SectionHeader from '../../components/ui/SectionHeader';
+import Switch from '../../components/ui/Switch';
 import Tabs, { type TabItem } from '../../components/ui/Tabs';
 import useBlockRules from '../../hooks/useBlockRules';
 import useSettings from '../../hooks/useSettings';
@@ -28,9 +29,10 @@ const readableDate = (dateIso: string) => {
 
 const OptionsApp = () => {
   useThemeEffect();
-  const { blockRules, removeRule, isLoading: isRulesLoading } = useBlockRules();
+  const { blockRules, removeRule, updateRule, isLoading: isRulesLoading } = useBlockRules();
   const { settings, updateSettings, isLoading: isSettingsLoading } = useSettings();
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
+  const [pendingMatchTypeRuleId, setPendingMatchTypeRuleId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<OptionsTab>('rules');
 
   const activeRuleCount = useMemo(() => blockRules?.filter((rule) => rule.enabled).length ?? 0, [blockRules]);
@@ -102,6 +104,18 @@ const OptionsApp = () => {
     }).catch(console.error);
   };
 
+
+  const handleMatchTypeToggle = async (rule: BlockRule, shouldBlockSubpages: boolean) => {
+    setPendingMatchTypeRuleId(rule.id);
+    try {
+      await updateRule(rule.id, {
+        matchType: shouldBlockSubpages ? 'prefix' : 'exact',
+      });
+    } finally {
+      setPendingMatchTypeRuleId(null);
+    }
+  };
+
   const renderRule = (rule: BlockRule) => {
     const unblockState =
       rule.unblockUntil && rule.unblockUntil > Date.now()
@@ -117,6 +131,16 @@ const OptionsApp = () => {
               Match: <strong>{rule.matchType}</strong> · Added {readableDate(rule.createdAt)}
             </p>
             <p className={styles.ruleMeta}>{unblockState}</p>
+            <Switch
+              className={styles.ruleSwitch}
+              label='Block subpages'
+              description={rule.matchType === 'prefix' ? 'On · Prefix match' : 'Off · Exact match'}
+              checked={rule.matchType === 'prefix'}
+              disabled={pendingMatchTypeRuleId === rule.id}
+              onChange={(event) => {
+                handleMatchTypeToggle(rule, event.target.checked).catch(console.error);
+              }}
+            />
           </div>
           <button
             className={styles.dangerButton}

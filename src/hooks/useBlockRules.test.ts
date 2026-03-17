@@ -109,4 +109,15 @@ describe('useBlockRules Hook', () => {
 
     expect(spy).toHaveBeenCalledWith('x');
   });
+
+  it('should call StorageService.updateRule when updateRule is called', async () => {
+    const spy = vi.spyOn(StorageService, 'updateRule').mockResolvedValue({ ...DEFAULT_RULE, id: 'x' });
+    const { result } = renderHook(() => useBlockRules());
+
+    await act(async () => {
+      await result.current.updateRule('x', { matchType: 'exact' });
+    });
+
+    expect(spy).toHaveBeenCalledWith('x', { matchType: 'exact' });
+  });
 });
