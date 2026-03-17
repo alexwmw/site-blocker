@@ -46,7 +46,9 @@ const BlockPageApp = () => {
         <p className={styles.subtitle}>
           You tried to open <strong>{urlLabel}</strong>. This page is blocked by your focus rules.
         </p>
-
+        <p>
+          <strong>If you wish to proceed, hold the button.</strong>
+        </p>
         <dl className={styles.details}>
           <div className={styles.detailsItem}>
             <dt className={styles.detailTerm}>Match type</dt>
@@ -63,7 +65,7 @@ const BlockPageApp = () => {
         </dl>
 
         <p className={styles.holdHelp}>
-          Hold to continue for {timeTotal ?? '...'} seconds. Releasing early will reset the timer.
+          Hold for {timeTotal ?? '...'} seconds to continue. Releasing early will reset the timer.
         </p>
 
         <BlockPageButton

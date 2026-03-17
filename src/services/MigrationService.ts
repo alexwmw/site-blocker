@@ -56,7 +56,7 @@ export class MigrationService {
     }
 
     if (normalizedTheme === 'dark') {
-      return 'mindful-dark';
+      return 'focus-dark';
     }
 
     if (normalizedTheme === 'mindful') {

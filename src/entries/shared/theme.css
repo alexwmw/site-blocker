@@ -14,24 +14,24 @@
   --color-bg-muted: #f3f9f5;
   --color-bg-input: #f4faf6;
 
-  --color-text-primary: #18352a;
-  --color-text-secondary: #486458;
-  --color-text-tertiary: #5a776a;
+  --color-text-primary: #183f2a;
+  --color-text-secondary: #486e58;
+  --color-text-tertiary: #5a816a;
   --color-text-inverse: #ffffff;
 
   --color-border: #cbded2;
   --color-border-strong: #acc8b8;
   --color-border-muted: #d8e8de;
 
-  --color-accent: #3b7a62;
-  --color-accent-strong: #326a54;
+  --color-accent: #3b8462;
+  --color-accent-strong: #327454;
   --color-accent-soft: #5c957f;
   --color-danger: #b64d5b;
 
   --color-block-page-bg: radial-gradient(circle at top, #e6f1ea 0%, #edf6f1 36%, #f4f9f6 100%);
 
   color-scheme: light;
-  font-family: var(--font-family-base);
+  font-family: var(--font-family-base), sans-serif;
 }
 
 :root[data-theme='mindful-light'] {
@@ -43,18 +43,18 @@
   --color-bg-muted: #f3f9f5;
   --color-bg-input: #f4faf6;
 
-  --color-text-primary: #18352a;
-  --color-text-secondary: #486458;
-  --color-text-tertiary: #5a776a;
+  --color-text-primary: #183f2a;
+  --color-text-secondary: #486e58;
+  --color-text-tertiary: #5a816a;
   --color-text-inverse: #ffffff;
 
   --color-border: #cbded2;
   --color-border-strong: #acc8b8;
   --color-border-muted: #d8e8de;
 
-  --color-accent: #3b7a62;
-  --color-accent-strong: #326a54;
-  --color-accent-soft: #5c957f;
+  --color-accent: #3b8462;
+  --color-accent-strong: #327454;
+  --color-accent-soft: #5c9f7f;
   --color-danger: #b64d5b;
 
   --color-block-page-bg: radial-gradient(circle at top, #e6f1ea 0%, #edf6f1 36%, #f4f9f6 100%);
@@ -80,9 +80,9 @@
   --color-border-strong: #424d46;
   --color-border-muted: #2d3430;
 
-  --color-accent: #7ea48f;
-  --color-accent-strong: #8ab19b;
-  --color-accent-soft: #96bda8;
+  --color-accent: #327454;
+  --color-accent-strong: #183f2a;
+  --color-accent-soft: #486e58;
   --color-danger: #d4818c;
 
   --color-block-page-bg: radial-gradient(circle at top, #202621 0%, #191e1b 36%, #141815 100%);
@@ -154,5 +154,5 @@
 
 body {
   margin: 0;
-  font-family: var(--font-family-base);
+  font-family: var(--font-family-base), sans-serif;
 }
