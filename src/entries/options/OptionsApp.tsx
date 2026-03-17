@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react';
 import Card from '../../components/ui/Card';
 import EyebrowLabel from '../../components/ui/EyebrowLabel';
 import SectionHeader from '../../components/ui/SectionHeader';
+import Tabs, { type TabItem } from '../../components/ui/Tabs';
 import useBlockRules from '../../hooks/useBlockRules';
 import useSettings from '../../hooks/useSettings';
 import useThemeEffect from '../../hooks/useThemeEffect';
@@ -13,6 +14,12 @@ import styles from './OptionsApp.module.css';
 const SCHEDULE_DAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as const;
 
 type OptionsTab = 'rules' | 'scheduling' | 'preferences';
+
+const OPTIONS_TABS: ReadonlyArray<TabItem<OptionsTab>> = [
+  { id: 'rules', label: 'Rules' },
+  { id: 'scheduling', label: 'Scheduling' },
+  { id: 'preferences', label: 'Preferences' },
+];
 
 const readableDate = (dateIso: string) => {
   const date = new Date(dateIso);
@@ -150,38 +157,13 @@ const OptionsApp = () => {
         </Card>
       </section>
 
-      <section
+      <Tabs
         className={styles.tabs}
-        aria-label='Options sections'
-      >
-        <button
-          type='button'
-          className={`${styles.tabButton} ${activeTab === 'rules' ? styles.tabButtonActive : ''}`}
-          onClick={() => {
-            setActiveTab('rules');
-          }}
-        >
-          Rules
-        </button>
-        <button
-          type='button'
-          className={`${styles.tabButton} ${activeTab === 'scheduling' ? styles.tabButtonActive : ''}`}
-          onClick={() => {
-            setActiveTab('scheduling');
-          }}
-        >
-          Scheduling
-        </button>
-        <button
-          type='button'
-          className={`${styles.tabButton} ${activeTab === 'preferences' ? styles.tabButtonActive : ''}`}
-          onClick={() => {
-            setActiveTab('preferences');
-          }}
-        >
-          Preferences
-        </button>
-      </section>
+        ariaLabel='Options sections'
+        items={OPTIONS_TABS}
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+      />
 
       {activeTab === 'preferences' ? (
         <section className={styles.section}>
