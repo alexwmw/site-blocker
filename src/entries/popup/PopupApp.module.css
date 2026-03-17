@@ -1,0 +1,50 @@
+.page {
+  width: 360px;
+  padding: 16px;
+  background: var(--color-bg);
+  color: var(--color-text-primary);
+}
+
+.heroTitle {
+  margin: 6px 0 0;
+  font-size: 1.2rem;
+}
+
+.subtle {
+  margin: 8px 0 0;
+  color: var(--color-text-secondary);
+  font-size: 0.92rem;
+}
+
+.section {
+  margin-top: 14px;
+  padding: 12px;
+}
+
+.statusList {
+  margin: 10px 0 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 6px;
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+}
+
+.positive {
+  color: var(--color-accent);
+}
+
+.warning {
+  color: var(--color-danger);
+}
+
+.actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.optionsButton {
+  width: 100%;
+  margin-top: 10px;
+}
