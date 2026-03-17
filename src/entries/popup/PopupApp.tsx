@@ -7,6 +7,7 @@ import SectionHeader from '../../components/ui/SectionHeader';
 import useBlockRules from '../../hooks/useBlockRules';
 import useCreateRuleFromTab from '../../hooks/useCreateRuleFromTab';
 import useSettings from '../../hooks/useSettings';
+import useThemeEffect from '../../hooks/useThemeEffect';
 import { RulesService } from '../../services/RulesService';
 import { SchedulingService } from '../../services/SchedulingService';
 
@@ -44,6 +45,7 @@ const StatusItem = ({ label, value, tone = 'neutral' }: StatusItemProps) => {
 };
 
 const PopupApp = () => {
+  useThemeEffect();
   const { activeTab, url, isSupported, createDomainPrefixRule, createPrefixUrlRule } = useCreateRuleFromTab();
   const { blockRules, addRule, isLoading: isRulesLoading } = useBlockRules();
   const { settings, isLoading: isSettingsLoading } = useSettings();
@@ -130,12 +132,27 @@ const PopupApp = () => {
         <p className={styles.subtle}>{activeTab?.url ?? 'No active tab found.'}</p>
       </header>
 
-      <Card as='section' className={styles.section}>
+      <Card
+        as='section'
+        className={styles.section}
+      >
         <SectionHeader title='Blocking' />
         <dl className={styles.statusGrid}>
-          <StatusItem label='Blocked by rule' value={isBlockedNow ? 'Yes' : 'No'} tone={isBlockedNow ? 'bad' : 'good'} />
-          <StatusItem label='Scheduling enabled' value={isScheduleEnabled ? 'Yes' : 'No'} tone={isScheduleEnabled ? 'neutral' : 'good'} />
-          <StatusItem label='URL supported' value={isSupported ? 'Yes' : 'No'} tone={isSupported ? 'good' : 'bad'} />
+          <StatusItem
+            label='Blocked by rule'
+            value={isBlockedNow ? 'Yes' : 'No'}
+            tone={isBlockedNow ? 'bad' : 'good'}
+          />
+          <StatusItem
+            label='Scheduling enabled'
+            value={isScheduleEnabled ? 'Yes' : 'No'}
+            tone={isScheduleEnabled ? 'neutral' : 'good'}
+          />
+          <StatusItem
+            label='URL supported'
+            value={isSupported ? 'Yes' : 'No'}
+            tone={isSupported ? 'good' : 'bad'}
+          />
           {nextUnblockExpiration ? (
             <StatusItem
               label='Temporary unblock remaining'
@@ -149,17 +166,31 @@ const PopupApp = () => {
         {isRulesLoading || isSettingsLoading ? <p className={styles.subtle}>Loading latest settings…</p> : null}
       </Card>
 
-      <Card as='section' className={styles.section}>
+      <Card
+        as='section'
+        className={styles.section}
+      >
         <SectionHeader title='Quick actions' />
         <div className={styles.actions}>
-          <Button disabled={!canAddRule} onClick={handleAddDomainClick}>
+          <Button
+            disabled={!canAddRule}
+            onClick={handleAddDomainClick}
+          >
             Add domain
           </Button>
-          <Button variant='secondary' disabled={!canAddRule} onClick={handleAddPathClick}>
+          <Button
+            variant='secondary'
+            disabled={!canAddRule}
+            onClick={handleAddPathClick}
+          >
             Add page
           </Button>
         </div>
-        <Button variant='ghost' className={styles.optionsButton} onClick={handleOpenOptions}>
+        <Button
+          variant='ghost'
+          className={styles.optionsButton}
+          onClick={handleOpenOptions}
+        >
           Manage rules in options
         </Button>
       </Card>
