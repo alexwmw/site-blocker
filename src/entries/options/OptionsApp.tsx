@@ -1,5 +1,8 @@
 import { useMemo, useState } from 'react';
 
+import Card from '../../components/ui/Card';
+import EyebrowLabel from '../../components/ui/EyebrowLabel';
+import SectionHeader from '../../components/ui/SectionHeader';
 import useBlockRules from '../../hooks/useBlockRules';
 import useSettings from '../../hooks/useSettings';
 import useThemeEffect from '../../hooks/useThemeEffect';
@@ -48,26 +51,25 @@ const OptionsApp = () => {
         : 'Blocked now';
 
     return (
-      <li
-        key={rule.id}
-        className='card rule-card'
-      >
-        <div>
-          <p className='rule-pattern'>{rule.pattern}</p>
-          <p className='rule-meta'>
-            Match: <strong>{rule.matchType}</strong> · Added {readableDate(rule.createdAt)}
-          </p>
-          <p className='rule-meta'>{unblockState}</p>
-        </div>
-        <button
-          className='danger-button'
-          onClick={() => {
-            handleRemove(rule.id).catch(console.error);
-          }}
-          disabled={pendingDeleteId === rule.id}
-        >
-          {pendingDeleteId === rule.id ? 'Removing…' : 'Remove'}
-        </button>
+      <li key={rule.id}>
+        <Card className='rule-card'>
+          <div>
+            <p className='rule-pattern'>{rule.pattern}</p>
+            <p className='rule-meta'>
+              Match: <strong>{rule.matchType}</strong> · Added {readableDate(rule.createdAt)}
+            </p>
+            <p className='rule-meta'>{unblockState}</p>
+          </div>
+          <button
+            className='danger-button'
+            onClick={() => {
+              handleRemove(rule.id).catch(console.error);
+            }}
+            disabled={pendingDeleteId === rule.id}
+          >
+            {pendingDeleteId === rule.id ? 'Removing…' : 'Remove'}
+          </button>
+        </Card>
       </li>
     );
   };
@@ -75,7 +77,7 @@ const OptionsApp = () => {
   return (
     <main className='options-page'>
       <header className='hero'>
-        <p className='eyebrow'>Site Blocker</p>
+        <EyebrowLabel>Site Blocker</EyebrowLabel>
         <h1>Focus controls</h1>
         <p className='subtle'>
           Keep your rules clear, adjust unblock friction, and tune the extension for long-term focus.
@@ -83,26 +85,23 @@ const OptionsApp = () => {
       </header>
 
       <section className='stats-grid'>
-        <article className='card stat'>
+        <Card as='article' className='stat'>
           <p>Total rules</p>
           <strong>{blockRules?.length ?? 0}</strong>
-        </article>
-        <article className='card stat'>
+        </Card>
+        <Card as='article' className='stat'>
           <p>Active rules</p>
           <strong>{activeRuleCount}</strong>
-        </article>
-        <article className='card stat'>
+        </Card>
+        <Card as='article' className='stat'>
           <p>Temporarily allowed</p>
           <strong>{pausedRuleCount}</strong>
-        </article>
+        </Card>
       </section>
 
       <section className='section'>
-        <div className='section-header'>
-          <h2>Preferences</h2>
-          {isSettingsLoading ? <span className='subtle'>Loading…</span> : null}
-        </div>
-        <div className='card settings-grid'>
+        <SectionHeader title='Preferences' status={isSettingsLoading ? <span className='subtle'>Loading…</span> : null} />
+        <Card className='settings-grid'>
           <label>
             Theme
             <select
@@ -131,19 +130,16 @@ const OptionsApp = () => {
               }}
             />
           </label>
-        </div>
+        </Card>
       </section>
 
       <section className='section'>
-        <div className='section-header'>
-          <h2>Rules</h2>
-          {isRulesLoading ? <span className='subtle'>Syncing…</span> : null}
-        </div>
+        <SectionHeader title='Rules' status={isRulesLoading ? <span className='subtle'>Syncing…</span> : null} />
         {!blockRules?.length ? (
-          <div className='card empty-state'>
+          <Card className='empty-state'>
             <p>No rules yet.</p>
             <p className='subtle'>Add rules from the popup to start blocking distracting sites.</p>
-          </div>
+          </Card>
         ) : (
           <ul className='rules-list'>{blockRules.map(renderRule)}</ul>
         )}

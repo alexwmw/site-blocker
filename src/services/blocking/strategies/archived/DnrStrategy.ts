@@ -1,7 +1,8 @@
+import type { UnblockResponse } from '../../../../types/messages';
 import type { BlockRule, Settings } from '../../../../types/schema';
 import { RulesService } from '../../../RulesService';
 import { StorageService } from '../../../StorageService';
-import type { BlockingStrategy, SyncItems, UnblockResult } from '../BlockingStrategy';
+import type { BlockingStrategy, SyncItems } from '../BlockingStrategy';
 
 const MANAGED_RULE_ID_MIN = 1_000_000;
 const MANAGED_RULE_ID_SPACE = 900_000_000;
@@ -163,7 +164,7 @@ export default class DnrStrategy implements BlockingStrategy {
     await this.applyDynamicRules();
   }
 
-  async handleUnblock(ruleIds: string[], targetUrl: string, senderTabId?: number): Promise<UnblockResult> {
+  async handleUnblock(ruleIds: string[], targetUrl: string, senderTabId?: number): Promise<UnblockResponse> {
     if (!RulesService.isSupportedUrl(targetUrl)) {
       return { ok: false, reason: 'Unsupported target URL.' };
     }

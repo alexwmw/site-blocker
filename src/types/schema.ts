@@ -85,6 +85,9 @@ export const settingsSchema = z.object({
   /** Scheduled blocking configuration. */
   schedule: scheduleSchema,
 
+  /** H1 on the block page */
+  blockPageHeadline: z.string(),
+
   /**
    * Extended unblock behaviour allowing a site to remain unblocked
    * for a limited time after a successful unblock.

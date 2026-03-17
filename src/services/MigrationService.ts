@@ -44,7 +44,7 @@ export class MigrationService {
     return typeof value === 'string' && (THEMES as readonly string[]).includes(value);
   }
 
-  private static toTheme(value: string | undefined, fallback: Theme): Theme {
+  private static _toTheme(value: string | undefined, fallback: Theme): Theme {
     if (typeof value !== 'string') {
       return fallback;
     }
@@ -192,7 +192,12 @@ export class MigrationService {
 
   private static mapSettings(old: LegacyOptions): Settings {
     return {
-      theme: this.toTheme(old.theme?.value, defaultSettings.theme),
+      ...defaultSettings,
+
+      // Ignored migratable settings
+      theme: defaultSettings.theme,
+
+      // All other migratable settings
       holdDurationSeconds: this.toNumber(old.unblockTimeout?.value, defaultSettings.holdDurationSeconds),
       extendedUnblock: {
         enabled: this.toBool(old.allowRevisits?.value, defaultSettings.extendedUnblock.enabled),

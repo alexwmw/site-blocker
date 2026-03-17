@@ -107,3 +107,25 @@
     color-scheme: dark;
   }
 }
+
+.ui-card {
+  background: var(--color-bg-elevated);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-soft);
+}
+
+.ui-eyebrow {
+  margin: 0;
+  color: var(--color-accent);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.75rem;
+}
+
+.ui-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}

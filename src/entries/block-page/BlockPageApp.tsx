@@ -1,6 +1,9 @@
 import type { LottieRefCurrentProps } from 'lottie-react';
 import { useMemo, useRef } from 'react';
 
+import Card from '../../components/ui/Card';
+import EyebrowLabel from '../../components/ui/EyebrowLabel';
+import useSettings from '../../hooks/useSettings';
 import useThemeEffect from '../../hooks/useThemeEffect';
 
 import BlockPageButton from './BlockPageButton';
@@ -13,6 +16,7 @@ const BlockPageApp = () => {
   const player = useRef<LottieRefCurrentProps>(null);
   const { onMouseDown, onKeyDown, timeRemaining, timeTotal } = useButtonEvents(player);
   const { ruleIds, targetUrl, patternHost, patternPath, matchType } = useBlockPageParams();
+  const { settings } = useSettings();
 
   const holdIsComplete = timeRemaining === 0;
 
@@ -32,9 +36,12 @@ const BlockPageApp = () => {
 
   return (
     <main className='block-page'>
-      <section className='blocked-card'>
-        <p className='eyebrow'>Hold to Unblock</p>
-        <h1>Stay on track</h1>
+      <Card
+        as='section'
+        className='blocked-card'
+      >
+        <EyebrowLabel>Hold to Unblock</EyebrowLabel>
+        <h1>{settings?.blockPageHeadline ?? 'Stay on track'}</h1>
         <p className='subtitle'>
           You tried to open <strong>{urlLabel}</strong>. This page is blocked by your focus rules.
         </p>
@@ -65,7 +72,7 @@ const BlockPageApp = () => {
           onMouseDown={onMouseDown}
           onKeyDown={onKeyDown}
         />
-      </section>
+      </Card>
     </main>
   );
 };
