@@ -13,9 +13,11 @@ const OptionsApp = () => {
         removeRule(rule.id).catch(console.error);
       };
       return (
-        <li key={rule.id}>
+        <li key={rule.id} className="options-page__rule">
           {rule.pattern}
-          <button onClick={handleRemove}>Remove</button>
+          <button className="options-page__remove" onClick={handleRemove}>
+            Remove
+          </button>
         </li>
       );
     },
@@ -23,10 +25,11 @@ const OptionsApp = () => {
   );
 
   return (
-    <div>
-      <p>Hello, world!</p>
+    <div className="options-page">
+      <h1>Site Blocker</h1>
+      <p className="options-page__subtitle">Manage your active blocking rules.</p>
       {blockRules?.length ? <h2>Block Rules</h2> : <h2>No Block Rules</h2>}
-      <ul>{blockRules?.map(mapRules)}</ul>
+      <ul className="options-page__rules">{blockRules?.map(mapRules)}</ul>
     </div>
   );
 };

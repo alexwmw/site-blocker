@@ -17,16 +17,18 @@ const BlockPageApp = () => {
   useNavigateOnUnblock(ruleIds, targetUrl, holdIsComplete);
 
   return (
-    <div>
-      <h1>Block Page</h1>
-      <p>{targetUrl}</p>
-      <p>Hold for {timeTotal} seconds</p>
-      <BlockPageButton
-        player={player}
-        remainingTime={timeRemaining}
-        onMouseDown={onMouseDown}
-        onKeyDown={onKeyDown}
-      />
+    <div className="block-page">
+      <div className="block-page__card">
+        <h1>Mindful Pause</h1>
+        <p className="block-page__url">{targetUrl}</p>
+        <p className="block-page__instructions">Hold for {timeTotal} seconds</p>
+        <BlockPageButton
+          player={player}
+          remainingTime={timeRemaining}
+          onMouseDown={onMouseDown}
+          onKeyDown={onKeyDown}
+        />
+      </div>
     </div>
   );
 };
