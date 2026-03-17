@@ -1,6 +1,7 @@
 import type { LottieRef } from 'lottie-react';
 import type { KeyboardEventHandler, MouseEventHandler } from 'react';
 
+import styles from './BlockPageButton.module.css';
 import LottieHold from './lotties/LottieHold';
 import LottieSuccess from './lotties/LottieSuccess';
 
@@ -19,18 +20,18 @@ const HoldButton = (props: HoldButtonProps) => {
   const buttonText = String(remainingTime === null ? 'Hold' : remainingTime);
 
   return (
-    <div className='hold-action'>
+    <div className={styles.holdAction}>
       <RelevantLottie lottieRef={player} />
       <button
         autoFocus={autoFocus}
         onKeyDown={onKeyDown}
         onMouseDown={onMouseDown}
-        className='hold-button'
+        className={styles.holdButton}
         aria-live='polite'
       >
         {buttonText}
       </button>
-      <p className='hold-caption'>{holdIsComplete ? 'Success! Redirecting…' : 'Click and hold or press Space.'}</p>
+      <p className={styles.holdCaption}>{holdIsComplete ? 'Success! Redirecting…' : 'Click and hold or press Space.'}</p>
     </div>
   );
 };

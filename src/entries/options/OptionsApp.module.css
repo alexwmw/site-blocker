@@ -1,16 +1,19 @@
-body {
-  margin: 0;
+.body {
   background: var(--color-bg);
   color: var(--color-text-primary);
 }
 
-.options-page {
+.page {
   max-width: 960px;
   margin: 0 auto;
   padding: 32px 20px 48px;
 }
 
-.hero h1 {
+.hero {
+  margin-bottom: 4px;
+}
+
+.heroTitle {
   margin: 0;
 }
 
@@ -22,7 +25,7 @@ body {
   margin-top: 28px;
 }
 
-.stats-grid {
+.statsGrid {
   margin-top: 18px;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -33,30 +36,29 @@ body {
   padding: 14px;
 }
 
-.stat p {
+.statText {
   margin: 0;
   color: var(--color-text-secondary);
 }
 
-.stat strong {
+.statValue {
   font-size: 1.8rem;
 }
 
-.settings-grid {
+.settingsGrid {
   padding: 16px;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 14px;
 }
 
-.settings-grid label {
+.settingsLabel {
   display: grid;
   gap: 8px;
   font-weight: 600;
 }
 
-.settings-grid select,
-.settings-grid input {
+.settingsInput {
   color: var(--color-text-primary);
   font: inherit;
   padding: 10px;
@@ -65,7 +67,7 @@ body {
   background: var(--color-bg-input);
 }
 
-.rules-list {
+.rulesList {
   list-style: none;
   margin: 0;
   padding: 0;
@@ -73,26 +75,26 @@ body {
   gap: 12px;
 }
 
-.rule-card {
+.ruleCard {
   display: flex;
   justify-content: space-between;
   gap: 16px;
   padding: 14px;
 }
 
-.rule-pattern {
+.rulePattern {
   margin: 0;
   font-size: 1.05rem;
   font-weight: 700;
 }
 
-.rule-meta {
+.ruleMeta {
   margin: 6px 0 0;
   color: var(--color-text-secondary);
   font-size: 0.92rem;
 }
 
-.danger-button {
+.dangerButton {
   border: 0;
   border-radius: var(--radius-sm);
   background: var(--color-danger);
@@ -103,11 +105,11 @@ body {
   height: fit-content;
 }
 
-.danger-button:disabled {
+.dangerButton:disabled {
   cursor: not-allowed;
   opacity: 0.75;
 }
 
-.empty-state {
+.emptyState {
   padding: 18px;
 }

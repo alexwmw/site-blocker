@@ -1,4 +1,7 @@
+import clsx from 'clsx';
 import type { ComponentPropsWithoutRef, ElementType, ReactNode } from 'react';
+
+import styles from './Card.module.css';
 
 type CardProps<T extends ElementType = 'div'> = {
   as?: T;
@@ -11,7 +14,7 @@ const Card = <T extends ElementType = 'div'>({ as, children, className, ...rest 
 
   return (
     <Component
-      className={['ui-card', className].filter(Boolean).join(' ')}
+      className={clsx(styles.card, className)}
       {...rest}
     >
       {children}
