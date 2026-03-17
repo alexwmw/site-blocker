@@ -2,21 +2,33 @@
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
+  padding: 8px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-card);
+  box-shadow: var(--shadow-soft);
 }
 
 .tabButton {
-  border: 1px solid var(--color-border-strong);
+  border: 1px solid transparent;
   border-radius: var(--radius-sm);
-  background: var(--color-bg-card);
+  background: transparent;
   color: var(--color-text-secondary);
   font: inherit;
-  font-weight: 600;
+  font-weight: 700;
   padding: 8px 14px;
   cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.tabButton:hover {
+  color: var(--color-text-primary);
+  background: color-mix(in srgb, var(--color-accent) 10%, transparent);
 }
 
 .tabButtonActive {
   color: var(--color-text-primary);
   border-color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 18%, transparent);
   box-shadow: 0 0 0 1px var(--color-accent);
 }
