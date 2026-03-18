@@ -17,11 +17,7 @@ const defaultSettings: Settings = {
   schedule: {
     enabled: false,
     windows: [
-      {
-        days: [false, false, false, false, false, false, false],
-        start: '00:00',
-        end: '23:59',
-      },
+      { id: '_initial', days: [false, false, false, false, false, false, false], start: '00:00', end: '23:59' },
     ],
   },
   extendedUnblock: {
@@ -168,13 +164,7 @@ describe('TabRedirectStrategy', () => {
       settings: makeSettings({
         schedule: {
           enabled: true,
-          windows: [
-            {
-              days: [true, true, true, true, true, true, true],
-              start: '11:00',
-              end: '12:00',
-            },
-          ],
+          windows: [{ id: '_initial', days: [true, true, true, true, true, true, true], start: '11:00', end: '12:00' }],
         },
       }),
     });
@@ -196,11 +186,7 @@ describe('TabRedirectStrategy', () => {
         schedule: {
           enabled: false,
           windows: [
-            {
-              days: [false, false, false, false, false, false, false],
-              start: '23:00',
-              end: '23:30',
-            },
+            { id: '_initial', days: [false, false, false, false, false, false, false], start: '23:00', end: '23:30' },
           ],
         },
       }),

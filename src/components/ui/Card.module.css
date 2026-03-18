@@ -4,3 +4,6 @@
   border: 1px solid var(--color-border);
   box-shadow: var(--shadow-soft);
 }
+.padding {
+  padding: 16px;
+}

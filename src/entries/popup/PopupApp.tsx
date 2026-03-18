@@ -6,6 +6,7 @@ import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import EyebrowLabel from '@/components/ui/EyebrowLabel';
 import SectionHeader from '@/components/ui/SectionHeader';
+import StatusItem from '@/components/ui/StatusItem';
 import useBlockRules from '@/hooks/useBlockRules';
 import useCreateRuleFromTab from '@/hooks/useCreateRuleFromTab';
 import useSettings from '@/hooks/useSettings';
@@ -23,25 +24,6 @@ const formatRemainingTime = (milliseconds: number) => {
   }
 
   return `${minutes}m ${seconds}s`;
-};
-
-type StatusTone = 'good' | 'bad' | 'neutral';
-
-type StatusItemProps = {
-  label: string;
-  value: string;
-  tone?: StatusTone;
-};
-
-const StatusItem = ({ label, value, tone = 'neutral' }: StatusItemProps) => {
-  return (
-    <div className={styles.statusItem}>
-      <dt className={styles.statusLabel}>{label}</dt>
-      <dd className={styles.statusValue}>
-        <span className={styles[`pill${tone[0].toUpperCase()}${tone.slice(1)}`]}>{value}</span>
-      </dd>
-    </div>
-  );
 };
 
 const PopupApp = () => {

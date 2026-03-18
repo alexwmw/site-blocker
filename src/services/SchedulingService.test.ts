@@ -8,6 +8,7 @@ const buildSchedule = (overrides: Partial<Schedule> = {}): Schedule => ({
   enabled: true,
   windows: [
     {
+      id: '_initial',
       days: [true, true, true, true, true, true, true],
       start: '10:00',
       end: '11:00',

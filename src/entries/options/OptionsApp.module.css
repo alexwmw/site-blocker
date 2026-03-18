@@ -17,17 +17,34 @@
   margin-top: 28px;
 }
 
+.statusGrid {
+  margin: 10px 0;
+  display: flex;
+  gap: 8px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+
 .settingsGrid {
-  padding: 16px;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 14px;
+}
+
+.disabled {
+  color: var(--color-text-secondary);
 }
 
 .settingsLabel {
   display: grid;
   gap: 8px;
   font-weight: 600;
+}
+
+.scheduleSettings {
+  > * {
+    justify-content: start;
+  }
 }
 
 .settingsInput {
@@ -70,6 +87,21 @@
 .ruleSwitch {
   margin-top: 10px;
 }
+
+.windowsList {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  margin: 12px 0 0;
+  gap: 12px;
+}
+
+.windowListButtonRow {
+  margin:12px 0 0;
+  display: flex;
+  justify-content: end;
+}
+
 
 .dangerButton {
   border: 0;

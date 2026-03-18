@@ -1,11 +1,15 @@
+import type { MouseEventHandler } from 'react';
 import { useState } from 'react';
 
 import styles from '../OptionsApp.module.css';
 import OptionsTab from '../OptionsTab';
 
+import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
+import StatusItem from '@/components/ui/StatusItem';
 import Switch from '@/components/ui/Switch';
 import useBlockRules from '@/hooks/useBlockRules';
+import useSettings from '@/hooks/useSettings';
 import type { BlockRule } from '@/types/schema';
 
 const readableDate = (dateIso: string) => {
@@ -13,10 +17,11 @@ const readableDate = (dateIso: string) => {
   return Number.isNaN(date.valueOf()) ? 'Unknown date' : date.toLocaleString();
 };
 
-const Rules = ({ className }: { className: string }) => {
+const Rules = ({ className, onEditSchedule }: { className: string; onEditSchedule: MouseEventHandler }) => {
   const { blockRules, removeRule, updateRule, isLoading: isRulesLoading } = useBlockRules();
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const [pendingMatchTypeRuleId, setPendingMatchTypeRuleId] = useState<string | null>(null);
+  const { isSchedulingEnabled } = useSettings();
 
   const handleRemove = async (ruleId: string) => {
     setPendingDeleteId(ruleId);
@@ -84,6 +89,16 @@ const Rules = ({ className }: { className: string }) => {
       isContentLoaded={isRulesLoading}
       className={className}
     >
+      {isSchedulingEnabled ? (
+        <div className={styles.statusGrid}>
+          <StatusItem
+            label='Scheduling is:'
+            value='On'
+            tone='bad'
+          />
+          <Button onClick={onEditSchedule}>Edit schedule</Button>
+        </div>
+      ) : null}
       {!blockRules?.length ? (
         <Card className={styles.emptyState}>
           <p>No rules yet.</p>

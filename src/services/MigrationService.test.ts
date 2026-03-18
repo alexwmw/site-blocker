@@ -115,14 +115,9 @@ describe('MigrationService - Deep Logic Tests', () => {
       const result = MigrationService.mapStartAndEndToWindows(old);
 
       expect(result).toEqual([
-        {
-          days: [false, false, false, false, false, true, true],
-          start: '23:00',
-          end: '23:59',
-        },
+        { id: '_initial', days: [false, false, false, false, false, true, true], start: '23:00', end: '23:59' },
       ]);
     });
-
 
     it('should map equal 23:59 times to an all-day valid window', () => {
       const old = {
@@ -140,11 +135,7 @@ describe('MigrationService - Deep Logic Tests', () => {
       const result = MigrationService.mapStartAndEndToWindows(old);
 
       expect(result).toEqual([
-        {
-          days: [false, false, false, false, false, true, true],
-          start: '00:00',
-          end: '23:59',
-        },
+        { id: '_initial', days: [false, false, false, false, false, true, true], start: '00:00', end: '23:59' },
       ]);
     });
   });

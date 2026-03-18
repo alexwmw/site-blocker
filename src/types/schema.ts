@@ -44,6 +44,9 @@ export type ScheduleDays = z.infer<typeof scheduleDaysSchema>;
 
 export const scheduleWindowSchema = z
   .object({
+    /** Unique identifier for the rule. */
+    id: z.string().readonly(),
+    /** Weekday booleans */
     days: scheduleDaysSchema,
     /** Start time in 24-hour `HH:mm` format. */
     start: z.string().regex(TIME_REGEX),
@@ -66,7 +69,9 @@ export type ScheduleWindow = z.infer<typeof scheduleWindowSchema>;
 export const scheduleSchema = z.object({
   /** Whether scheduled blocking is enabled. */
   enabled: z.boolean(),
-  windows: z.array(scheduleWindowSchema),
+  windows: z
+    .array(scheduleWindowSchema)
+    .refine((data) => data[0].id === '_initial', { message: "Initial window must have the id '_initial'" }),
 });
 
 /**
@@ -117,7 +122,7 @@ export type MatchType = z.infer<typeof matchTypeSchema>;
  */
 export const blockRuleSchema = z.object({
   /** Unique identifier for the rule. */
-  id: z.string(),
+  id: z.string().readonly(),
 
   /** URL, hostname, or path pattern to match against. */
   pattern: z.string(),

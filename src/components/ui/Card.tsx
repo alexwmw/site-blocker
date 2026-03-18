@@ -7,14 +7,15 @@ type CardProps<T extends ElementType = 'div'> = {
   as?: T;
   children: ReactNode;
   className?: string;
+  padding?: boolean;
 } & Omit<ComponentPropsWithoutRef<T>, 'as' | 'children' | 'className'>;
 
-const Card = <T extends ElementType = 'div'>({ as, children, className, ...rest }: CardProps<T>) => {
+const Card = <T extends ElementType = 'div'>({ as, children, padding, className, ...rest }: CardProps<T>) => {
   const Component = as ?? 'div';
 
   return (
     <Component
-      className={clsx(styles.card, className)}
+      className={clsx(styles.card, padding && styles.padding, className)}
       {...rest}
     >
       {children}

@@ -53,7 +53,12 @@ const OptionsApp = () => {
 
       {activeTab === 'preferences' ? <Preferences className={styles.section} /> : null}
       {activeTab === 'scheduling' ? <Scheduling className={styles.section} /> : null}
-      {activeTab === 'rules' ? <Rules className={styles.section} /> : null}
+      {activeTab === 'rules' ? (
+        <Rules
+          className={styles.section}
+          onEditSchedule={() => setActiveTab('scheduling')}
+        />
+      ) : null}
     </main>
   );
 };

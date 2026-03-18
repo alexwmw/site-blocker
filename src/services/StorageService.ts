@@ -3,8 +3,8 @@ import type { SafeParseReturnType, ZodIssue } from 'zod';
 import defaultSettings from './defaultSettings';
 import { RulesService } from './RulesService';
 
-import type { BlockRule, Settings, StorageSchema } from '@/types/schema';
-import { blockRuleSchema, blockRulesSchema, settingsSchema } from '@/types/schema';
+import type { BlockRule, ScheduleWindow, Settings, StorageSchema } from '@/types/schema';
+import { blockRuleSchema, blockRulesSchema, scheduleWindowSchema, settingsSchema } from '@/types/schema';
 import { deepMerge } from '@/utils/deepMerge';
 
 const SETTINGS_KEY: keyof StorageSchema = 'settings';
@@ -19,6 +19,10 @@ export type AddRuleResult = {
   ok: boolean;
   reason?: string;
   duplicateRules?: BlockRule[];
+};
+export type AddScheduleWindowResult = {
+  ok: boolean;
+  reason?: string;
 };
 
 export class StorageService {
@@ -121,6 +125,63 @@ export class StorageService {
     const newRules = currentRules.filter((rule) => rule.id !== ruleId);
 
     await this.setRules(newRules);
+  }
+
+  static async addScheduleWindow(newWindow: ScheduleWindow): Promise<AddScheduleWindowResult> {
+    const { schedule } = await this.getSettings();
+    const currentWindows = schedule.windows;
+    const validated = scheduleWindowSchema.parse(newWindow);
+    await this.updateSettings({
+      schedule: {
+        ...schedule,
+        windows: [...currentWindows, validated],
+      },
+    });
+    return { ok: true };
+  }
+
+  static async removeScheduleWindow(id: string) {
+    if (id === '_initial') {
+      // initial window cannot be removed
+      return;
+    }
+    const { schedule } = await this.getSettings();
+    const currentWindows = schedule.windows;
+    await this.updateSettings({
+      schedule: {
+        ...schedule,
+        windows: currentWindows.filter((window) => window.id !== id),
+      },
+    });
+  }
+
+  static async updateScheduleWindow(
+    windowId: string,
+    updates: Partial<ScheduleWindow>,
+  ): Promise<ScheduleWindow | null> {
+    const { schedule } = await this.getSettings();
+    const currentWindows = schedule.windows;
+    const windowIndex = currentWindows.findIndex((window) => window.id === windowId);
+
+    if (windowIndex === -1) {
+      return null;
+    }
+
+    const updatedWindow = scheduleWindowSchema.parse({
+      ...currentWindows[windowIndex],
+      ...updates,
+    });
+
+    const nextWindows = [...currentWindows];
+    nextWindows[windowIndex] = updatedWindow;
+
+    await this.updateSettings({
+      schedule: {
+        ...schedule,
+        windows: nextWindows,
+      },
+    });
+    return updatedWindow;
   }
 
   static addListener(listener: StorageListener): void {

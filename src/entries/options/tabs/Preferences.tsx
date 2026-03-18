@@ -23,7 +23,10 @@ const Preferences = ({ className }: { className?: string }) => {
       isContentLoaded={isSettingsLoading}
       className={className}
     >
-      <Card className={styles.settingsGrid}>
+      <Card
+        padding
+        className={styles.settingsGrid}
+      >
         <label className={styles.settingsLabel}>
           Theme
           <select
