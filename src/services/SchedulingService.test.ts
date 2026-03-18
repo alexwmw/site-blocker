@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import type { Schedule } from '../types/schema';
-
 import { SchedulingService } from './SchedulingService';
+
+import type { Schedule } from '@/types/schema';
 
 const buildSchedule = (overrides: Partial<Schedule> = {}): Schedule => ({
   enabled: true,

@@ -10,7 +10,11 @@
     "skipLibCheck": true,
     "outDir": "dist",
     "types": ["chrome"],
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    }
   },
   "include": ["src", "vite.config.ts"]
 }

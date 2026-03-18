@@ -1,9 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { BlockRule, Settings } from '../../../../types/schema';
-import { StorageService } from '../../../StorageService';
-
 import DnrStrategy from './DnrStrategy';
+
+import { StorageService } from '@/services/StorageService';
+import type { BlockRule, Settings } from '@/types/schema';
 
 const defaultSettings: Settings = {
   theme: 'mindful-light',

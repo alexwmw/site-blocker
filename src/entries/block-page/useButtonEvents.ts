@@ -2,7 +2,7 @@ import type { LottieRefCurrentProps } from 'lottie-react';
 import type { KeyboardEventHandler, MouseEventHandler, RefObject } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import useSettings from '../../hooks/useSettings';
+import useSettings from '@/hooks/useSettings';
 
 type RefCurrentProps = {
   play: () => void;

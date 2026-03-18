@@ -1,8 +1,6 @@
 import type { Mock } from 'vitest';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { UnblockResponse } from '../../types/messages';
-import type { BlockRule } from '../../types/schema';
 import defaultSettings from '../defaultSettings';
 import { StorageService } from '../StorageService';
 
@@ -12,6 +10,9 @@ import type { SyncItems } from './strategies/BlockingStrategy';
 import TabRedirectStrategy from './strategies/TabRedirectStrategy';
 import type { Listener } from './test-utils';
 import { createEvent } from './test-utils';
+
+import type { UnblockResponse } from '@/types/messages';
+import type { BlockRule } from '@/types/schema';
 
 const rules: BlockRule[] = [
   {

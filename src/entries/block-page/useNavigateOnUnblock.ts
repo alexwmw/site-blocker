@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { MessagesService } from '../../services/MessagesService';
+import { MessagesService } from '@/services/MessagesService';
 
 const useNavigateOnUnblock = (ruleIds: string[] | null, targetUrl: string | null, isUnblocked: boolean) => {
   const [didNavigate, setDidNavigate] = useState<boolean>(false);

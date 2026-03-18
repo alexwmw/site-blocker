@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 
-import type { StorageListener } from '../services/StorageService';
-import { StorageService } from '../services/StorageService';
-import type { Settings } from '../types/schema';
+import type { StorageListener } from '@/services/StorageService';
+import { StorageService } from '@/services/StorageService';
+import type { Settings } from '@/types/schema';
 
 const useSettings = () => {
   const [settings, setSettings] = useState<Settings | null>(null);

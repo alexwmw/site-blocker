@@ -1,8 +1,9 @@
-import type { UnblockResponse } from '../../../../types/messages';
-import type { BlockRule, Settings } from '../../../../types/schema';
-import { RulesService } from '../../../RulesService';
-import { StorageService } from '../../../StorageService';
 import type { BlockingStrategy, SyncItems } from '../BlockingStrategy';
+
+import { RulesService } from '@/services/RulesService';
+import { StorageService } from '@/services/StorageService';
+import type { UnblockResponse } from '@/types/messages';
+import type { BlockRule, Settings } from '@/types/schema';
 
 const MANAGED_RULE_ID_MIN = 1_000_000;
 const MANAGED_RULE_ID_SPACE = 900_000_000;
