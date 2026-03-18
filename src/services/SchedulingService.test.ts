@@ -40,4 +40,56 @@ describe('SchedulingService', () => {
     expect(SchedulingService.isScheduleActiveNow(schedule)).toBe(false);
     expect(SchedulingService.isBlockingActiveNow(schedule)).toBe(true);
   });
+
+  it('reports duplicate, overlap, and no-day validation issues', () => {
+    const schedule = buildSchedule({
+      windows: [
+        {
+          id: '_initial',
+          days: [true, false, false, false, false, false, false],
+          start: '09:00',
+          end: '11:00',
+        },
+        {
+          id: 'duplicate',
+          days: [true, false, false, false, false, false, false],
+          start: '09:00',
+          end: '11:00',
+        },
+        {
+          id: 'empty-days',
+          days: [false, false, false, false, false, false, false],
+          start: '12:00',
+          end: '13:00',
+        },
+      ],
+    });
+
+    const messages = SchedulingService.getValidationIssues(schedule).map((issue) => issue.message);
+
+    expect(messages).toContain('Duplicate recurring schedule rule. Adjust the days or time range.');
+    expect(messages.some((message) => message.includes('overlaps with 09:00–11:00'))).toBe(true);
+    expect(messages).toContain('Select at least one day for this schedule window.');
+  });
+
+  it('treats invalid schedules as inactive until conflicts are resolved', () => {
+    const schedule = buildSchedule({
+      windows: [
+        {
+          id: '_initial',
+          days: [true, false, false, false, false, false, false],
+          start: '09:00',
+          end: '11:00',
+        },
+        {
+          id: 'overlap',
+          days: [true, false, false, false, false, false, false],
+          start: '10:30',
+          end: '11:30',
+        },
+      ],
+    });
+
+    expect(SchedulingService.isScheduleActiveNow(schedule, new Date('2026-01-05T10:45:00.000Z'))).toBe(false);
+  });
 });

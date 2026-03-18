@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import type { StorageListener } from '@/services/StorageService';
 import { StorageService } from '@/services/StorageService';
@@ -7,26 +7,37 @@ import { createUniqueId } from '@/utils/createUniqueId';
 
 const useSettings = () => {
   const [settings, setSettings] = useState<Settings | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const loadSettings = useCallback(async () => {
+    try {
+      setError(null);
+      const nextSettings = await StorageService.getSettings();
+      setSettings(nextSettings);
+    } catch (loadError) {
+      console.error(loadError);
+      setError(loadError instanceof Error ? loadError.message : 'Unable to load your settings.');
+      setSettings(null);
+    }
+  }, []);
 
   useEffect(() => {
-    // Initial load
-    StorageService.getSettings().then(setSettings).catch(console.error);
+    loadSettings().catch(console.error);
 
-    // Listen for Storage Changes
     const listener: StorageListener = (changes) => {
-      // If the 'settings' key was updated anywhere in the extension...
       if (changes.settings) {
         setSettings(changes.settings.newValue as Settings);
+        setError(null);
       }
     };
 
     StorageService.addListener(listener);
 
-    // Clean up the listener when the component unmounts
     return () => StorageService.removeListener(listener);
-  }, []);
+  }, [loadSettings]);
 
   const updateSettings = async (updates: Partial<Settings>) => {
+    setError(null);
     await StorageService.updateSettings(updates);
   };
 
@@ -52,12 +63,14 @@ const useSettings = () => {
 
   return {
     settings,
+    error,
+    retryLoad: loadSettings,
     updateSettings,
     isSchedulingEnabled,
     addScheduleWindow,
     removeScheduleWindow,
     updateScheduleWindow,
-    isLoading: settings === null,
+    isLoading: settings === null && error === null,
   };
 };
 

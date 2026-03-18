@@ -120,6 +120,25 @@ describe('StorageService', () => {
     expect(storageMock.local.set).not.toHaveBeenCalled();
   });
 
+  it('should reject overlapping schedule updates before persisting', async () => {
+    storageMock.local.get.mockResolvedValue({ settings: defaultSettings });
+
+    await expect(
+      StorageService.updateSettings({
+        schedule: {
+          ...defaultSettings.schedule,
+          enabled: true,
+          windows: [
+            { id: '_initial', days: [true, false, false, false, false, false, false], start: '09:00', end: '12:00' },
+            { id: 'window-2', days: [true, false, false, false, false, false, false], start: '11:00', end: '13:00' },
+          ],
+        },
+      }),
+    ).rejects.toThrow(/overlaps/);
+
+    expect(storageMock.local.set).not.toHaveBeenCalled();
+  });
+
   it('should filter out the correct rule when removing', async () => {
     const rules: BlockRule[] = [
       { id: '1', pattern: 'string', matchType: 'prefix', createdAt: new Date().toISOString(), enabled: true },

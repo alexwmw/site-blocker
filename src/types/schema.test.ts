@@ -20,8 +20,8 @@ describe('Schema Validation', () => {
         {
           id: '_initial',
           days: [true, true, true, true, true, true, true],
-          start: '9:00 AM', // Wrong format
-          end: '25:00', // Impossible hour
+          start: '9:00 AM',
+          end: '25:00',
         },
       ],
     };
@@ -52,6 +52,33 @@ describe('Schema Validation', () => {
       windows: [{ id: '_initial', days: [true, true, true, true, true, true, true], start: '19:00', end: '07:30' }],
     };
     const result = settingsSchema.shape.schedule.safeParse(schedule);
+    expect(result.success).toBe(false);
+  });
+
+  it('should reject windows with no selected days', () => {
+    const schedule: Schedule = {
+      enabled: true,
+      windows: [
+        { id: '_initial', days: [false, false, false, false, false, false, false], start: '09:00', end: '17:30' },
+      ],
+    };
+
+    const result = settingsSchema.shape.schedule.safeParse(schedule);
+
+    expect(result.success).toBe(false);
+  });
+
+  it('should reject duplicate schedule rules and overlaps', () => {
+    const schedule: Schedule = {
+      enabled: true,
+      windows: [
+        { id: '_initial', days: [true, false, false, false, false, false, false], start: '09:00', end: '12:00' },
+        { id: 'window-2', days: [true, false, false, false, false, false, false], start: '09:00', end: '12:00' },
+      ],
+    };
+
+    const result = settingsSchema.shape.schedule.safeParse(schedule);
+
     expect(result.success).toBe(false);
   });
 });

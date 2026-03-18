@@ -69,6 +69,28 @@ describe('useSettings Hook', () => {
     expect(result.current.settings?.theme).toBe('mindful-dark');
   });
 
+  it('should expose loading errors and support retrying', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const loadSpy = vi
+      .spyOn(StorageService, 'getSettings')
+      .mockRejectedValueOnce(new Error('boom'))
+      .mockResolvedValueOnce(defaultSettings);
+
+    const { result } = renderHook(() => useSettings());
+
+    await waitFor(() => {
+      expect(result.current.error).toBe('boom');
+    });
+
+    await act(async () => {
+      await result.current.retryLoad();
+    });
+
+    expect(loadSpy).toHaveBeenCalledTimes(2);
+    expect(result.current.error).toBeNull();
+    expect(result.current.settings).toEqual(defaultSettings);
+  });
+
   it('should call StorageService.updateSettings when updateSettings is called', async () => {
     const spy = vi.spyOn(StorageService, 'updateSettings').mockResolvedValue();
     const { result } = renderHook(() => useSettings());

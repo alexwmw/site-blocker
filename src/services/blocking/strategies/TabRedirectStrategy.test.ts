@@ -55,11 +55,14 @@ describe('TabRedirectStrategy', () => {
 
   const tabsUpdate = vi.fn();
   const tabsGet = vi.fn();
+  const tabsQuery = vi.fn();
   const startedStrategies: TabRedirectStrategy[] = [];
 
   beforeEach(() => {
     vi.clearAllMocks();
     startedStrategies.length = 0;
+
+    tabsQuery.mockResolvedValue([]);
 
     vi.stubGlobal('chrome', {
       tabs: {
@@ -68,6 +71,7 @@ describe('TabRedirectStrategy', () => {
         onRemoved,
         update: tabsUpdate,
         get: tabsGet,
+        query: tabsQuery,
       },
       runtime: {
         getURL: vi.fn((path: string) => `chrome-extension://test/${path}`),
@@ -198,6 +202,32 @@ describe('TabRedirectStrategy', () => {
     await Promise.resolve();
 
     await vi.waitFor(() => expect(tabsUpdate).toHaveBeenCalledTimes(1));
+  });
+
+  it('re-evaluates open tabs immediately when schedule changes become active', async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-01-05T10:15:00'));
+    tabsQuery.mockResolvedValue([{ id: 5, url: 'https://reddit.com/r/aita/comments/123' } as chrome.tabs.Tab]);
+    const strategy = new TabRedirectStrategy();
+
+    await strategy.start();
+    startedStrategies.push(strategy);
+    await strategy.sync({
+      rules: [makeRule()],
+      settings: makeSettings({
+        schedule: {
+          enabled: true,
+          windows: [{ id: '_initial', days: [true, true, true, true, true, true, true], start: '10:00', end: '11:00' }],
+        },
+      }),
+    });
+
+    await vi.waitFor(() => expect(tabsUpdate).toHaveBeenCalledTimes(1));
+    expect(tabsUpdate).toHaveBeenCalledWith(
+      5,
+      expect.objectContaining({ url: expect.stringContaining(getBlockPageUrl()) }),
+    );
+    vi.useRealTimers();
   });
 
   it('handleUnblock updates unblockUntil state when required and navigates sender tab back to target', async () => {

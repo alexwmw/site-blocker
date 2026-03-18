@@ -1,4 +1,5 @@
 import clsx from 'clsx';
+import { useEffect, useMemo, useState } from 'react';
 
 import styles from '../OptionsApp.module.css';
 import OptionsTab from '../OptionsTab';
@@ -7,70 +8,192 @@ import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import Switch from '@/components/ui/Switch';
 import useSettings from '@/hooks/useSettings';
-import type { ScheduleWindow } from '@/types/schema';
+import { SchedulingService } from '@/services/SchedulingService';
+import type { Schedule, ScheduleDays, ScheduleWindow } from '@/types/schema';
 
 const SCHEDULE_DAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as const;
 
+const buildUpdatedSchedule = (schedule: Schedule, windowId: string, updates: Partial<ScheduleWindow>): Schedule => ({
+  ...schedule,
+  windows: schedule.windows.map((window) => (window.id === windowId ? { ...window, ...updates } : window)),
+});
+
+const QUICK_DAY_PRESETS: Array<{ label: string; days: ScheduleDays }> = [
+  { label: 'Weekdays', days: [true, true, true, true, true, false, false] },
+  { label: 'Weekends', days: [false, false, false, false, false, true, true] },
+  { label: 'Every day', days: [true, true, true, true, true, true, true] },
+  { label: 'Clear', days: [false, false, false, false, false, false, false] },
+];
+
 const Scheduling = ({ className }: { className: string }) => {
-  const {
-    settings,
-    updateSettings,
-    isLoading: isSettingsLoading,
-    updateScheduleWindow,
-    addScheduleWindow,
-    removeScheduleWindow,
-  } = useSettings();
+  const { settings, updateSettings, isLoading, error, retryLoad } = useSettings();
+  const [draftSchedule, setDraftSchedule] = useState<Schedule | null>(null);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [savingWindowIds, setSavingWindowIds] = useState<string[]>([]);
+  const [isSavingToggle, setIsSavingToggle] = useState(false);
 
-  const handleScheduleEnabledChange = (enabled: boolean) => {
-    if (!settings) {
+  useEffect(() => {
+    if (settings?.schedule) {
+      setDraftSchedule(settings.schedule);
+      setSaveError(null);
+    }
+  }, [settings]);
+
+  const schedule = draftSchedule ?? settings?.schedule ?? null;
+  const timezoneLabel = useMemo(() => SchedulingService.formatTimezoneLabel(), []);
+  const issues = useMemo(() => (schedule ? SchedulingService.getValidationIssues(schedule) : []), [schedule]);
+  const hasWindows = Boolean(schedule && schedule.windows.length > 0);
+
+  const persistSchedule = async (nextSchedule: Schedule, targetWindowId?: string) => {
+    setDraftSchedule(nextSchedule);
+    setSaveError(null);
+
+    const nextIssues = SchedulingService.getValidationIssues(nextSchedule);
+    if (nextIssues.length > 0) {
       return;
     }
 
-    updateSettings({
-      schedule: {
-        ...settings.schedule,
-        enabled,
+    if (targetWindowId) {
+      setSavingWindowIds((current) => [...new Set([...current, targetWindowId])]);
+    }
+
+    try {
+      await updateSettings({ schedule: nextSchedule });
+    } catch (persistError) {
+      console.error(persistError);
+      setSaveError(persistError instanceof Error ? persistError.message : 'Unable to save schedule changes.');
+    } finally {
+      if (targetWindowId) {
+        setSavingWindowIds((current) => current.filter((id) => id !== targetWindowId));
+      }
+    }
+  };
+
+  const handleScheduleEnabledChange = async (enabled: boolean) => {
+    if (!schedule) {
+      return;
+    }
+
+    setIsSavingToggle(true);
+    try {
+      await updateSettings({
+        schedule: {
+          ...schedule,
+          enabled,
+        },
+      });
+      setDraftSchedule((current) => (current ? { ...current, enabled } : current));
+      setSaveError(null);
+    } catch (persistError) {
+      console.error(persistError);
+      setSaveError(persistError instanceof Error ? persistError.message : 'Unable to update scheduled blocking.');
+    } finally {
+      setIsSavingToggle(false);
+    }
+  };
+
+  const addWindow = async () => {
+    if (!schedule) {
+      return;
+    }
+
+    const newWindow: ScheduleWindow = {
+      id: crypto.randomUUID(),
+      days: [true, true, true, true, true, false, false],
+      start: '09:00',
+      end: '17:00',
+    };
+
+    await persistSchedule(
+      {
+        ...schedule,
+        windows: [...schedule.windows, newWindow],
       },
-    }).catch(console.error);
+      newWindow.id,
+    );
   };
 
-  const handleScheduleWindowChange = async (window: ScheduleWindow, updates: Partial<ScheduleWindow>) => {
-    await updateScheduleWindow(window.id, updates);
-  };
-
-  const handleScheduleDayToggle = (window: ScheduleWindow, dayIndex: number, checked: boolean) => {
-    if (!settings || settings.schedule.windows.length === 0) {
+  const removeWindow = async (windowId: string) => {
+    if (!schedule || windowId === '_initial') {
       return;
     }
 
-    const nextDays = [...window.days] as typeof window.days;
-    nextDays[dayIndex] = checked;
-
-    updateScheduleWindow(window.id, { days: nextDays }).catch(console.error);
+    await persistSchedule(
+      {
+        ...schedule,
+        windows: schedule.windows.filter((window) => window.id !== windowId),
+      },
+      windowId,
+    );
   };
 
-  const renderWindows = (window: ScheduleWindow, windowIndex: number) => {
-    const disabled = !settings || !settings.schedule.enabled;
+  const updateWindow = async (windowId: string, updates: Partial<ScheduleWindow>) => {
+    if (!schedule) {
+      return;
+    }
+
+    await persistSchedule(buildUpdatedSchedule(schedule, windowId, updates), windowId);
+  };
+
+  const renderWindow = (window: ScheduleWindow, windowIndex: number) => {
+    const disabled = !schedule || !schedule.enabled;
+    const messages = SchedulingService.getWindowValidationMessages(schedule, window.id);
+    const isSavingWindow = savingWindowIds.includes(window.id);
+
     return (
-      <li key={windowIndex}>
+      <li key={window.id}>
         <Card
           padding
-          className={clsx(styles.settingsGrid, disabled && styles.disabled)}
+          className={clsx(styles.settingsGrid, styles.scheduleWindowCard, disabled && styles.disabled)}
         >
-          <div className={styles.settingsLabel}>
-            Active days
+          <div className={styles.scheduleWindowHeader}>
+            <div>
+              <strong>Window {windowIndex + 1}</strong>
+              <p className={styles.subtle}>Recurring weekly block</p>
+            </div>
+            {window.id !== '_initial' ? (
+              <Button
+                variant='ghost'
+                disabled={disabled || isSavingWindow}
+                onClick={() => {
+                  removeWindow(window.id).catch(console.error);
+                }}
+              >
+                Remove
+              </Button>
+            ) : null}
+          </div>
+
+          <div className={styles.scheduleGroup}>
+            <span className={styles.settingsLabel}>Repeat on</span>
+            <div className={styles.presetRow}>
+              {QUICK_DAY_PRESETS.map((preset) => (
+                <Button
+                  key={preset.label}
+                  variant='secondary'
+                  disabled={disabled || isSavingWindow}
+                  onClick={() => {
+                    updateWindow(window.id, { days: preset.days }).catch(console.error);
+                  }}
+                >
+                  {preset.label}
+                </Button>
+              ))}
+            </div>
             <div className={styles.dayGrid}>
               {SCHEDULE_DAY_LABELS.map((day, index) => (
                 <label
-                  key={day}
+                  key={`${window.id}-${day}`}
                   className={styles.dayChip}
                 >
                   <input
                     type='checkbox'
                     checked={Boolean(window.days[index])}
-                    disabled={disabled}
+                    disabled={disabled || isSavingWindow}
                     onChange={(event) => {
-                      handleScheduleDayToggle(window, index, event.target.checked);
+                      const nextDays = [...window.days] as ScheduleDays;
+                      nextDays[index] = event.target.checked;
+                      updateWindow(window.id, { days: nextDays }).catch(console.error);
                     }}
                   />
                   {day}
@@ -78,41 +201,47 @@ const Scheduling = ({ className }: { className: string }) => {
               ))}
             </div>
           </div>
+
           <label className={styles.settingsLabel}>
             Start time
             <input
               className={styles.settingsInput}
               type='time'
-              value={window.start ?? '09:00'}
-              disabled={disabled}
+              step={900}
+              value={window.start}
+              disabled={disabled || isSavingWindow}
               onChange={(event) => {
-                handleScheduleWindowChange(window, { start: event.target.value }).catch(console.error);
+                updateWindow(window.id, { start: event.target.value }).catch(console.error);
               }}
             />
           </label>
+
           <label className={styles.settingsLabel}>
             End time
             <input
               className={styles.settingsInput}
               type='time'
-              value={window.end ?? '17:00'}
-              disabled={disabled}
+              step={900}
+              value={window.end}
+              disabled={disabled || isSavingWindow}
               onChange={(event) => {
-                handleScheduleWindowChange(window, { end: event.target.value }).catch(console.error);
+                updateWindow(window.id, { end: event.target.value }).catch(console.error);
               }}
             />
           </label>
-          <span>
-            {window.id !== '_initial' ? (
-              <Button
-                onClick={() => {
-                  removeScheduleWindow(window.id).catch(console.error);
-                }}
-              >
-                Remove schedule window
-              </Button>
+
+          <div className={styles.scheduleAssistiveCopy}>
+            <strong>Timezone</strong>
+            <p className={styles.subtle}>Schedule windows use your browser's local timezone: {timezoneLabel}.</p>
+            {isSavingWindow ? <p className={styles.subtle}>Saving changes…</p> : null}
+            {messages.length > 0 ? (
+              <ul className={styles.inlineErrorList}>
+                {messages.map((message) => (
+                  <li key={`${window.id}-${message}`}>{message}</li>
+                ))}
+              </ul>
             ) : null}
-          </span>
+          </div>
         </Card>
       </li>
     );
@@ -121,7 +250,7 @@ const Scheduling = ({ className }: { className: string }) => {
   return (
     <OptionsTab
       title='Scheduling'
-      isContentLoaded={isSettingsLoading}
+      isContentLoaded={isLoading}
       className={className}
     >
       <Card
@@ -132,25 +261,107 @@ const Scheduling = ({ className }: { className: string }) => {
           id='scheduling_enabled'
           label='Enable scheduled blocking'
           onChange={(event) => {
-            handleScheduleEnabledChange(event.target.checked);
+            handleScheduleEnabledChange(event.target.checked).catch(console.error);
           }}
-          disabled={!settings}
-          checked={Boolean(settings?.schedule.enabled)}
+          disabled={!schedule || isSavingToggle}
+          checked={Boolean(schedule?.enabled)}
           reverse
           tight
         />
+        <div className={styles.scheduleAssistiveCopy}>
+          <p className={styles.subtle}>
+            When this is off, blocking stays active all day. Turn it on to block only during the recurring windows
+            below.
+          </p>
+          <p className={styles.subtle}>Current timezone: {timezoneLabel}</p>
+        </div>
       </Card>
-      <h3>Schedule windows</h3>
-      <ul className={styles.windowsList}>{settings?.schedule.windows.map(renderWindows)}</ul>
-      <div className={styles.windowListButtonRow}>
-        <Button
-          onClick={() => {
-            addScheduleWindow().catch(console.error);
-          }}
+
+      {isLoading ? (
+        <Card
+          className={styles.emptyState}
+          padding
         >
-          Add new schedule window
-        </Button>
-      </div>
+          Loading schedule windows…
+        </Card>
+      ) : null}
+
+      {error ? (
+        <Card
+          className={styles.errorState}
+          padding
+        >
+          <p>We couldn&apos;t load your scheduling settings.</p>
+          <p className={styles.subtle}>{error}</p>
+          <Button
+            variant='secondary'
+            onClick={() => {
+              Promise.resolve(retryLoad()).catch(console.error);
+            }}
+          >
+            Retry
+          </Button>
+        </Card>
+      ) : null}
+
+      {!isLoading && !error && schedule ? (
+        <>
+          <div className={styles.scheduleHeadingRow}>
+            <div>
+              <h3>Schedule windows</h3>
+              <p className={styles.subtle}>
+                Add weekly rules, adjust days quickly, and resolve overlaps before they are saved.
+              </p>
+            </div>
+            <Button
+              onClick={() => {
+                addWindow().catch(console.error);
+              }}
+            >
+              Add new schedule window
+            </Button>
+          </div>
+
+          {saveError ? (
+            <Card
+              className={styles.errorState}
+              padding
+            >
+              {saveError}
+            </Card>
+          ) : null}
+
+          {issues.length > 0 ? (
+            <Card
+              className={styles.errorState}
+              padding
+            >
+              <strong>Fix schedule conflicts before saving</strong>
+              <ul className={styles.inlineErrorList}>
+                {issues.map((issue) => (
+                  <li key={`${issue.windowId ?? 'schedule'}-${issue.path.join('-')}-${issue.message}`}>
+                    {issue.message}
+                  </li>
+                ))}
+              </ul>
+            </Card>
+          ) : null}
+
+          {hasWindows ? (
+            <ul className={styles.windowsList}>{schedule.windows.map(renderWindow)}</ul>
+          ) : (
+            <Card
+              className={styles.emptyState}
+              padding
+            >
+              <strong>No schedule windows yet.</strong>
+              <p className={styles.subtle}>
+                Create your first recurring block window to limit blocking to specific times.
+              </p>
+            </Card>
+          )}
+        </>
+      ) : null}
     </OptionsTab>
   );
 };

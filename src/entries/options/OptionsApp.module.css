@@ -24,7 +24,6 @@
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
 }
 
-
 .settingsGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -83,7 +82,6 @@
   font-size: 0.92rem;
 }
 
-
 .ruleSwitch {
   margin-top: 10px;
 }
@@ -97,11 +95,10 @@
 }
 
 .windowListButtonRow {
-  margin:12px 0 0;
+  margin: 12px 0 0;
   display: flex;
   justify-content: end;
 }
-
 
 .dangerButton {
   border: 0;
@@ -123,11 +120,9 @@
   padding: 18px;
 }
 
-
 .tabs {
   margin-top: 20px;
 }
-
 
 .checkboxLabel {
   display: flex;
@@ -148,4 +143,59 @@
   gap: 6px;
   font-size: 0.9rem;
   font-weight: 500;
+}
+
+.scheduleHeadingRow {
+  margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: end;
+}
+
+.scheduleWindowCard {
+  align-items: start;
+}
+
+.scheduleWindowHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: start;
+}
+
+.scheduleWindowHeader p {
+  margin: 4px 0 0;
+}
+
+.scheduleGroup {
+  display: grid;
+  gap: 10px;
+}
+
+.presetRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.scheduleAssistiveCopy {
+  display: grid;
+  gap: 6px;
+}
+
+.scheduleAssistiveCopy p {
+  margin: 0;
+}
+
+.inlineErrorList {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--color-danger);
+}
+
+.errorState {
+  margin-top: 12px;
+  border-color: var(--color-danger);
 }

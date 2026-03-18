@@ -42,6 +42,11 @@ export const scheduleDaysSchema = z.tuple([
 
 export type ScheduleDays = z.infer<typeof scheduleDaysSchema>;
 
+const timeToMinutes = (time: string): number => {
+  const [hours, minutes] = time.split(':').map(Number);
+  return hours * 60 + minutes;
+};
+
 export const scheduleWindowSchema = z
   .object({
     /** Unique identifier for the rule. */
@@ -53,9 +58,22 @@ export const scheduleWindowSchema = z
     /** End time in 24-hour `HH:mm` format. */
     end: z.string().regex(TIME_REGEX),
   })
-  .refine((data) => data.end > data.start, {
-    message: 'End time cannot be earlier than start time.',
-    path: ['end'], // Sets the error path to 'end'
+  .superRefine((data, ctx) => {
+    if (!data.days.some(Boolean)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['days'],
+        message: 'Select at least one day for this schedule window.',
+      });
+    }
+
+    if (timeToMinutes(data.end) <= timeToMinutes(data.start)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['end'],
+        message: 'End time must be later than the start time.',
+      });
+    }
   });
 
 export type ScheduleWindow = z.infer<typeof scheduleWindowSchema>;
@@ -66,13 +84,58 @@ export type ScheduleWindow = z.infer<typeof scheduleWindowSchema>;
  * When `enabled` is `true`, blocking only applies on selected days and within
  * the configured time range.
  */
-export const scheduleSchema = z.object({
-  /** Whether scheduled blocking is enabled. */
-  enabled: z.boolean(),
-  windows: z
-    .array(scheduleWindowSchema)
-    .refine((data) => data[0].id === '_initial', { message: "Initial window must have the id '_initial'" }),
-});
+export const scheduleSchema = z
+  .object({
+    /** Whether scheduled blocking is enabled. */
+    enabled: z.boolean(),
+    windows: z.array(scheduleWindowSchema),
+  })
+  .superRefine((data, ctx) => {
+    if (data.windows.length > 0 && data.windows[0]?.id !== '_initial') {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['windows', 0, 'id'],
+        message: "Initial window must have the id '_initial'",
+      });
+    }
+
+    for (const [index, window] of data.windows.entries()) {
+      for (const [compareIndex, compareWindow] of data.windows.entries()) {
+        if (compareIndex <= index) {
+          continue;
+        }
+
+        const sameRange = window.start === compareWindow.start && window.end === compareWindow.end;
+        const sameDays = window.days.every((dayEnabled, dayIndex) => dayEnabled === compareWindow.days[dayIndex]);
+        if (sameRange && sameDays) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['windows', compareIndex, 'days'],
+            message: 'Duplicate recurring schedule rule. Adjust the days or time range.',
+          });
+        }
+
+        const overlapsOnAnyDay = window.days.some((dayEnabled, dayIndex) => {
+          if (!dayEnabled || !compareWindow.days[dayIndex]) {
+            return false;
+          }
+
+          return (
+            timeToMinutes(window.start) < timeToMinutes(compareWindow.end) &&
+            timeToMinutes(compareWindow.start) < timeToMinutes(window.end)
+          );
+        });
+
+        if (overlapsOnAnyDay) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['windows', compareIndex, 'days'],
+            message: `This schedule window overlaps with ${window.start}–${window.end} on one or more selected days.`,
+          });
+        }
+      }
+    }
+  });
 
 /**
  * User-configurable extension settings.

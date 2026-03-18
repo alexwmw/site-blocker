@@ -2,6 +2,7 @@ import type { SafeParseReturnType, ZodIssue } from 'zod';
 
 import defaultSettings from './defaultSettings';
 import { RulesService } from './RulesService';
+import { SchedulingService } from './SchedulingService';
 
 import type { BlockRule, ScheduleWindow, Settings, StorageSchema } from '@/types/schema';
 import { blockRuleSchema, blockRulesSchema, scheduleWindowSchema, settingsSchema } from '@/types/schema';
@@ -23,6 +24,14 @@ export type AddRuleResult = {
 export type AddScheduleWindowResult = {
   ok: boolean;
   reason?: string;
+};
+
+const assertValidSchedule = (settings: Settings): Settings => {
+  const issues = SchedulingService.getValidationIssues(settings.schedule);
+  if (issues.length > 0) {
+    throw new Error(issues.map((issue) => issue.message).join(' '));
+  }
+  return settings;
 };
 
 export class StorageService {
@@ -47,7 +56,7 @@ export class StorageService {
   static async updateSettings(updates: Partial<Settings>): Promise<void> {
     const current: Settings = await this.getSettings();
     const merged: Settings = deepMerge(current, updates);
-    const finalSettings: Settings = settingsSchema.parse(merged);
+    const finalSettings: Settings = assertValidSchedule(settingsSchema.parse(merged));
 
     await chrome.storage.local.set({ [SETTINGS_KEY]: finalSettings });
   }
