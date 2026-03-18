@@ -68,7 +68,7 @@ describe('Schema Validation', () => {
     expect(result.success).toBe(false);
   });
 
-  it('should reject duplicate schedule rules and overlaps', () => {
+  it('should allow overlapping windows because blocking still works', () => {
     const schedule: Schedule = {
       enabled: true,
       windows: [
@@ -79,6 +79,6 @@ describe('Schema Validation', () => {
 
     const result = settingsSchema.shape.schedule.safeParse(schedule);
 
-    expect(result.success).toBe(false);
+    expect(result.success).toBe(true);
   });
 });

@@ -189,13 +189,17 @@
   margin: 0;
 }
 
-.inlineErrorList {
+.inlineWarningList {
   margin: 0;
   padding-left: 18px;
-  color: var(--color-danger);
+  color: var(--color-text-secondary);
 }
 
 .errorState {
   margin-top: 12px;
   border-color: var(--color-danger);
+}
+
+.warningState {
+  margin-top: 12px;
 }

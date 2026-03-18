@@ -105,7 +105,7 @@ describe('Scheduling tab', () => {
     expect(screen.getByText('No schedule windows yet.')).toBeTruthy();
   });
 
-  it('surfaces inline conflict guidance for invalid schedules', () => {
+  it('surfaces overlap guidance as a warning instead of a blocking error', () => {
     mockedUseSettings.mockReturnValue({
       settings: {
         ...baseSettings,
@@ -135,7 +135,7 @@ describe('Scheduling tab', () => {
 
     render(<Scheduling className='test' />);
 
-    expect(screen.getByText('Fix schedule conflicts before saving')).toBeTruthy();
-    expect(screen.getAllByText(/overlaps with 09:00–12:00/)[0]).toBeTruthy();
+    expect(screen.getByText('Heads up')).toBeTruthy();
+    expect(screen.getAllByText(/Blocking will still work, but you may want to combine them/)[0]).toBeTruthy();
   });
 });

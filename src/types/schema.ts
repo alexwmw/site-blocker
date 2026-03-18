@@ -98,43 +98,6 @@ export const scheduleSchema = z
         message: "Initial window must have the id '_initial'",
       });
     }
-
-    for (const [index, window] of data.windows.entries()) {
-      for (const [compareIndex, compareWindow] of data.windows.entries()) {
-        if (compareIndex <= index) {
-          continue;
-        }
-
-        const sameRange = window.start === compareWindow.start && window.end === compareWindow.end;
-        const sameDays = window.days.every((dayEnabled, dayIndex) => dayEnabled === compareWindow.days[dayIndex]);
-        if (sameRange && sameDays) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            path: ['windows', compareIndex, 'days'],
-            message: 'Duplicate recurring schedule rule. Adjust the days or time range.',
-          });
-        }
-
-        const overlapsOnAnyDay = window.days.some((dayEnabled, dayIndex) => {
-          if (!dayEnabled || !compareWindow.days[dayIndex]) {
-            return false;
-          }
-
-          return (
-            timeToMinutes(window.start) < timeToMinutes(compareWindow.end) &&
-            timeToMinutes(compareWindow.start) < timeToMinutes(window.end)
-          );
-        });
-
-        if (overlapsOnAnyDay) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            path: ['windows', compareIndex, 'days'],
-            message: `This schedule window overlaps with ${window.start}–${window.end} on one or more selected days.`,
-          });
-        }
-      }
-    }
   });
 
 /**

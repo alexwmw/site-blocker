@@ -20,27 +20,23 @@ describe('StorageService', () => {
   });
 
   it('should correctly merge nested schedule updates', async () => {
-    // 1. Initial State
     storageMock.local.get.mockResolvedValue({
       settings: { ...defaultSettings, theme: 'mindful-light' },
     });
 
-    // 2. Update just the schedule toggle
     await StorageService.updateSettings({
-      schedule: { enabled: false } as Schedule, // partial update
+      schedule: { enabled: false } as Schedule,
     });
 
-    // 3. Verify the set call
     const [[setCall]] = storageMock.local.set.mock.calls;
-    expect(setCall.settings.theme).toBe('mindful-light'); // Preserved
-    expect(setCall.settings.schedule.enabled).toBe(false); // Updated
-    expect(setCall.settings.schedule.windows[0].days).toEqual(defaultSettings.schedule.windows[0].days); // Preserved!
+    expect(setCall.settings.theme).toBe('mindful-light');
+    expect(setCall.settings.schedule.enabled).toBe(false);
+    expect(setCall.settings.schedule.windows[0].days).toEqual(defaultSettings.schedule.windows[0].days);
   });
 
   it('should throw an error if updateSettings receives invalid types', async () => {
     storageMock.local.get.mockResolvedValue({ settings: defaultSettings });
 
-    // Trying to pass a string to a number field
     await expect(StorageService.updateSettings({ holdDurationSeconds: 'not-a-number' } as never)).rejects.toThrow();
   });
 
@@ -58,7 +54,7 @@ describe('StorageService', () => {
     const [[setCall]] = storageMock.local.set.mock.calls;
 
     expect(setCall.rules).toHaveLength(2);
-    expect(setCall.rules[0]).not.toBe(rules[0]); // to be a new object
+    expect(setCall.rules[0]).not.toBe(rules[0]);
 
     expect(setCall.rules[0].pattern).toBe('test-pattern');
     expect(setCall.rules[0]).toStrictEqual({
@@ -120,23 +116,21 @@ describe('StorageService', () => {
     expect(storageMock.local.set).not.toHaveBeenCalled();
   });
 
-  it('should reject overlapping schedule updates before persisting', async () => {
+  it('should allow overlapping schedule updates because they are only warnings', async () => {
     storageMock.local.get.mockResolvedValue({ settings: defaultSettings });
 
-    await expect(
-      StorageService.updateSettings({
-        schedule: {
-          ...defaultSettings.schedule,
-          enabled: true,
-          windows: [
-            { id: '_initial', days: [true, false, false, false, false, false, false], start: '09:00', end: '12:00' },
-            { id: 'window-2', days: [true, false, false, false, false, false, false], start: '11:00', end: '13:00' },
-          ],
-        },
-      }),
-    ).rejects.toThrow(/overlaps/);
+    await StorageService.updateSettings({
+      schedule: {
+        ...defaultSettings.schedule,
+        enabled: true,
+        windows: [
+          { id: '_initial', days: [true, false, false, false, false, false, false], start: '09:00', end: '12:00' },
+          { id: 'window-2', days: [true, false, false, false, false, false, false], start: '11:00', end: '13:00' },
+        ],
+      },
+    });
 
-    expect(storageMock.local.set).not.toHaveBeenCalled();
+    expect(storageMock.local.set).toHaveBeenCalledTimes(1);
   });
 
   it('should filter out the correct rule when removing', async () => {

@@ -12,18 +12,21 @@ import { SchedulingService } from '@/services/SchedulingService';
 import type { Schedule, ScheduleDays, ScheduleWindow } from '@/types/schema';
 
 const SCHEDULE_DAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as const;
-
-const buildUpdatedSchedule = (schedule: Schedule, windowId: string, updates: Partial<ScheduleWindow>): Schedule => ({
-  ...schedule,
-  windows: schedule.windows.map((window) => (window.id === windowId ? { ...window, ...updates } : window)),
-});
+const TIME_STEP_MINUTES = 15;
+const TIME_OPTIONS = Array.from({ length: Math.floor((24 * 60) / TIME_STEP_MINUTES) }, (_, index) =>
+  SchedulingService.minutesToTime(index * TIME_STEP_MINUTES),
+);
 
 const QUICK_DAY_PRESETS: Array<{ label: string; days: ScheduleDays }> = [
   { label: 'Weekdays', days: [true, true, true, true, true, false, false] },
   { label: 'Weekends', days: [false, false, false, false, false, true, true] },
   { label: 'Every day', days: [true, true, true, true, true, true, true] },
-  { label: 'Clear', days: [false, false, false, false, false, false, false] },
 ];
+
+const buildUpdatedSchedule = (schedule: Schedule, windowId: string, updates: Partial<ScheduleWindow>): Schedule => ({
+  ...schedule,
+  windows: schedule.windows.map((window) => (window.id === windowId ? { ...window, ...updates } : window)),
+});
 
 const Scheduling = ({ className }: { className: string }) => {
   const { settings, updateSettings, isLoading, error, retryLoad } = useSettings();
@@ -41,17 +44,12 @@ const Scheduling = ({ className }: { className: string }) => {
 
   const schedule = draftSchedule ?? settings?.schedule ?? null;
   const timezoneLabel = useMemo(() => SchedulingService.formatTimezoneLabel(), []);
-  const issues = useMemo(() => (schedule ? SchedulingService.getValidationIssues(schedule) : []), [schedule]);
+  const warnings = useMemo(() => (schedule ? SchedulingService.getWarnings(schedule) : []), [schedule]);
   const hasWindows = Boolean(schedule && schedule.windows.length > 0);
 
   const persistSchedule = async (nextSchedule: Schedule, targetWindowId?: string) => {
     setDraftSchedule(nextSchedule);
     setSaveError(null);
-
-    const nextIssues = SchedulingService.getValidationIssues(nextSchedule);
-    if (nextIssues.length > 0) {
-      return;
-    }
 
     if (targetWindowId) {
       setSavingWindowIds((current) => [...new Set([...current, targetWindowId])]);
@@ -137,8 +135,13 @@ const Scheduling = ({ className }: { className: string }) => {
 
   const renderWindow = (window: ScheduleWindow, windowIndex: number) => {
     const disabled = !schedule || !schedule.enabled;
-    const messages = SchedulingService.getWindowValidationMessages(schedule, window.id);
     const isSavingWindow = savingWindowIds.includes(window.id);
+    const enabledDayCount = window.days.filter(Boolean).length;
+    const startMinutes = SchedulingService.timeToMinutes(window.start);
+    const endMinutes = SchedulingService.timeToMinutes(window.end);
+    const startOptions = TIME_OPTIONS.filter((time) => SchedulingService.timeToMinutes(time) < endMinutes);
+    const endOptions = TIME_OPTIONS.filter((time) => SchedulingService.timeToMinutes(time) > startMinutes);
+    const warningMessages = SchedulingService.getWindowWarningMessages(schedule, window.id);
 
     return (
       <li key={window.id}>
@@ -181,62 +184,84 @@ const Scheduling = ({ className }: { className: string }) => {
               ))}
             </div>
             <div className={styles.dayGrid}>
-              {SCHEDULE_DAY_LABELS.map((day, index) => (
-                <label
-                  key={`${window.id}-${day}`}
-                  className={styles.dayChip}
-                >
-                  <input
-                    type='checkbox'
-                    checked={Boolean(window.days[index])}
-                    disabled={disabled || isSavingWindow}
-                    onChange={(event) => {
-                      const nextDays = [...window.days] as ScheduleDays;
-                      nextDays[index] = event.target.checked;
-                      updateWindow(window.id, { days: nextDays }).catch(console.error);
-                    }}
-                  />
-                  {day}
-                </label>
-              ))}
+              {SCHEDULE_DAY_LABELS.map((day, index) => {
+                const isOnlyEnabledDay = enabledDayCount === 1 && window.days[index];
+
+                return (
+                  <label
+                    key={`${window.id}-${day}`}
+                    className={styles.dayChip}
+                  >
+                    <input
+                      type='checkbox'
+                      checked={Boolean(window.days[index])}
+                      disabled={disabled || isSavingWindow || isOnlyEnabledDay}
+                      onChange={(event) => {
+                        const nextDays = [...window.days] as ScheduleDays;
+                        nextDays[index] = event.target.checked;
+                        updateWindow(window.id, { days: nextDays }).catch(console.error);
+                      }}
+                    />
+                    {day}
+                  </label>
+                );
+              })}
             </div>
+            <p className={styles.subtle}>Each window always keeps at least one active day selected.</p>
           </div>
 
           <label className={styles.settingsLabel}>
             Start time
-            <input
+            <select
               className={styles.settingsInput}
-              type='time'
-              step={900}
               value={window.start}
               disabled={disabled || isSavingWindow}
               onChange={(event) => {
                 updateWindow(window.id, { start: event.target.value }).catch(console.error);
               }}
-            />
+            >
+              {startOptions.map((time) => (
+                <option
+                  key={`${window.id}-start-${time}`}
+                  value={time}
+                >
+                  {time}
+                </option>
+              ))}
+            </select>
           </label>
 
           <label className={styles.settingsLabel}>
             End time
-            <input
+            <select
               className={styles.settingsInput}
-              type='time'
-              step={900}
               value={window.end}
               disabled={disabled || isSavingWindow}
               onChange={(event) => {
                 updateWindow(window.id, { end: event.target.value }).catch(console.error);
               }}
-            />
+            >
+              {endOptions.map((time) => (
+                <option
+                  key={`${window.id}-end-${time}`}
+                  value={time}
+                >
+                  {time}
+                </option>
+              ))}
+            </select>
           </label>
 
           <div className={styles.scheduleAssistiveCopy}>
             <strong>Timezone</strong>
-            <p className={styles.subtle}>Schedule windows use your browser's local timezone: {timezoneLabel}.</p>
+            <p className={styles.subtle}>Schedule windows use your browser&apos;s local timezone: {timezoneLabel}.</p>
+            <p className={styles.subtle}>
+              Times are in 15-minute increments, and end times are always after start times.
+            </p>
             {isSavingWindow ? <p className={styles.subtle}>Saving changes…</p> : null}
-            {messages.length > 0 ? (
-              <ul className={styles.inlineErrorList}>
-                {messages.map((message) => (
+            {warningMessages.length > 0 ? (
+              <ul className={styles.inlineWarningList}>
+                {warningMessages.map((message) => (
                   <li key={`${window.id}-${message}`}>{message}</li>
                 ))}
               </ul>
@@ -310,7 +335,7 @@ const Scheduling = ({ className }: { className: string }) => {
             <div>
               <h3>Schedule windows</h3>
               <p className={styles.subtle}>
-                Add weekly rules, adjust days quickly, and resolve overlaps before they are saved.
+                Add weekly rules, adjust days quickly, and review overlap warnings when you intentionally stack windows.
               </p>
             </div>
             <Button
@@ -331,17 +356,15 @@ const Scheduling = ({ className }: { className: string }) => {
             </Card>
           ) : null}
 
-          {issues.length > 0 ? (
+          {warnings.length > 0 ? (
             <Card
-              className={styles.errorState}
+              className={styles.warningState}
               padding
             >
-              <strong>Fix schedule conflicts before saving</strong>
-              <ul className={styles.inlineErrorList}>
-                {issues.map((issue) => (
-                  <li key={`${issue.windowId ?? 'schedule'}-${issue.path.join('-')}-${issue.message}`}>
-                    {issue.message}
-                  </li>
+              <strong>Heads up</strong>
+              <ul className={styles.inlineWarningList}>
+                {warnings.map((warning) => (
+                  <li key={`${warning.code}-${warning.windowIds.join('-')}`}>{warning.message}</li>
                 ))}
               </ul>
             </Card>
