@@ -58,22 +58,9 @@ export const scheduleWindowSchema = z
     /** End time in 24-hour `HH:mm` format. */
     end: z.string().regex(TIME_REGEX),
   })
-  .superRefine((data, ctx) => {
-    if (!data.days.some(Boolean)) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['days'],
-        message: 'Select at least one day for this schedule window.',
-      });
-    }
-
-    if (timeToMinutes(data.end) <= timeToMinutes(data.start)) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        path: ['end'],
-        message: 'End time must be later than the start time.',
-      });
-    }
+  .refine((data) => timeToMinutes(data.end) > timeToMinutes(data.start), {
+    message: 'End time cannot be earlier than start time.',
+    path: ['end'], // Sets the error path to 'end'
   });
 
 export type ScheduleWindow = z.infer<typeof scheduleWindowSchema>;

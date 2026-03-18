@@ -158,20 +158,38 @@
   align-items: start;
 }
 
+.scheduleWindowSettingsGrid {
+  display: grid;
+  gap: 14px;
+  grid-template-areas:
+          'header header'
+          'days   days'
+          'start  end ';
+}
+
 .scheduleWindowHeader {
   display: flex;
   justify-content: space-between;
   gap: 12px;
   align-items: start;
+  grid-area: header;
+}
+
+.scheduleWindowDays {
+  grid-area: days;  display: grid;
+  gap: 10px;
+}
+
+.scheduleWindowStart {
+  grid-area: start;
+}
+
+.scheduleWindowEnd {
+  grid-area: end;
 }
 
 .scheduleWindowHeader p {
   margin: 4px 0 0;
-}
-
-.scheduleGroup {
-  display: grid;
-  gap: 10px;
 }
 
 .presetRow {
