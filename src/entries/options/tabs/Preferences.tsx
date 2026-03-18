@@ -1,8 +1,9 @@
-import Card from '../../../components/ui/Card';
-import useSettings from '../../../hooks/useSettings';
-import type { Theme } from '../../../types/schema';
 import styles from '../OptionsApp.module.css';
 import OptionsTab from '../OptionsTab';
+
+import Card from '@/components/ui/Card';
+import useSettings from '@/hooks/useSettings';
+import type { Theme } from '@/types/schema';
 
 const Preferences = ({ className }: { className?: string }) => {
   const { settings, updateSettings, isLoading: isSettingsLoading } = useSettings();

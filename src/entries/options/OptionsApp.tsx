@@ -1,15 +1,15 @@
 import { useMemo, useState } from 'react';
 
-import Hero from '../../components/ui/Hero';
-import Tabs, { type TabItem } from '../../components/ui/Tabs';
-import useBlockRules from '../../hooks/useBlockRules';
-import useThemeEffect from '../../hooks/useThemeEffect';
-
 import styles from './OptionsApp.module.css';
 import StatsGrid from './StatsGrid';
 import Preferences from './tabs/Preferences';
 import Rules from './tabs/Rules';
 import Scheduling from './tabs/Scheduling';
+
+import Hero from '@/components/ui/Hero';
+import Tabs, { type TabItem } from '@/components/ui/Tabs';
+import useBlockRules from '@/hooks/useBlockRules';
+import useThemeEffect from '@/hooks/useThemeEffect';
 
 type OptionsTab = 'rules' | 'scheduling' | 'preferences';
 
@@ -39,7 +39,7 @@ const OptionsApp = () => {
       <StatsGrid
         stats={{
           'Total rules': blockRules?.length ?? 0,
-          'Active rules': activeRuleCount,
+          'Active rules': activeRuleCount - pausedRuleCount,
           'Temporarily allowed': pausedRuleCount,
         }}
       />

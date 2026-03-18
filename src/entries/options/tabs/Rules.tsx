@@ -1,11 +1,12 @@
 import { useState } from 'react';
 
-import Card from '../../../components/ui/Card';
-import Switch from '../../../components/ui/Switch';
-import useBlockRules from '../../../hooks/useBlockRules';
-import type { BlockRule } from '../../../types/schema';
 import styles from '../OptionsApp.module.css';
 import OptionsTab from '../OptionsTab';
+
+import Card from '@/components/ui/Card';
+import Switch from '@/components/ui/Switch';
+import useBlockRules from '@/hooks/useBlockRules';
+import type { BlockRule } from '@/types/schema';
 
 const readableDate = (dateIso: string) => {
   const date = new Date(dateIso);

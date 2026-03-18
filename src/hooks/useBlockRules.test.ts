@@ -1,10 +1,10 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { StorageService } from '../services/StorageService';
-import type { BlockRule } from '../types/schema';
-
 import useBlockRules from './useBlockRules';
+
+import { StorageService } from '@/services/StorageService';
+import type { BlockRule } from '@/types/schema';
 
 const DEFAULT_RULE: BlockRule = {
   id: '111',

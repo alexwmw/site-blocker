@@ -1,8 +1,9 @@
-import Card from '../../../components/ui/Card';
-import useSettings from '../../../hooks/useSettings';
-import type { ScheduleWindow } from '../../../types/schema';
 import styles from '../OptionsApp.module.css';
 import OptionsTab from '../OptionsTab';
+
+import Card from '@/components/ui/Card';
+import useSettings from '@/hooks/useSettings';
+import type { ScheduleWindow } from '@/types/schema';
 
 const SCHEDULE_DAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as const;
 

@@ -1,8 +1,8 @@
 import type { ComponentProps } from 'react';
 
-import SectionHeader from '../../components/ui/SectionHeader';
-
 import styles from './OptionsApp.module.css';
+
+import SectionHeader from '@/components/ui/SectionHeader';
 
 const OptionsTab = ({
   title,

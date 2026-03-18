@@ -1,4 +1,4 @@
-import type { Settings } from '../types/schema';
+import type { Settings } from '@/types/schema';
 
 const defaultSettings: Settings = {
   theme: 'mindful-light',

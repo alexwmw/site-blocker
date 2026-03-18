@@ -1,9 +1,9 @@
-import BlockingEngine from '../../services/blocking/BlockingEngine';
-import type { SyncItems } from '../../services/blocking/strategies/BlockingStrategy';
-import { MessagesService } from '../../services/MessagesService';
-import { MigrationService } from '../../services/MigrationService';
-import { StorageService } from '../../services/StorageService';
-import { blockRulesSchema, settingsSchema } from '../../types/schema';
+import BlockingEngine from '@/services/blocking/BlockingEngine';
+import type { SyncItems } from '@/services/blocking/strategies/BlockingStrategy';
+import { MessagesService } from '@/services/MessagesService';
+import { MigrationService } from '@/services/MigrationService';
+import { StorageService } from '@/services/StorageService';
+import { blockRulesSchema, settingsSchema } from '@/types/schema';
 
 const blockingEngine = new BlockingEngine();
 

@@ -1,17 +1,9 @@
-import type { LegacyOptions, LegacyProvider } from '../types/legacy-schema';
-import type {
-  BlockRule,
-  Schedule,
-  ScheduleDays,
-  ScheduleWindow,
-  Settings,
-  StorageSchema,
-  Theme,
-} from '../types/schema';
-import { storageSchema, THEMES, TIME_REGEX } from '../types/schema';
-import { createUniqueId } from '../utils/createUniqueId';
-
 import defaultSettings from './defaultSettings';
+
+import type { LegacyOptions, LegacyProvider } from '@/types/legacy-schema';
+import type { BlockRule, Schedule, ScheduleDays, ScheduleWindow, Settings, StorageSchema, Theme } from '@/types/schema';
+import { storageSchema, THEMES, TIME_REGEX } from '@/types/schema';
+import { createUniqueId } from '@/utils/createUniqueId';
 
 export class MigrationService {
   private static toBool(val: string | boolean | undefined, fallback: boolean): boolean {

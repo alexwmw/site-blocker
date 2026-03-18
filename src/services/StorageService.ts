@@ -1,11 +1,11 @@
 import type { SafeParseReturnType, ZodIssue } from 'zod';
 
-import type { BlockRule, Settings, StorageSchema } from '../types/schema';
-import { blockRuleSchema, blockRulesSchema, settingsSchema } from '../types/schema';
-import { deepMerge } from '../utils/deepMerge';
-
 import defaultSettings from './defaultSettings';
 import { RulesService } from './RulesService';
+
+import type { BlockRule, Settings, StorageSchema } from '@/types/schema';
+import { blockRuleSchema, blockRulesSchema, settingsSchema } from '@/types/schema';
+import { deepMerge } from '@/utils/deepMerge';
 
 const SETTINGS_KEY: keyof StorageSchema = 'settings';
 const RULES_KEY: keyof StorageSchema = 'rules';

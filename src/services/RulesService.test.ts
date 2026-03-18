@@ -1,9 +1,9 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import type { BlockRule } from '../types/schema';
-
 import { RulesService } from './RulesService';
 import { StorageService } from './StorageService';
+
+import type { BlockRule } from '@/types/schema';
 
 function makeRule(overrides: Partial<BlockRule> = {}): BlockRule {
   return {

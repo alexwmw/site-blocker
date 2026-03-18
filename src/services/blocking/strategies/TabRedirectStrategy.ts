@@ -1,11 +1,12 @@
-import type { UnblockResponse } from '../../../types/messages';
-import type { BlockRule, Settings } from '../../../types/schema';
-import { RulesService } from '../../RulesService';
-import { SchedulingService } from '../../SchedulingService';
-import { StorageService } from '../../StorageService';
 import { getBlockPageUrl } from '../getBlockPageUrl';
 
 import type { BlockingStrategy, SyncItems } from './BlockingStrategy';
+
+import { RulesService } from '@/services/RulesService';
+import { SchedulingService } from '@/services/SchedulingService';
+import { StorageService } from '@/services/StorageService';
+import type { UnblockResponse } from '@/types/messages';
+import type { BlockRule, Settings } from '@/types/schema';
 
 type EnforceArgs = {
   tabId?: number;

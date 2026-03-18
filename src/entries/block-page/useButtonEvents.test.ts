@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import useButtonEvents from './useButtonEvents';
 
-vi.mock('../../hooks/useSettings', () => ({
+vi.mock('@/hooks/useSettings', () => ({
   default: () => ({
     settings: {
       holdDurationSeconds: 2,
@@ -43,7 +43,6 @@ describe('useButtonEvents', () => {
     expect(stop).toHaveBeenCalledOnce();
     expect(result.current.timeRemaining).toBeNull();
   });
-
 
   it('ignores duplicate mouse down while already holding', () => {
     const play = vi.fn();

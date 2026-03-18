@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import { RulesService } from '../services/RulesService';
-import type { BlockRule, MatchType } from '../types/schema';
-import { createUniqueId } from '../utils/createUniqueId';
+import { RulesService } from '@/services/RulesService';
+import type { BlockRule, MatchType } from '@/types/schema';
+import { createUniqueId } from '@/utils/createUniqueId';
 
 /**
  *

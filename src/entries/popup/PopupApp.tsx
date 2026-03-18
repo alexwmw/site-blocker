@@ -1,17 +1,17 @@
 import { useEffect, useMemo, useState } from 'react';
 
-import Button from '../../components/ui/Button';
-import Card from '../../components/ui/Card';
-import EyebrowLabel from '../../components/ui/EyebrowLabel';
-import SectionHeader from '../../components/ui/SectionHeader';
-import useBlockRules from '../../hooks/useBlockRules';
-import useCreateRuleFromTab from '../../hooks/useCreateRuleFromTab';
-import useSettings from '../../hooks/useSettings';
-import useThemeEffect from '../../hooks/useThemeEffect';
-import { RulesService } from '../../services/RulesService';
-import { SchedulingService } from '../../services/SchedulingService';
-
 import styles from './PopupApp.module.css';
+
+import Button from '@/components/ui/Button';
+import Card from '@/components/ui/Card';
+import EyebrowLabel from '@/components/ui/EyebrowLabel';
+import SectionHeader from '@/components/ui/SectionHeader';
+import useBlockRules from '@/hooks/useBlockRules';
+import useCreateRuleFromTab from '@/hooks/useCreateRuleFromTab';
+import useSettings from '@/hooks/useSettings';
+import useThemeEffect from '@/hooks/useThemeEffect';
+import { RulesService } from '@/services/RulesService';
+import { SchedulingService } from '@/services/SchedulingService';
 
 const formatRemainingTime = (milliseconds: number) => {
   const totalSeconds = Math.max(0, Math.floor(milliseconds / 1000));

@@ -1,11 +1,11 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import defaultSettings from '../services/defaultSettings';
-import { StorageService } from '../services/StorageService';
-import type { Settings } from '../types/schema';
-
 import useSettings from './useSettings';
+
+import defaultSettings from '@/services/defaultSettings';
+import { StorageService } from '@/services/StorageService';
+import type { Settings } from '@/types/schema';
 
 // Mock Chrome API
 let listeners: Array<(changes: unknown) => void> = [];

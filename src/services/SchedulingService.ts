@@ -1,4 +1,4 @@
-import type { DayOfWeek, Schedule, ScheduleWindow } from '../types/schema';
+import type { DayOfWeek, Schedule, ScheduleWindow } from '@/types/schema';
 
 export class SchedulingService {
   static getDayOfWeek(day: number | Date = new Date()): DayOfWeek {

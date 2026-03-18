@@ -1,4 +1,4 @@
-import type { BlockRule } from '../types/schema';
+import type { BlockRule } from '@/types/schema';
 
 export class RulesService {
   /**

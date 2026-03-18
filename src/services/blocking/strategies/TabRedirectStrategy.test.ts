@@ -1,12 +1,13 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { BlockRule, Settings } from '../../../types/schema';
-import { RulesService } from '../../RulesService';
-import { StorageService } from '../../StorageService';
 import { getBlockPageUrl } from '../getBlockPageUrl';
 import { createEvent } from '../test-utils';
 
 import TabRedirectStrategy from './TabRedirectStrategy';
+
+import { RulesService } from '@/services/RulesService';
+import { StorageService } from '@/services/StorageService';
+import type { BlockRule, Settings } from '@/types/schema';
 
 const defaultSettings: Settings = {
   blockPageHeadline: 'Stay on track',

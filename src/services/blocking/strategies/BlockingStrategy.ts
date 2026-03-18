@@ -1,5 +1,5 @@
-import type { UnblockResponse } from '../../../types/messages';
-import type { StorageSchema } from '../../../types/schema';
+import type { UnblockResponse } from '@/types/messages';
+import type { StorageSchema } from '@/types/schema';
 
 export type SyncItems = Partial<StorageSchema>;
 

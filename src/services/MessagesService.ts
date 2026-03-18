@@ -1,6 +1,6 @@
-import type { ResponseForRequest, RuntimeRequest, RuntimeResponse, UnblockResponse } from '../types/messages';
-
 import type BlockingEngine from './blocking/BlockingEngine';
+
+import type { ResponseForRequest, RuntimeRequest, RuntimeResponse, UnblockResponse } from '@/types/messages';
 
 export class MessagesService {
   static async sendMessage<TReq extends RuntimeRequest>(message: TReq): Promise<ResponseForRequest<TReq>> {

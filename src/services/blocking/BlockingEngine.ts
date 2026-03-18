@@ -1,9 +1,10 @@
-import type { UnblockResponse } from '../../types/messages';
-import type { BlockRule, Settings } from '../../types/schema';
 import { StorageService } from '../StorageService';
 
 import type { BlockingStrategy, SyncItems } from './strategies/BlockingStrategy';
 import TabRedirectStrategy from './strategies/TabRedirectStrategy';
+
+import type { UnblockResponse } from '@/types/messages';
+import type { BlockRule, Settings } from '@/types/schema';
 
 export default class BlockingEngine implements BlockingStrategy {
   private activeStrategy: BlockingStrategy;

@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 
-import type { StorageListener } from '../services/StorageService';
-import { StorageService } from '../services/StorageService';
-import type { BlockRule } from '../types/schema';
+import type { StorageListener } from '@/services/StorageService';
+import { StorageService } from '@/services/StorageService';
+import type { BlockRule } from '@/types/schema';
 
 const useBlockRules = () => {
   const [blockRules, setBlockRules] = useState<BlockRule[] | null>(null);
