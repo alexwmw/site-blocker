@@ -23,7 +23,7 @@ const SchedulingWindow = ({ window, windowIndex, disabled, removeWindow, updateW
       >
         <div className={styles.scheduleWindowHeader}>
           <div>
-            <strong>Window {windowIndex + 1}</strong>
+            <strong>Schedule {windowIndex + 1}</strong>
             <p className={styles.subtle}>Recurring weekly block</p>
           </div>
           {window.id !== '_initial' ? (
