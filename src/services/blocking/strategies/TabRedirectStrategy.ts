@@ -142,12 +142,30 @@ export default class TabRedirectStrategy implements BlockingStrategy {
     this.started = false;
   }
 
+  private async reevaluateOpenTabs() {
+    if (!this.started) {
+      return;
+    }
+
+    const tabs = await chrome.tabs.query({});
+    await Promise.all(
+      tabs.map(async (tab) => {
+        const args = await this.evaluate(tab.id, tab.url);
+        await this.enforce(args);
+      }),
+    );
+  }
+
   async sync({ rules, settings }: SyncItems) {
     if (settings) {
       this.settings = settings;
     }
     if (rules) {
       this.rules = rules;
+    }
+
+    if (settings || rules) {
+      await this.reevaluateOpenTabs();
     }
   }
 

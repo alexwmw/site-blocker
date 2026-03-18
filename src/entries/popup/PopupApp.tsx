@@ -11,6 +11,7 @@ import useBlockRules from '@/hooks/useBlockRules';
 import useCreateRuleFromTab from '@/hooks/useCreateRuleFromTab';
 import useSettings from '@/hooks/useSettings';
 import useThemeEffect from '@/hooks/useThemeEffect';
+import { getBlockPageUrl } from '@/services/blocking/getBlockPageUrl';
 import { RulesService } from '@/services/RulesService';
 import { SchedulingService } from '@/services/SchedulingService';
 
@@ -30,8 +31,10 @@ const PopupApp = () => {
   useThemeEffect();
   const { activeTab, url, isSupported, createDomainPrefixRule, createPrefixUrlRule } = useCreateRuleFromTab();
   const { blockRules, addRule, isLoading: isRulesLoading } = useBlockRules();
-  const { settings, isLoading: isSettingsLoading } = useSettings();
+  const { settings, isLoading: isSettingsLoading, isSchedulingEnabled } = useSettings();
   const [tickNow, setTickNow] = useState(Date.now());
+
+  const isBlockPageUrl = useMemo(() => Boolean(activeTab?.url?.startsWith(getBlockPageUrl())), [activeTab]);
 
   const matchingRules = useMemo(() => {
     return url && blockRules ? RulesService.findMatchingRules(url, blockRules) : [];
@@ -40,7 +43,6 @@ const PopupApp = () => {
   const matchingTemporarilyUnblockedRules = matchingRules.filter((rule) => (rule.unblockUntil ?? 0) > tickNow);
   const activeBlockingRules = matchingRules.filter((rule) => (rule.unblockUntil ?? 0) <= tickNow);
 
-  const isScheduleEnabled = Boolean(settings?.schedule.enabled);
   const isBlockingTime = SchedulingService.isBlockingActiveNow(settings?.schedule);
   const isBlockedByRule = isSupported && activeBlockingRules.length > 0;
   const isBlockedNow = isBlockedByRule && isBlockingTime;
@@ -80,7 +82,7 @@ const PopupApp = () => {
     if (matchingTemporarilyUnblockedRules.length > 0) {
       return 'This page matches a rule but is temporarily unblocked.';
     }
-    if (isScheduleEnabled && !isBlockingTime) {
+    if (isSchedulingEnabled && !isBlockingTime) {
       return 'This page matches a rule, but blocking is currently outside your scheduled window.';
     }
     return null;
@@ -109,9 +111,9 @@ const PopupApp = () => {
   return (
     <main className={styles.page}>
       <header>
-        <EyebrowLabel>Site Blocker</EyebrowLabel>
+        <EyebrowLabel>Hold</EyebrowLabel>
         <h1 className={styles.heroTitle}>Active page status</h1>
-        <p className={styles.subtle}>{activeTab?.url ?? 'No active tab found.'}</p>
+        {!isBlockPageUrl ? <p className={styles.subtle}>{activeTab?.url ?? 'No active tab found.'}</p> : null}
       </header>
 
       <Card
@@ -127,8 +129,8 @@ const PopupApp = () => {
           />
           <StatusItem
             label='Scheduling enabled'
-            value={isScheduleEnabled ? 'Yes' : 'No'}
-            tone={isScheduleEnabled ? 'neutral' : 'good'}
+            value={isSchedulingEnabled ? 'Yes' : 'No'}
+            tone={isSchedulingEnabled ? 'neutral' : 'good'}
           />
           <StatusItem
             label='URL supported'
@@ -153,21 +155,23 @@ const PopupApp = () => {
         className={styles.section}
       >
         <SectionHeader title='Quick actions' />
-        <div className={styles.actions}>
-          <Button
-            disabled={!canAddRule}
-            onClick={handleAddDomainClick}
-          >
-            Add domain
-          </Button>
-          <Button
-            variant='secondary'
-            disabled={!canAddRule}
-            onClick={handleAddPathClick}
-          >
-            Add page
-          </Button>
-        </div>
+        {!isBlockPageUrl ? (
+          <div className={styles.actions}>
+            <Button
+              disabled={!canAddRule}
+              onClick={handleAddDomainClick}
+            >
+              Add domain
+            </Button>
+            <Button
+              variant='secondary'
+              disabled={!canAddRule}
+              onClick={handleAddPathClick}
+            >
+              Add page
+            </Button>
+          </div>
+        ) : null}
         <Button
           variant='ghost'
           className={styles.optionsButton}

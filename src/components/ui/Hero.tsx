@@ -1,7 +1,7 @@
 import EyebrowLabel from './EyebrowLabel';
 import styles from './Hero.module.css';
 
-const Hero = ({ label = 'Site blocker', title, subheading }: { label?: string; title: string; subheading: string }) => {
+const Hero = ({ label = 'Hold', title, subheading }: { label?: string; title: string; subheading: string }) => {
   return (
     <header className={styles.hero}>
       <EyebrowLabel>{label}</EyebrowLabel>
