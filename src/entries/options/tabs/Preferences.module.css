@@ -1,0 +1,21 @@
+.settingsGrid {
+    padding: 16px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px;
+}
+
+.settingsLabel {
+    display: grid;
+    gap: 8px;
+    font-weight: 600;
+}
+
+.settingsInput {
+    color: var(--color-text-primary);
+    font: inherit;
+    padding: 10px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-border-strong);
+    background: var(--color-bg-input);
+}
