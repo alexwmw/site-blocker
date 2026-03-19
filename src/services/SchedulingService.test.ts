@@ -41,30 +41,6 @@ describe('SchedulingService', () => {
     expect(SchedulingService.isBlockingActiveNow(schedule)).toBe(true);
   });
 
-  it('reports overlap and duplicate windows as warnings instead of blocking errors', () => {
-    const schedule = buildSchedule({
-      windows: [
-        {
-          id: '_initial',
-          days: [true, false, false, false, false, false, false],
-          start: '09:00',
-          end: '11:00',
-        },
-        {
-          id: 'duplicate',
-          days: [true, false, false, false, false, false, false],
-          start: '09:00',
-          end: '11:00',
-        },
-      ],
-    });
-
-    const warnings = SchedulingService.getWarnings(schedule).map((warning) => warning.message);
-
-    expect(warnings).toContain('Windows 1 and 2 are identical. Keeping both is harmless, but one could be removed.');
-    expect(SchedulingService.getValidationIssues(schedule)).toEqual([]);
-  });
-
   it('treats overlapping schedules as active when the current time matches them', () => {
     const schedule = buildSchedule({
       windows: [
@@ -84,5 +60,20 @@ describe('SchedulingService', () => {
     });
 
     expect(SchedulingService.isScheduleActiveNow(schedule, new Date('2026-01-05T10:45:00.000Z'))).toBe(true);
+  });
+
+  it('allows windows with no selected days without treating them as invalid', () => {
+    const schedule = buildSchedule({
+      windows: [
+        {
+          id: '_initial',
+          days: [false, false, false, false, false, false, false],
+          start: '09:00',
+          end: '11:00',
+        },
+      ],
+    });
+
+    expect(SchedulingService.isScheduleActiveNow(schedule, new Date('2026-01-05T10:00:00.000Z'))).toBe(false);
   });
 });

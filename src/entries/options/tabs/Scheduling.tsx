@@ -82,13 +82,15 @@ const Scheduling = ({ className }: { className: string }) => {
 
           <ul className={styles.windowsList}>
             {schedule.windows.map((win, index) => (
-              <SchedulingWindow
-                window={win}
-                disabled={!schedule || !isSchedulingEnabled}
-                windowIndex={index}
-                removeWindow={() => removeScheduleWindow(win.id)}
-                updateWindow={(update: Partial<ScheduleWindow>) => updateScheduleWindow(win.id, update)}
-              />
+              <li key={win.id}>
+                <SchedulingWindow
+                  window={win}
+                  disabled={!schedule || !isSchedulingEnabled}
+                  windowIndex={index}
+                  removeWindow={() => removeScheduleWindow(win.id)}
+                  updateWindow={(update: Partial<ScheduleWindow>) => updateScheduleWindow(win.id, update)}
+                />
+              </li>
             ))}
           </ul>
         </>
