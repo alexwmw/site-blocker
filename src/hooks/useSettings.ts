@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import type { StorageListener } from '@/services/StorageService';
 import { StorageService } from '@/services/StorageService';
@@ -7,13 +7,20 @@ import type { Settings } from '@/types/schema';
 const useSettings = () => {
   const [settings, setSettings] = useState<Settings | null>(null);
 
-  useEffect(() => {
-    // Initial load
-    StorageService.getSettings().then(setSettings).catch(console.error);
+  const loadSettings = useCallback(async () => {
+    try {
+      const nextSettings = await StorageService.getSettings();
+      setSettings(nextSettings);
+    } catch (loadError) {
+      console.error(loadError);
+      setSettings(null);
+    }
+  }, []);
 
-    // Listen for Storage Changes
+  useEffect(() => {
+    loadSettings().catch(console.error);
+
     const listener: StorageListener = (changes) => {
-      // If the 'settings' key was updated anywhere in the extension...
       if (changes.settings) {
         setSettings(changes.settings.newValue as Settings);
       }
@@ -21,9 +28,8 @@ const useSettings = () => {
 
     StorageService.addListener(listener);
 
-    // Clean up the listener when the component unmounts
     return () => StorageService.removeListener(listener);
-  }, []);
+  }, [loadSettings]);
 
   const updateSettings = async (updates: Partial<Settings>) => {
     await StorageService.updateSettings(updates);

@@ -6,7 +6,7 @@ export class SchedulingService {
     return (n + 6) % 7;
   }
 
-  private static timeToMinutes(time: string): number {
+  static timeToMinutes(time: string): number {
     const [h, m] = time.split(':').map(Number);
     return h * 60 + m;
   }

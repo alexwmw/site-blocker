@@ -8,9 +8,10 @@ const defaultSettings: Settings = {
     enabled: false,
     windows: [
       {
+        id: '_initial',
         days: [true, true, true, true, true, false, false],
         start: '09:00',
-        end: '16:59',
+        end: '17:00',
       },
     ],
   },

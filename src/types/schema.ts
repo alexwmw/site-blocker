@@ -42,15 +42,23 @@ export const scheduleDaysSchema = z.tuple([
 
 export type ScheduleDays = z.infer<typeof scheduleDaysSchema>;
 
+const timeToMinutes = (time: string): number => {
+  const [hours, minutes] = time.split(':').map(Number);
+  return hours * 60 + minutes;
+};
+
 export const scheduleWindowSchema = z
   .object({
+    /** Unique identifier for the rule. */
+    id: z.string().readonly(),
+    /** Weekday booleans */
     days: scheduleDaysSchema,
     /** Start time in 24-hour `HH:mm` format. */
     start: z.string().regex(TIME_REGEX),
     /** End time in 24-hour `HH:mm` format. */
     end: z.string().regex(TIME_REGEX),
   })
-  .refine((data) => data.end > data.start, {
+  .refine((data) => timeToMinutes(data.end) > timeToMinutes(data.start), {
     message: 'End time cannot be earlier than start time.',
     path: ['end'], // Sets the error path to 'end'
   });
@@ -63,11 +71,21 @@ export type ScheduleWindow = z.infer<typeof scheduleWindowSchema>;
  * When `enabled` is `true`, blocking only applies on selected days and within
  * the configured time range.
  */
-export const scheduleSchema = z.object({
-  /** Whether scheduled blocking is enabled. */
-  enabled: z.boolean(),
-  windows: z.array(scheduleWindowSchema),
-});
+export const scheduleSchema = z
+  .object({
+    /** Whether scheduled blocking is enabled. */
+    enabled: z.boolean(),
+    windows: z.array(scheduleWindowSchema),
+  })
+  .superRefine((data, ctx) => {
+    if (data.windows.length > 0 && data.windows[0]?.id !== '_initial') {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['windows', 0, 'id'],
+        message: "Initial window must have the id '_initial'",
+      });
+    }
+  });
 
 /**
  * User-configurable extension settings.
@@ -117,7 +135,7 @@ export type MatchType = z.infer<typeof matchTypeSchema>;
  */
 export const blockRuleSchema = z.object({
   /** Unique identifier for the rule. */
-  id: z.string(),
+  id: z.string().readonly(),
 
   /** URL, hostname, or path pattern to match against. */
   pattern: z.string(),

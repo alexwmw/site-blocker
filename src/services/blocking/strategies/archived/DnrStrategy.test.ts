@@ -14,6 +14,7 @@ const defaultSettings: Settings = {
     enabled: true,
     windows: [
       {
+        id: '_initial',
         days: [false, false, false, false, false, false, false],
         start: '00:00',
         end: '23:59',

@@ -17,17 +17,33 @@
   margin-top: 28px;
 }
 
+.statusGrid {
+  margin: 10px 0;
+  display: flex;
+  gap: 8px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
 .settingsGrid {
-  padding: 16px;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 14px;
+}
+
+.disabled {
+  color: var(--color-text-secondary);
 }
 
 .settingsLabel {
   display: grid;
   gap: 8px;
   font-weight: 600;
+}
+
+.scheduleSettings {
+  > * {
+    justify-content: start;
+  }
 }
 
 .settingsInput {
@@ -66,9 +82,22 @@
   font-size: 0.92rem;
 }
 
-
 .ruleSwitch {
   margin-top: 10px;
+}
+
+.windowsList {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  margin: 12px 0 0;
+  gap: 12px;
+}
+
+.windowListButtonRow {
+  margin: 12px 0 0;
+  display: flex;
+  justify-content: end;
 }
 
 .dangerButton {
@@ -91,11 +120,9 @@
   padding: 18px;
 }
 
-
 .tabs {
   margin-top: 20px;
 }
-
 
 .checkboxLabel {
   display: flex;
@@ -116,4 +143,82 @@
   gap: 6px;
   font-size: 0.9rem;
   font-weight: 500;
+}
+
+.scheduleHeadingRow {
+  margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: end;
+}
+
+.scheduleWindowCard {
+  align-items: start;
+}
+
+.scheduleWindowSettingsGrid {
+  display: grid;
+  gap: 14px;
+  grid-template-areas:
+    'header header'
+    'days   days'
+    'start  end ';
+}
+
+.scheduleWindowHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: start;
+  grid-area: header;
+}
+
+.scheduleWindowDays {
+  grid-area: days;
+  display: grid;
+  gap: 10px;
+}
+
+.scheduleWindowStart {
+  grid-area: start;
+}
+
+.scheduleWindowEnd {
+  grid-area: end;
+}
+
+.scheduleWindowHeader p {
+  margin: 4px 0 0;
+}
+
+.presetRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.scheduleAssistiveCopy {
+  display: grid;
+  gap: 6px;
+}
+
+.scheduleAssistiveCopy p {
+  margin: 0;
+}
+
+.inlineWarningList {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--color-text-secondary);
+}
+
+.errorState {
+  margin-top: 12px;
+  border-color: var(--color-danger);
+}
+
+.warningState {
+  margin-top: 12px;
 }

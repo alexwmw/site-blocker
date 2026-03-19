@@ -12,7 +12,8 @@
     "lint:fix": "eslint . --fix",
     "preview": "vite preview",
     "format": "prettier --write .",
-    "test": "vitest --run"
+    "test": "vitest --run",
+    "prettier": "prettier */**/*.css --write"
   },
   "dependencies": {
     "lottie-react": "^2.4.1",

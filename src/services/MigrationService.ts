@@ -133,15 +133,11 @@ export class MigrationService {
     const allDay = this.toBool(old.activeTimes?.value?.allDay?.value, false);
     const days = this.parseLegacyActiveDays(old, defaultSettings.schedule.windows[0].days);
 
+    const _initial = '_initial';
+
     // Legacy "all day" flag maps directly to a single full-day window.
     if (allDay) {
-      return [
-        {
-          start: '00:00',
-          end: '23:59',
-          days,
-        },
-      ];
+      return [{ id: _initial, start: '00:00', end: '23:59', days }];
     }
 
     // Parse and sanitize start/end values (fallbacks come from default settings).
@@ -153,37 +149,31 @@ export class MigrationService {
 
     // Normal daytime window: same-day range that already satisfies end > start.
     if (end > start) {
-      return [{ days, end, start }];
+      return [{ id: _initial, days, end, start }];
     }
 
     // Equal start/end needs normalization to avoid invalid zero-length windows.
     if (end === start) {
       // 23:59 -> 23:59 is treated as effectively full-day for migration purposes.
       if (start === '23:59') {
-        return [{ days, start: '00:00', end: '23:59' }];
+        return [{ id: _initial, days, start: '00:00', end: '23:59' }];
       }
 
       // Any other equal time is expanded to a minimal 1-minute valid window.
-      return [
-        {
-          start,
-          end: this.addOneMinute(end),
-          days,
-        },
-      ];
+      return [{ id: _initial, start, end: this.addOneMinute(end), days }];
     }
 
     // Overnight window ending exactly at midnight should not produce a second
     // split segment of 00:00 -> 00:00 (invalid under schema end > start).
     if (end === '00:00') {
-      return [{ days, start, end: '23:59' }];
+      return [{ id: _initial, days, start, end: '23:59' }];
     }
 
-    // General overnight case: split into [start..23:59] on current days and
-    // [00:00..end] on the following day set.
+    // General overnight case: split into [start 23:59] on current days and
+    // [00:00 end] on the following day set.
     return [
-      { days, start, end: '23:59' },
-      { days: this.shiftDaysForward(days), start: '00:00', end },
+      { id: _initial, days, start, end: '23:59' },
+      { id: createUniqueId(), days: this.shiftDaysForward(days), start: '00:00', end },
     ];
   }
 

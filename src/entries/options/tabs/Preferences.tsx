@@ -6,7 +6,7 @@ import useSettings from '@/hooks/useSettings';
 import type { Theme } from '@/types/schema';
 
 const Preferences = ({ className }: { className?: string }) => {
-  const { settings, updateSettings, isLoading: isSettingsLoading } = useSettings();
+  const { settings, updateSettings } = useSettings();
 
   const handleThemeChange = (theme: Theme) => {
     updateSettings({ theme }).catch(console.error);
@@ -20,10 +20,12 @@ const Preferences = ({ className }: { className?: string }) => {
   return (
     <OptionsTab
       title='Preference'
-      isContentLoaded={isSettingsLoading}
       className={className}
     >
-      <Card className={styles.settingsGrid}>
+      <Card
+        padding
+        className={styles.settingsGrid}
+      >
         <label className={styles.settingsLabel}>
           Theme
           <select

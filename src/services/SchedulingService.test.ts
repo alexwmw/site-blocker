@@ -8,6 +8,7 @@ const buildSchedule = (overrides: Partial<Schedule> = {}): Schedule => ({
   enabled: true,
   windows: [
     {
+      id: '_initial',
       days: [true, true, true, true, true, true, true],
       start: '10:00',
       end: '11:00',
@@ -38,5 +39,41 @@ describe('SchedulingService', () => {
 
     expect(SchedulingService.isScheduleActiveNow(schedule)).toBe(false);
     expect(SchedulingService.isBlockingActiveNow(schedule)).toBe(true);
+  });
+
+  it('treats overlapping schedules as active when the current time matches them', () => {
+    const schedule = buildSchedule({
+      windows: [
+        {
+          id: '_initial',
+          days: [true, false, false, false, false, false, false],
+          start: '09:00',
+          end: '11:00',
+        },
+        {
+          id: 'overlap',
+          days: [true, false, false, false, false, false, false],
+          start: '10:30',
+          end: '11:30',
+        },
+      ],
+    });
+
+    expect(SchedulingService.isScheduleActiveNow(schedule, new Date('2026-01-05T10:45:00.000Z'))).toBe(true);
+  });
+
+  it('allows windows with no selected days without treating them as invalid', () => {
+    const schedule = buildSchedule({
+      windows: [
+        {
+          id: '_initial',
+          days: [false, false, false, false, false, false, false],
+          start: '09:00',
+          end: '11:00',
+        },
+      ],
+    });
+
+    expect(SchedulingService.isScheduleActiveNow(schedule, new Date('2026-01-05T10:00:00.000Z'))).toBe(false);
   });
 });

@@ -6,6 +6,14 @@
   font-weight: 600;
 }
 
+.switchLabel.reverse {
+  flex-direction: row-reverse;
+}
+
+.switchLabel.compact {
+  justify-content: start;
+}
+
 .textGroup {
   display: grid;
   gap: 2px;
