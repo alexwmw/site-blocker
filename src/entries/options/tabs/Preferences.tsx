@@ -6,7 +6,7 @@ import Card from '@/components/ui/Card';
 import SectionHeader from '@/components/ui/SectionHeader';
 import Switch from '@/components/ui/Switch';
 import { defaultPreferenceSettings } from '@/services/defaultSettings';
-import { SETTINGS_LIMITS, type Settings, type Theme } from '@/types/schema';
+import { type Settings, SETTINGS_LIMITS, type Theme } from '@/types/schema';
 
 type PreferencesProps = {
   className?: string;
@@ -84,10 +84,6 @@ const Preferences = ({ className, settings, updateSettings }: PreferencesProps) 
         durationMinutes,
       },
     }).catch(console.error);
-  };
-
-  const handleRatedChange = (isRated: boolean) => {
-    updateSettings({ isRated }).catch(console.error);
   };
 
   const handleResetPreferences = () => {
@@ -193,33 +189,6 @@ const Preferences = ({ className, settings, updateSettings }: PreferencesProps) 
               </select>
             </label>
           </div>
-        </Card>
-
-        <Card
-          padding
-          className={styles.preferenceCard}
-        >
-          <SectionHeader title='Notifications' />
-          <Switch
-            id='is-rated'
-            label='I have already rated or reviewed the extension'
-            description='Use this to suppress future rate-and-review nudges tied to your settings profile.'
-            checked={settings.isRated}
-            onChange={(event) => {
-              handleRatedChange(event.target.checked);
-            }}
-          />
-        </Card>
-
-        <Card
-          padding
-          className={styles.preferenceCard}
-        >
-          <SectionHeader title='Account & licensing' />
-          <p className={styles.fieldHint}>
-            This version of Site Blocker does not require sign-in or a paid license. Your preferences are stored locally
-            in the extension.
-          </p>
         </Card>
 
         <div className={styles.preferenceActions}>

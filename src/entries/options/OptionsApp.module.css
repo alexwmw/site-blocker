@@ -60,6 +60,7 @@
   display: grid;
   gap: 8px;
   font-weight: 600;
+  grid-template-rows: auto auto 1fr;
 }
 
 .scheduleSettings {
