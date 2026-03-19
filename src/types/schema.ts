@@ -5,8 +5,8 @@ export const TIME_REGEX = /^([01][0-9]|2[0-3]):[0-5][0-9]$/;
 
 /** Supported UI themes. */
 export const THEMES = [
-  'paper-light',
-  'paper-dark',
+  'intention-light',
+  'intention-dark',
   'mindful-light',
   'mindful-dark',
   'focus-light',

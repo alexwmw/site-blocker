@@ -36,8 +36,8 @@ const Preferences = ({ className }: { className?: string }) => {
             }}
             disabled={!settings}
           >
-            <option value='paper-light'>Intentional (light)</option>
-            <option value='paper-dark'>Intentional (dark)</option>
+            <option value='intention-light'>Intentional (light)</option>
+            <option value='intention-dark'>Intentional (dark)</option>
             <option value='mindful-light'>Mindful (light)</option>
             <option value='mindful-dark'>Mindful (dark)</option>
             <option value='focus-light'>Focused (light)</option>
