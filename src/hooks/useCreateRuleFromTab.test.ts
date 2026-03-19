@@ -28,6 +28,7 @@ describe('useCreateRuleFromActiveTab', () => {
 
     expect(chromeMock.tabs.query).not.toHaveBeenCalled();
     expect(result.current.error).toBeNull();
+    expect(result.current.isResolved).toBe(true);
     expect(result.current.createDomainPrefixRule()?.pattern).toBe('theguardian.com');
   });
 
@@ -44,6 +45,7 @@ describe('useCreateRuleFromActiveTab', () => {
 
     expect(chromeMock.tabs.query).not.toHaveBeenCalled();
     expect(result.current.error).toBeNull();
+    expect(result.current.isResolved).toBe(true);
   });
 
   it('loads active tab and marks supported URLs', async () => {
@@ -51,11 +53,14 @@ describe('useCreateRuleFromActiveTab', () => {
 
     const { result } = renderHook(() => useCreateRuleFromTab());
 
+    expect(result.current.isResolved).toBe(false);
+
     await waitFor(() => {
       expect(result.current.activeTab?.url).toBe('https://www.reddit.com/r/aita');
     });
 
     expect(result.current.error).toBeNull();
+    expect(result.current.isResolved).toBe(true);
   });
 
   it('preserves query errors instead of treating them as empty loaded state', async () => {
@@ -69,6 +74,7 @@ describe('useCreateRuleFromActiveTab', () => {
     });
 
     expect(result.current.activeTab).toBeNull();
+    expect(result.current.isResolved).toBe(true);
   });
 
   it('creates exact and prefix URL rules from active tab', async () => {

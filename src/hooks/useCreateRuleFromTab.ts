@@ -12,12 +12,14 @@ const toError = (value: unknown): Error => (value instanceof Error ? value : new
  */
 const useCreateRuleFromTab = (tab?: chrome.tabs.Tab | null) => {
   const [activeTab, setActiveTab] = useState<chrome.tabs.Tab | null>(tab ?? null);
+  const [isResolved, setIsResolved] = useState(tab !== undefined);
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
     if (tab !== undefined) {
       setActiveTab(tab);
       setError(null);
+      setIsResolved(true);
       return;
     }
 
@@ -26,10 +28,12 @@ const useCreateRuleFromTab = (tab?: chrome.tabs.Tab | null) => {
       .then((tabs) => {
         setActiveTab(tabs[0] ?? null);
         setError(null);
+        setIsResolved(true);
       })
       .catch((queryError) => {
         console.error(queryError);
         setError(toError(queryError));
+        setIsResolved(true);
       });
   }, [tab]);
 
@@ -61,6 +65,7 @@ const useCreateRuleFromTab = (tab?: chrome.tabs.Tab | null) => {
   return {
     activeTab,
     error,
+    isResolved,
     createExactUrlRule: () => createUrlRule('exact', 'path'),
     createPrefixUrlRule: () => createUrlRule('prefix', 'path'),
     createDomainPrefixRule: () => createUrlRule('prefix', 'domain'),

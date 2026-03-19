@@ -5,11 +5,11 @@ import styles from './PopupApp.module.css';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import EyebrowLabel from '@/components/ui/EyebrowLabel';
+import RenderBoundary from '@/components/ui/RenderBoundary';
 import SectionHeader from '@/components/ui/SectionHeader';
 import StatusItem from '@/components/ui/StatusItem';
 import useBlockRules from '@/hooks/useBlockRules';
 import useCreateRuleFromTab from '@/hooks/useCreateRuleFromTab';
-import useIsScheduleEnabled from '@/hooks/useIsScheduleEnabled';
 import useSettings from '@/hooks/useSettings';
 import useThemeEffect from '@/hooks/useThemeEffect';
 import { getBlockPageUrl } from '@/services/blocking/getBlockPageUrl';
@@ -30,12 +30,18 @@ const formatRemainingTime = (milliseconds: number) => {
 
 const PopupApp = () => {
   useThemeEffect();
-  const { activeTab, createDomainPrefixRule, createPrefixUrlRule } = useCreateRuleFromTab();
-  const { blockRules, addRule } = useBlockRules();
-  const { settings } = useSettings();
-  const isScheduleEnabled = useIsScheduleEnabled();
+  const {
+    activeTab,
+    createDomainPrefixRule,
+    createPrefixUrlRule,
+    error: activeTabError,
+    isResolved,
+  } = useCreateRuleFromTab();
+  const { blockRules, addRule, error: blockRulesError } = useBlockRules();
+  const { settings, error: settingsError } = useSettings();
   const [tickNow, setTickNow] = useState(Date.now());
 
+  const popupData = blockRules && settings && isResolved ? { activeTab, blockRules, settings } : null;
   const url = activeTab?.url ?? null;
   const isSupported = Boolean(url && RulesService.isSupportedUrl(url));
   const isBlockPageUrl = useMemo(() => Boolean(activeTab?.url?.startsWith(getBlockPageUrl())), [activeTab]);
@@ -47,6 +53,7 @@ const PopupApp = () => {
   const matchingTemporarilyUnblockedRules = matchingRules.filter((rule) => (rule.unblockUntil ?? 0) > tickNow);
   const activeBlockingRules = matchingRules.filter((rule) => (rule.unblockUntil ?? 0) <= tickNow);
 
+  const isScheduleEnabled = Boolean(settings?.schedule.enabled);
   const isBlockingTime = SchedulingService.isBlockingActiveNow(settings?.schedule);
   const isBlockedByRule = isSupported && activeBlockingRules.length > 0;
   const isBlockedNow = isBlockedByRule && isBlockingTime;
@@ -117,72 +124,78 @@ const PopupApp = () => {
       <header>
         <EyebrowLabel>Hold</EyebrowLabel>
         <h1 className={styles.heroTitle}>Active page status</h1>
-        {!isBlockPageUrl ? <p className={styles.subtle}>{activeTab?.url ?? 'No active tab found.'}</p> : null}
       </header>
 
-      <Card
-        as='section'
-        className={styles.section}
+      <RenderBoundary
+        data={popupData}
+        error={activeTabError ?? blockRulesError ?? settingsError}
       >
-        <SectionHeader title='Blocking' />
-        <dl className={styles.statusGrid}>
-          <StatusItem
-            label='Blocked by rule'
-            value={isBlockedNow ? 'Yes' : 'No'}
-            tone={isBlockedNow ? 'bad' : 'good'}
-          />
-          <StatusItem
-            label='Scheduling enabled'
-            value={isScheduleEnabled ? 'Yes' : 'No'}
-            tone={isScheduleEnabled ? 'neutral' : 'good'}
-          />
-          <StatusItem
-            label='URL supported'
-            value={isSupported ? 'Yes' : 'No'}
-            tone={isSupported ? 'good' : 'bad'}
-          />
-          {nextUnblockExpiration ? (
-            <StatusItem
-              label='Temporary unblock remaining'
-              value={formatRemainingTime(nextUnblockExpiration - tickNow)}
-              tone='neutral'
-            />
-          ) : null}
-        </dl>
+        {!isBlockPageUrl ? <p className={styles.subtle}>{activeTab?.url ?? 'No active tab found.'}</p> : null}
 
-        {notBlockedReason ? <p className={styles.reasonBanner}>{notBlockedReason}</p> : null}
-      </Card>
-
-      <Card
-        as='section'
-        className={styles.section}
-      >
-        <SectionHeader title='Quick actions' />
-        {!isBlockPageUrl ? (
-          <div className={styles.actions}>
-            <Button
-              disabled={!canAddRule}
-              onClick={handleAddDomainClick}
-            >
-              Add domain
-            </Button>
-            <Button
-              variant='secondary'
-              disabled={!canAddRule}
-              onClick={handleAddPathClick}
-            >
-              Add page
-            </Button>
-          </div>
-        ) : null}
-        <Button
-          variant='ghost'
-          className={styles.optionsButton}
-          onClick={handleOpenOptions}
+        <Card
+          as='section'
+          className={styles.section}
         >
-          Manage rules in options
-        </Button>
-      </Card>
+          <SectionHeader title='Blocking' />
+          <dl className={styles.statusGrid}>
+            <StatusItem
+              label='Blocked by rule'
+              value={isBlockedNow ? 'Yes' : 'No'}
+              tone={isBlockedNow ? 'bad' : 'good'}
+            />
+            <StatusItem
+              label='Scheduling enabled'
+              value={isScheduleEnabled ? 'Yes' : 'No'}
+              tone={isScheduleEnabled ? 'neutral' : 'good'}
+            />
+            <StatusItem
+              label='URL supported'
+              value={isSupported ? 'Yes' : 'No'}
+              tone={isSupported ? 'good' : 'bad'}
+            />
+            {nextUnblockExpiration ? (
+              <StatusItem
+                label='Temporary unblock remaining'
+                value={formatRemainingTime(nextUnblockExpiration - tickNow)}
+                tone='neutral'
+              />
+            ) : null}
+          </dl>
+
+          {notBlockedReason ? <p className={styles.reasonBanner}>{notBlockedReason}</p> : null}
+        </Card>
+
+        <Card
+          as='section'
+          className={styles.section}
+        >
+          <SectionHeader title='Quick actions' />
+          {!isBlockPageUrl ? (
+            <div className={styles.actions}>
+              <Button
+                disabled={!canAddRule}
+                onClick={handleAddDomainClick}
+              >
+                Add domain
+              </Button>
+              <Button
+                variant='secondary'
+                disabled={!canAddRule}
+                onClick={handleAddPathClick}
+              >
+                Add page
+              </Button>
+            </div>
+          ) : null}
+          <Button
+            variant='ghost'
+            className={styles.optionsButton}
+            onClick={handleOpenOptions}
+          >
+            Manage rules in options
+          </Button>
+        </Card>
+      </RenderBoundary>
     </main>
   );
 };

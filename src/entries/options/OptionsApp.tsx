@@ -7,6 +7,7 @@ import Rules from './tabs/Rules';
 import Scheduling from './tabs/Scheduling';
 
 import Hero from '@/components/ui/Hero';
+import RenderBoundary from '@/components/ui/RenderBoundary';
 import Tabs, { type TabItem } from '@/components/ui/Tabs';
 import useBlockRules from '@/hooks/useBlockRules';
 import useThemeEffect from '@/hooks/useThemeEffect';
@@ -21,7 +22,7 @@ const OPTIONS_TABS: ReadonlyArray<TabItem<OptionsTab>> = [
 
 const OptionsApp = () => {
   useThemeEffect();
-  const { blockRules } = useBlockRules();
+  const { blockRules, error } = useBlockRules();
   const [activeTab, setActiveTab] = useState<OptionsTab>('rules');
 
   const activeRuleCount = useMemo(() => blockRules?.filter((rule) => rule.enabled).length ?? 0, [blockRules]);
@@ -36,13 +37,18 @@ const OptionsApp = () => {
         title='Focus controls'
         subheading='Keep your rules clear, adjust unblock friction, and tune the extension for long-term focus.'
       />
-      <StatsGrid
-        stats={{
-          'Total rules': blockRules?.length ?? 0,
-          'Active rules': activeRuleCount - pausedRuleCount,
-          'Temporarily allowed': pausedRuleCount,
-        }}
-      />
+      <RenderBoundary
+        data={blockRules}
+        error={error}
+      >
+        <StatsGrid
+          stats={{
+            'Total rules': blockRules?.length ?? 0,
+            'Active rules': activeRuleCount - pausedRuleCount,
+            'Temporarily allowed': pausedRuleCount,
+          }}
+        />
+      </RenderBoundary>
       <Tabs
         className={styles.tabs}
         ariaLabel='Options sections'
