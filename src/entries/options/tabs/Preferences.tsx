@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react';
+
 import styles from '../OptionsApp.module.css';
 import OptionsTab from '../OptionsTab';
 
@@ -27,6 +29,14 @@ const parseIntegerInput = (value: string): number | null => {
 const clamp = (value: number, min: number, max: number): number => Math.max(min, Math.min(max, value));
 
 const Preferences = ({ className, settings, updateSettings }: PreferencesProps) => {
+  const [[theme, mode], setModeAndTheme] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (settings?.theme) {
+      setModeAndTheme(settings.theme.split('-'));
+    }
+  }, [settings?.theme]);
+
   if (!settings) {
     return (
       <OptionsTab
@@ -175,17 +185,27 @@ const Preferences = ({ className, settings, updateSettings }: PreferencesProps) 
               Theme
               <select
                 className={styles.settingsInput}
-                value={settings.theme}
+                value={theme}
                 onChange={(event) => {
-                  handleThemeChange(event.target.value as Theme);
+                  handleThemeChange((event.target.value + '-' + mode) as Theme);
                 }}
               >
-                <option value='intention-light'>Intentional (light)</option>
-                <option value='intention-dark'>Intentional (dark)</option>
-                <option value='mindful-light'>Mindful (light)</option>
-                <option value='mindful-dark'>Mindful (dark)</option>
-                <option value='focus-light'>Focused (light)</option>
-                <option value='focus-dark'>Focused (dark)</option>
+                <option value='intention'>Intentional</option>
+                <option value='mindful'>Mindful</option>
+                <option value='focus'>Focused</option>
+              </select>
+            </label>{' '}
+            <label className={styles.settingsLabel}>
+              Mode
+              <select
+                className={styles.settingsInput}
+                value={mode}
+                onChange={(event) => {
+                  handleThemeChange((theme + '-' + event.target.value) as Theme);
+                }}
+              >
+                <option value='light'>Light</option>
+                <option value='dark'>Dark</option>
               </select>
             </label>
           </div>
