@@ -40,6 +40,24 @@ describe('StorageService', () => {
     await expect(StorageService.updateSettings({ holdDurationSeconds: 'not-a-number' } as never)).rejects.toThrow();
   });
 
+  it('should not overwrite invalid persisted settings with defaults', async () => {
+    storageMock.local.get.mockResolvedValue({
+      settings: { ...defaultSettings, holdDurationSeconds: 'not-a-number' },
+    });
+
+    await expect(StorageService.getSettings()).rejects.toThrow();
+    expect(storageMock.local.set).not.toHaveBeenCalled();
+  });
+
+  it('should surface invalid persisted rules instead of returning an empty array', async () => {
+    storageMock.local.get.mockResolvedValue({
+      rules: [{ id: '1', pattern: 'abc.com' }],
+    });
+
+    await expect(StorageService.getRules()).rejects.toThrow();
+    expect(storageMock.local.set).not.toHaveBeenCalled();
+  });
+
   it('should update specific properties on specific rules and leave all else unchanged', async () => {
     const rules: BlockRule[] = [
       { id: '1', pattern: 'string', matchType: 'prefix', createdAt: new Date().toISOString(), enabled: true },

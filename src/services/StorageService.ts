@@ -1,10 +1,15 @@
-import type { SafeParseReturnType, ZodIssue } from 'zod';
+import { ZodError, type SafeParseReturnType, type ZodIssue, type ZodType } from 'zod';
 
 import defaultSettings from './defaultSettings';
 import { RulesService } from './RulesService';
 
 import type { BlockRule, ScheduleWindow, Settings, StorageSchema } from '@/types/schema';
-import { blockRuleSchema, blockRulesSchema, scheduleWindowSchema, settingsSchema } from '@/types/schema';
+import {
+  blockRuleSchema,
+  blockRulesSchema,
+  scheduleWindowSchema,
+  settingsSchema,
+} from '@/types/schema';
 import { deepMerge } from '@/utils/deepMerge';
 
 const SETTINGS_KEY: keyof StorageSchema = 'settings';
@@ -26,22 +31,36 @@ export type AddScheduleWindowResult = {
 };
 
 export class StorageService {
-  static async getSettings(): Promise<Settings> {
-    const result = await chrome.storage.local.get(SETTINGS_KEY);
-
-    const data = result[SETTINGS_KEY];
-    const validated = settingsSchema.safeParse(data);
+  private static parseStoredValue<T>(
+    key: keyof StorageSchema,
+    schema: ZodType<T>,
+    value: unknown,
+  ): T {
+    const validated = schema.safeParse(value);
 
     if (validated.success) {
       return validated.data;
     }
 
-    if (data) {
-      console.error('Zod Validation Failed for Settings:', validated.error.format());
+    this.logError(validated);
+    throw new ZodError(
+      validated.error.issues.map((issue) => ({
+        ...issue,
+        path: [key, ...issue.path],
+      })),
+    );
+  }
+
+  static async getSettings(): Promise<Settings> {
+    const result = await chrome.storage.local.get(SETTINGS_KEY);
+    const data = result[SETTINGS_KEY];
+
+    if (data === undefined) {
+      await chrome.storage.local.set({ [SETTINGS_KEY]: defaultSettings });
+      return defaultSettings;
     }
 
-    await chrome.storage.local.set({ [SETTINGS_KEY]: defaultSettings });
-    return defaultSettings;
+    return this.parseStoredValue(SETTINGS_KEY, settingsSchema, data);
   }
 
   static async updateSettings(updates: Partial<Settings>): Promise<void> {
@@ -65,17 +84,12 @@ export class StorageService {
   static async getRules(): Promise<BlockRule[]> {
     const result = await chrome.storage.local.get(RULES_KEY);
     const data = result[RULES_KEY];
-    const validated = blockRulesSchema.safeParse(data);
 
-    if (validated.success) {
-      return validated.data;
+    if (data === undefined) {
+      return [];
     }
 
-    if (data) {
-      this.logError(validated);
-    }
-
-    return [];
+    return this.parseStoredValue(RULES_KEY, blockRulesSchema, data);
   }
   static async addRule(newRule: BlockRule): Promise<AddRuleResult> {
     const currentRules: BlockRule[] = await this.getRules();
