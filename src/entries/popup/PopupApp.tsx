@@ -9,7 +9,7 @@ import SectionHeader from '@/components/ui/SectionHeader';
 import StatusItem from '@/components/ui/StatusItem';
 import useBlockRules from '@/hooks/useBlockRules';
 import useCreateRuleFromTab from '@/hooks/useCreateRuleFromTab';
-import useSchedule from '@/hooks/useSchedule';
+import useIsScheduleEnabled from '@/hooks/useIsScheduleEnabled';
 import useSettings from '@/hooks/useSettings';
 import useThemeEffect from '@/hooks/useThemeEffect';
 import { getBlockPageUrl } from '@/services/blocking/getBlockPageUrl';
@@ -30,12 +30,14 @@ const formatRemainingTime = (milliseconds: number) => {
 
 const PopupApp = () => {
   useThemeEffect();
-  const { activeTab, url, isSupported, createDomainPrefixRule, createPrefixUrlRule } = useCreateRuleFromTab();
+  const { activeTab, createDomainPrefixRule, createPrefixUrlRule } = useCreateRuleFromTab();
   const { blockRules, addRule } = useBlockRules();
   const { settings } = useSettings();
-  const { isScheduleEnabled } = useSchedule();
+  const isScheduleEnabled = useIsScheduleEnabled();
   const [tickNow, setTickNow] = useState(Date.now());
 
+  const url = activeTab?.url ?? null;
+  const isSupported = Boolean(url && RulesService.isSupportedUrl(url));
   const isBlockPageUrl = useMemo(() => Boolean(activeTab?.url?.startsWith(getBlockPageUrl())), [activeTab]);
 
   const matchingRules = useMemo(() => {

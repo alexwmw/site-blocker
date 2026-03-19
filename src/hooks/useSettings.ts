@@ -4,16 +4,20 @@ import type { StorageListener } from '@/services/StorageService';
 import { StorageService } from '@/services/StorageService';
 import type { Settings } from '@/types/schema';
 
+const toError = (value: unknown): Error => (value instanceof Error ? value : new Error(String(value)));
+
 const useSettings = () => {
   const [settings, setSettings] = useState<Settings | null>(null);
+  const [error, setError] = useState<Error | null>(null);
 
   const loadSettings = useCallback(async () => {
     try {
       const nextSettings = await StorageService.getSettings();
       setSettings(nextSettings);
+      setError(null);
     } catch (loadError) {
       console.error(loadError);
-      setSettings(null);
+      setError(toError(loadError));
     }
   }, []);
 
@@ -23,6 +27,7 @@ const useSettings = () => {
     const listener: StorageListener = (changes) => {
       if (changes.settings) {
         setSettings(changes.settings.newValue as Settings);
+        setError(null);
       }
     };
 
@@ -37,8 +42,8 @@ const useSettings = () => {
 
   return {
     settings,
+    error,
     updateSettings,
-    isLoading: settings === null,
   };
 };
 

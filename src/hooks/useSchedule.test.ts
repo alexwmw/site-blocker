@@ -42,8 +42,8 @@ describe('useSchedule', () => {
           ],
         },
       },
+      error: null,
       updateSettings: mockUpdateSettings,
-      isLoading: false,
     });
   });
 
@@ -62,22 +62,34 @@ describe('useSchedule', () => {
         },
       ],
     });
-    expect(result.current.isLoading).toBe(false);
-    expect(result.current.isScheduleEnabled).toBe(false);
+    expect(result.current.error).toBeNull();
   });
 
-  it('returns loading state when schedule is null', () => {
+  it('returns unresolved state when settings are not loaded yet', () => {
     vi.mocked(useSettings).mockReturnValue({
       settings: null,
+      error: null,
       updateSettings: mockUpdateSettings,
-      isLoading: true,
     });
 
     const { result } = renderHook(() => useSchedule());
 
     expect(result.current.schedule).toBeNull();
-    expect(result.current.isLoading).toBe(true);
-    expect(result.current.isScheduleEnabled).toBe(false);
+    expect(result.current.error).toBeNull();
+  });
+
+  it('returns settings load errors', () => {
+    const loadError = new Error('schedule failed');
+    vi.mocked(useSettings).mockReturnValue({
+      settings: null,
+      error: loadError,
+      updateSettings: mockUpdateSettings,
+    });
+
+    const { result } = renderHook(() => useSchedule());
+
+    expect(result.current.schedule).toBeNull();
+    expect(result.current.error).toBe(loadError);
   });
 
   it('calls updateSettings when setSchedulingEnabled is called', async () => {

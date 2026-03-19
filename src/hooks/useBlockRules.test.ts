@@ -33,7 +33,7 @@ vi.stubGlobal('chrome', chromeMock);
 describe('useBlockRules Hook', () => {
   beforeEach(() => {
     vi.restoreAllMocks();
-    listeners = []; // Reset listeners between tests
+    listeners = [];
 
     chromeMock.storage.local.get.mockImplementation(async (key: string) => {
       return {
@@ -43,26 +43,35 @@ describe('useBlockRules Hook', () => {
   });
 
   it('should load initial rules from StorageService', async () => {
-    // const mockRules: BlockRule[] = [DEFAULT_RULE];
-    // vi.spyOn(StorageService, 'getRules').mockResolvedValue(mockRules);
-
     const { result } = renderHook(() => useBlockRules());
 
     await waitFor(() => {
-      expect(result.current.isLoading).toBe(false);
+      expect(result.current.blockRules).toHaveLength(3);
     });
 
     expect(result.current.blockRules?.[0].id).toBe('111');
     expect(result.current.blockRules?.[1].id).toBe('222');
-    expect(result.current.blockRules?.length).toBe(3);
-    expect(result.current.isLoading).toBe(false);
+    expect(result.current.error).toBeNull();
+  });
+
+  it('should preserve load errors instead of returning an empty loaded result', async () => {
+    const loadError = new Error('failed to load rules');
+    vi.spyOn(StorageService, 'getRules').mockRejectedValue(loadError);
+
+    const { result } = renderHook(() => useBlockRules());
+
+    await waitFor(() => {
+      expect(result.current.error).toBe(loadError);
+    });
+
+    expect(result.current.blockRules).toBeNull();
   });
 
   it('should update state when chrome.storage.onChanged fires', async () => {
     const { result } = renderHook(() => useBlockRules());
 
     await waitFor(() => {
-      expect(result.current.isLoading).toBe(false);
+      expect(result.current.blockRules).toHaveLength(3);
     });
 
     await act(async () => {
@@ -86,6 +95,7 @@ describe('useBlockRules Hook', () => {
 
     expect(result.current.blockRules?.length).toBe(4);
     expect(result.current.blockRules?.[3]?.id).toBe('444');
+    expect(result.current.error).toBeNull();
   });
 
   it('should call StorageService.addRule when addRule is called', async () => {

@@ -1,29 +1,40 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import type { StorageListener } from '@/services/StorageService';
 import { StorageService } from '@/services/StorageService';
 import type { BlockRule } from '@/types/schema';
 
+const toError = (value: unknown): Error => (value instanceof Error ? value : new Error(String(value)));
+
 const useBlockRules = () => {
   const [blockRules, setBlockRules] = useState<BlockRule[] | null>(null);
+  const [error, setError] = useState<Error | null>(null);
+
+  const loadBlockRules = useCallback(async () => {
+    try {
+      const nextBlockRules = await StorageService.getRules();
+      setBlockRules(nextBlockRules);
+      setError(null);
+    } catch (loadError) {
+      console.error(loadError);
+      setError(toError(loadError));
+    }
+  }, []);
 
   useEffect(() => {
-    // Initial load
-    StorageService.getRules().then(setBlockRules).catch(console.error);
+    loadBlockRules().catch(console.error);
 
-    // Listen for Storage Changes
     const listener: StorageListener = (changes) => {
-      // If the 'rules' key was updated anywhere in the extension...
       if (changes.rules) {
         setBlockRules(changes.rules.newValue as BlockRule[]);
+        setError(null);
       }
     };
 
     StorageService.addListener(listener);
 
-    // Clean up the listener when the component unmounts
     return () => StorageService.removeListener(listener);
-  }, []);
+  }, [loadBlockRules]);
 
   const addRule = async (rule: BlockRule) => {
     await StorageService.addRule(rule);
@@ -39,10 +50,10 @@ const useBlockRules = () => {
 
   return {
     blockRules,
+    error,
     addRule,
     removeRule,
     updateRule,
-    isLoading: blockRules === null,
   };
 };
 

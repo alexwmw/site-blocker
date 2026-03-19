@@ -11,18 +11,19 @@ export const createNewScheduleWindow: () => ScheduleWindow = () => ({
 });
 
 const useSchedule = () => {
-  const { settings, updateSettings } = useSettings();
+  const { settings, error, updateSettings } = useSettings();
 
   const setSchedulingEnabled = async (enabled: boolean) => {
     if (!settings) {
       return;
     }
-    updateSettings({
+
+    await updateSettings({
       schedule: {
         ...settings.schedule,
         enabled,
       },
-    }).catch(console.error);
+    });
   };
 
   const addScheduleWindow = async (window?: ScheduleWindow) => {
@@ -39,12 +40,11 @@ const useSchedule = () => {
 
   return {
     schedule: settings?.schedule ?? null,
+    error,
     setSchedulingEnabled,
     addScheduleWindow,
     removeScheduleWindow,
     updateScheduleWindow,
-    isLoading: !settings?.schedule,
-    isScheduleEnabled: Boolean(settings?.schedule.enabled),
   };
 };
 

@@ -26,7 +26,7 @@ vi.stubGlobal('chrome', chromeMock);
 describe('useSettings Hook', () => {
   beforeEach(() => {
     vi.restoreAllMocks();
-    listeners = []; // Reset listeners between tests
+    listeners = [];
 
     chromeMock.storage.local.get.mockImplementation(async (key: string) => {
       return {
@@ -42,18 +42,30 @@ describe('useSettings Hook', () => {
     const { result } = renderHook(() => useSettings());
 
     await waitFor(() => {
-      expect(result.current.isLoading).toBe(false);
+      expect(result.current.settings).toEqual(mockSettings);
     });
 
-    expect(result.current.settings?.theme).toBe('mindful-light');
-    expect(result.current.isLoading).toBe(false);
+    expect(result.current.error).toBeNull();
+  });
+
+  it('should preserve load errors instead of treating them as loaded empty state', async () => {
+    const loadError = new Error('failed to load settings');
+    vi.spyOn(StorageService, 'getSettings').mockRejectedValue(loadError);
+
+    const { result } = renderHook(() => useSettings());
+
+    await waitFor(() => {
+      expect(result.current.error).toBe(loadError);
+    });
+
+    expect(result.current.settings).toBeNull();
   });
 
   it('should update state when chrome.storage.onChanged fires', async () => {
     const { result } = renderHook(() => useSettings());
 
     await waitFor(() => {
-      expect(result.current.isLoading).toBe(false);
+      expect(result.current.settings).toEqual(defaultSettings);
     });
 
     await act(async () => {
@@ -67,6 +79,7 @@ describe('useSettings Hook', () => {
     });
 
     expect(result.current.settings?.theme).toBe('mindful-dark');
+    expect(result.current.error).toBeNull();
   });
 
   it('should call StorageService.updateSettings when updateSettings is called', async () => {
