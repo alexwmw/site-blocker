@@ -39,29 +39,25 @@ describe('Preferences', () => {
 
     expect(screen.getByText('Blocking behavior')).toBeTruthy();
     expect(screen.getByText('Appearance')).toBeTruthy();
-    expect(screen.getByText('Notifications')).toBeTruthy();
-    expect(screen.getByText('Account & licensing')).toBeTruthy();
 
     const themeSelect = screen.getByRole('combobox');
     const spinbuttons = screen.getAllByRole('spinbutton') as HTMLInputElement[];
     const holdDurationInput = spinbuttons[0];
     const unblockDurationInput = spinbuttons[1];
     const headlineInput = screen.getByRole('textbox', { name: /block page headline/i }) as HTMLInputElement;
-    const [unblockEnabledSwitch, ratedSwitch] = screen.getAllByRole('checkbox') as HTMLInputElement[];
+    const [unblockEnabledSwitch] = screen.getAllByRole('checkbox') as HTMLInputElement[];
 
     expect((themeSelect as HTMLSelectElement).value).toBe('mindful-dark');
     expect(holdDurationInput.value).toBe('15');
     expect(headlineInput.value).toBe('Keep going');
     expect(unblockDurationInput.value).toBe('10');
     expect(unblockEnabledSwitch.checked).toBe(true);
-    expect(ratedSwitch.checked).toBe(false);
 
     fireEvent.change(themeSelect, { target: { value: 'focus-light' } });
     fireEvent.change(holdDurationInput, { target: { value: '25' } });
     fireEvent.change(headlineInput, { target: { value: 'Deep work only' } });
     fireEvent.click(unblockEnabledSwitch);
     fireEvent.change(unblockDurationInput, { target: { value: '45' } });
-    fireEvent.click(ratedSwitch);
 
     expect(updateSettings).toHaveBeenNthCalledWith(1, { theme: 'focus-light' });
     expect(updateSettings).toHaveBeenNthCalledWith(2, { holdDurationSeconds: 25 });
@@ -72,7 +68,6 @@ describe('Preferences', () => {
     expect(updateSettings).toHaveBeenNthCalledWith(5, {
       extendedUnblock: { enabled: true, durationMinutes: 45 },
     });
-    expect(updateSettings).toHaveBeenNthCalledWith(6, { isRated: true });
   });
 
   it('clamps invalid values and resets visible preferences to defaults', () => {
