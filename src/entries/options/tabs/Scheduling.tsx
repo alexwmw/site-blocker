@@ -9,13 +9,12 @@ import useSchedule from '@/hooks/useSchedule';
 import type { ScheduleWindow } from '@/types/schema';
 
 const Scheduling = ({ className }: { className: string }) => {
-  const { schedule, isLoading, addScheduleWindow, removeScheduleWindow, updateScheduleWindow, setSchedulingEnabled } =
+  const { schedule, addScheduleWindow, removeScheduleWindow, updateScheduleWindow, setSchedulingEnabled } =
     useSchedule();
 
   return (
     <OptionsTab
       title='Scheduling'
-      isContentLoaded={isLoading}
       className={className}
     >
       <Card
@@ -40,7 +39,7 @@ const Scheduling = ({ className }: { className: string }) => {
           </p>
         </div>
       </Card>
-      {!isLoading && schedule ? (
+      {schedule ? (
         <>
           <div className={styles.scheduleHeadingRow}>
             <div>

@@ -31,8 +31,8 @@ const formatRemainingTime = (milliseconds: number) => {
 const PopupApp = () => {
   useThemeEffect();
   const { activeTab, url, isSupported, createDomainPrefixRule, createPrefixUrlRule } = useCreateRuleFromTab();
-  const { blockRules, addRule, isLoading: isRulesLoading } = useBlockRules();
-  const { settings, isLoading: isSettingsLoading } = useSettings();
+  const { blockRules, addRule } = useBlockRules();
+  const { settings } = useSettings();
   const { isScheduleEnabled } = useSchedule();
   const [tickNow, setTickNow] = useState(Date.now());
 
@@ -149,7 +149,6 @@ const PopupApp = () => {
         </dl>
 
         {notBlockedReason ? <p className={styles.reasonBanner}>{notBlockedReason}</p> : null}
-        {isRulesLoading || isSettingsLoading ? <p className={styles.subtle}>Loading latest settings…</p> : null}
       </Card>
 
       <Card

@@ -18,7 +18,7 @@ const readableDate = (dateIso: string) => {
 };
 
 const Rules = ({ className, onClickEditSchedule }: { className: string; onClickEditSchedule: MouseEventHandler }) => {
-  const { blockRules, removeRule, updateRule, isLoading: isRulesLoading } = useBlockRules();
+  const { blockRules, removeRule, updateRule } = useBlockRules();
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const [pendingMatchTypeRuleId, setPendingMatchTypeRuleId] = useState<string | null>(null);
   const { isScheduleEnabled } = useSchedule();
@@ -86,7 +86,6 @@ const Rules = ({ className, onClickEditSchedule }: { className: string; onClickE
   return (
     <OptionsTab
       title='Rules'
-      isContentLoaded={isRulesLoading}
       className={className}
     >
       {isScheduleEnabled ? (
