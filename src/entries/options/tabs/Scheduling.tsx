@@ -68,9 +68,7 @@ const Scheduling = ({ className }: { className: string }) => {
           <div className={styles.scheduleHeadingRow}>
             <div>
               <h3>Schedule windows</h3>
-              <p className={styles.subtle}>
-                Add weekly rules, adjust days quickly, and review overlap warnings when you intentionally stack windows.
-              </p>
+              <p className={styles.subtle}>Add weekly rules, adjust days and times, and set multiple schedules.</p>
             </div>
             <Button
               disabled={!isSchedulingEnabled}
@@ -84,13 +82,15 @@ const Scheduling = ({ className }: { className: string }) => {
 
           <ul className={styles.windowsList}>
             {schedule.windows.map((win, index) => (
-              <SchedulingWindow
-                window={win}
-                disabled={!schedule || !isSchedulingEnabled}
-                windowIndex={index}
-                removeWindow={() => removeScheduleWindow(win.id)}
-                updateWindow={(update: Partial<ScheduleWindow>) => updateScheduleWindow(win.id, update)}
-              />
+              <li key={win.id}>
+                <SchedulingWindow
+                  window={win}
+                  disabled={!schedule || !isSchedulingEnabled}
+                  windowIndex={index}
+                  removeWindow={() => removeScheduleWindow(win.id)}
+                  updateWindow={(update: Partial<ScheduleWindow>) => updateScheduleWindow(win.id, update)}
+                />
+              </li>
             ))}
           </ul>
         </>
