@@ -2,12 +2,15 @@ import styles from '../OptionsApp.module.css';
 import OptionsTab from '../OptionsTab';
 
 import Card from '@/components/ui/Card';
-import useSettings from '@/hooks/useSettings';
-import type { Theme } from '@/types/schema';
+import type { Settings, Theme } from '@/types/schema';
 
-const Preferences = ({ className }: { className?: string }) => {
-  const { settings, updateSettings } = useSettings();
+type PreferencesProps = {
+  className?: string;
+  settings: Settings | null;
+  updateSettings: (updates: Partial<Settings>) => Promise<void>;
+};
 
+const Preferences = ({ className, settings, updateSettings }: PreferencesProps) => {
   const handleThemeChange = (theme: Theme) => {
     updateSettings({ theme }).catch(console.error);
   };
@@ -34,7 +37,6 @@ const Preferences = ({ className }: { className?: string }) => {
             onChange={(event) => {
               handleThemeChange(event.target.value as Theme);
             }}
-            disabled={!settings}
           >
             <option value='mindful-light'>Mindful light</option>
             <option value='mindful-dark'>Mindful dark</option>
@@ -51,7 +53,6 @@ const Preferences = ({ className }: { className?: string }) => {
             min={3}
             max={99}
             value={settings?.holdDurationSeconds ?? 3}
-            disabled={!settings}
             onChange={(event) => {
               handleHoldDurationChange(Number(event.target.value));
             }}

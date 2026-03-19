@@ -8,20 +8,25 @@ import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import StatusItem from '@/components/ui/StatusItem';
 import Switch from '@/components/ui/Switch';
-import useBlockRules from '@/hooks/useBlockRules';
-import useIsScheduleEnabled from '@/hooks/useIsScheduleEnabled';
-import type { BlockRule } from '@/types/schema';
+import type { BlockRule, Schedule } from '@/types/schema';
+
+type RulesProps = {
+  blockRules: BlockRule[];
+  className: string;
+  onClickEditSchedule: MouseEventHandler;
+  removeRule: (id: string) => Promise<void>;
+  schedule: Schedule | null;
+  updateRule: (id: string, updates: Partial<BlockRule>) => Promise<void>;
+};
 
 const readableDate = (dateIso: string) => {
   const date = new Date(dateIso);
   return Number.isNaN(date.valueOf()) ? 'Unknown date' : date.toLocaleString();
 };
 
-const Rules = ({ className, onClickEditSchedule }: { className: string; onClickEditSchedule: MouseEventHandler }) => {
-  const { blockRules, removeRule, updateRule } = useBlockRules();
+const Rules = ({ blockRules, className, onClickEditSchedule, removeRule, schedule, updateRule }: RulesProps) => {
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const [pendingMatchTypeRuleId, setPendingMatchTypeRuleId] = useState<string | null>(null);
-  const isScheduleEnabled = useIsScheduleEnabled();
 
   const handleRemove = async (ruleId: string) => {
     setPendingDeleteId(ruleId);
@@ -83,12 +88,13 @@ const Rules = ({ className, onClickEditSchedule }: { className: string; onClickE
       </li>
     );
   };
+
   return (
     <OptionsTab
       title='Rules'
       className={className}
     >
-      {isScheduleEnabled ? (
+      {schedule?.enabled ? (
         <div className={styles.statusGrid}>
           <StatusItem
             label='Scheduling is:'
@@ -98,7 +104,7 @@ const Rules = ({ className, onClickEditSchedule }: { className: string; onClickE
           <Button onClick={onClickEditSchedule}>Edit schedule</Button>
         </div>
       ) : null}
-      {!blockRules?.length ? (
+      {!blockRules.length ? (
         <Card className={styles.emptyState}>
           <p>No rules yet.</p>
           <p className={styles.subtle}>Add rules from the popup to start blocking distracting sites.</p>
