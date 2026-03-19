@@ -1,9 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { BlockRule, Schedule } from '../types/schema';
-
 import defaultSettings from './defaultSettings';
 import { StorageService } from './StorageService';
+
+import type { BlockRule, Schedule } from '@/types/schema';
 
 // Mock Chrome Storage
 const storageMock = {
@@ -116,7 +116,7 @@ describe('StorageService', () => {
     expect(storageMock.local.set).not.toHaveBeenCalled();
   });
 
-  it('should allow overlapping schedule updates because they are only warnings', async () => {
+  it('should allow overlapping schedule updates', async () => {
     storageMock.local.get.mockResolvedValue({ settings: defaultSettings });
 
     await StorageService.updateSettings({

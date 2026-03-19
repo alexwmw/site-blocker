@@ -7,16 +7,13 @@ import { createUniqueId } from '@/utils/createUniqueId';
 
 const useSettings = () => {
   const [settings, setSettings] = useState<Settings | null>(null);
-  const [error, setError] = useState<string | null>(null);
 
   const loadSettings = useCallback(async () => {
     try {
-      setError(null);
       const nextSettings = await StorageService.getSettings();
       setSettings(nextSettings);
     } catch (loadError) {
       console.error(loadError);
-      setError(loadError instanceof Error ? loadError.message : 'Unable to load your settings.');
       setSettings(null);
     }
   }, []);
@@ -27,7 +24,6 @@ const useSettings = () => {
     const listener: StorageListener = (changes) => {
       if (changes.settings) {
         setSettings(changes.settings.newValue as Settings);
-        setError(null);
       }
     };
 
@@ -37,7 +33,6 @@ const useSettings = () => {
   }, [loadSettings]);
 
   const updateSettings = async (updates: Partial<Settings>) => {
-    setError(null);
     await StorageService.updateSettings(updates);
   };
 
@@ -63,14 +58,13 @@ const useSettings = () => {
 
   return {
     settings,
-    error,
     retryLoad: loadSettings,
     updateSettings,
     isSchedulingEnabled,
     addScheduleWindow,
     removeScheduleWindow,
     updateScheduleWindow,
-    isLoading: settings === null && error === null,
+    isLoading: settings === null,
   };
 };
 
