@@ -4,7 +4,14 @@ import { z } from 'zod';
 export const TIME_REGEX = /^([01][0-9]|2[0-3]):[0-5][0-9]$/;
 
 /** Supported UI themes. */
-export const THEMES = ['mindful-light', 'mindful-dark', 'focus-light', 'focus-dark'] as const;
+export const THEMES = [
+  'intention-light',
+  'intention-dark',
+  'mindful-light',
+  'mindful-dark',
+  'focus-light',
+  'focus-dark',
+] as const;
 
 /** User-selected UI theme. */
 export const themeSchema = z.enum(THEMES);
