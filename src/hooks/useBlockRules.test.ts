@@ -98,6 +98,27 @@ describe('useBlockRules Hook', () => {
     expect(result.current.error).toBeNull();
   });
 
+  it('should reject invalid chrome.storage.onChanged rules payloads', async () => {
+    const { result } = renderHook(() => useBlockRules());
+
+    await waitFor(() => {
+      expect(result.current.blockRules).toHaveLength(3);
+    });
+
+    await act(async () => {
+      expect(listeners).toHaveLength(1);
+      listeners[0]({
+        rules: {
+          newValue: [{ id: 'invalid-rule' }],
+          oldValue: [DEFAULT_RULE],
+        },
+      });
+    });
+
+    expect(result.current.blockRules).toBeNull();
+    expect(result.current.error).toBeInstanceOf(Error);
+  });
+
   it('should call StorageService.addRule when addRule is called', async () => {
     const spy = vi.spyOn(StorageService, 'addRule').mockResolvedValue({ ok: true });
     const { result } = renderHook(() => useBlockRules());

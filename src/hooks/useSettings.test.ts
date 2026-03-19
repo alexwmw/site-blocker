@@ -82,6 +82,27 @@ describe('useSettings Hook', () => {
     expect(result.current.error).toBeNull();
   });
 
+  it('should reject invalid chrome.storage.onChanged settings payloads', async () => {
+    const { result } = renderHook(() => useSettings());
+
+    await waitFor(() => {
+      expect(result.current.settings).toEqual(defaultSettings);
+    });
+
+    await act(async () => {
+      expect(listeners).toHaveLength(1);
+      listeners[0]({
+        settings: {
+          newValue: { ...defaultSettings, holdDurationSeconds: 'invalid' },
+          oldValue: defaultSettings,
+        },
+      });
+    });
+
+    expect(result.current.settings).toBeNull();
+    expect(result.current.error).toBeInstanceOf(Error);
+  });
+
   it('should call StorageService.updateSettings when updateSettings is called', async () => {
     const spy = vi.spyOn(StorageService, 'updateSettings').mockResolvedValue();
     const { result } = renderHook(() => useSettings());

@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 import type { StorageListener } from '@/services/StorageService';
 import { StorageService } from '@/services/StorageService';
 import type { BlockRule } from '@/types/schema';
+import { blockRulesSchema } from '@/types/schema';
 
 const toError = (value: unknown): Error => (value instanceof Error ? value : new Error(String(value)));
 
@@ -17,6 +18,7 @@ const useBlockRules = () => {
       setError(null);
     } catch (loadError) {
       console.error(loadError);
+      setBlockRules(null);
       setError(toError(loadError));
     }
   }, []);
@@ -26,7 +28,17 @@ const useBlockRules = () => {
 
     const listener: StorageListener = (changes) => {
       if (changes.rules) {
-        setBlockRules(changes.rules.newValue as BlockRule[]);
+        const validated = blockRulesSchema.safeParse(changes.rules.newValue);
+
+        if (!validated.success) {
+          const changeError = validated.error;
+          console.error(changeError);
+          setBlockRules(null);
+          setError(changeError);
+          return;
+        }
+
+        setBlockRules(validated.data);
         setError(null);
       }
     };
