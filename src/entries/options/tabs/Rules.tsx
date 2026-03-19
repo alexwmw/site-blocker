@@ -9,7 +9,7 @@ import Card from '@/components/ui/Card';
 import StatusItem from '@/components/ui/StatusItem';
 import Switch from '@/components/ui/Switch';
 import useBlockRules from '@/hooks/useBlockRules';
-import useSchedule from '@/hooks/useSchedule';
+import useIsScheduleEnabled from '@/hooks/useIsScheduleEnabled';
 import type { BlockRule } from '@/types/schema';
 
 const readableDate = (dateIso: string) => {
@@ -21,7 +21,7 @@ const Rules = ({ className, onClickEditSchedule }: { className: string; onClickE
   const { blockRules, removeRule, updateRule } = useBlockRules();
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const [pendingMatchTypeRuleId, setPendingMatchTypeRuleId] = useState<string | null>(null);
-  const { isScheduleEnabled } = useSchedule();
+  const isScheduleEnabled = useIsScheduleEnabled();
 
   const handleRemove = async (ruleId: string) => {
     setPendingDeleteId(ruleId);

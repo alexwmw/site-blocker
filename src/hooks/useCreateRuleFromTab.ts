@@ -1,8 +1,10 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { RulesService } from '@/services/RulesService';
 import type { BlockRule, MatchType } from '@/types/schema';
 import { createUniqueId } from '@/utils/createUniqueId';
+
+const toError = (value: unknown): Error => (value instanceof Error ? value : new Error(String(value)));
 
 /**
  *
@@ -10,27 +12,31 @@ import { createUniqueId } from '@/utils/createUniqueId';
  */
 const useCreateRuleFromTab = (tab?: chrome.tabs.Tab | null) => {
   const [activeTab, setActiveTab] = useState<chrome.tabs.Tab | null>(tab ?? null);
-
-  const isSupported = useMemo(() => {
-    const url = activeTab?.url;
-    return Boolean(url && RulesService.isSupportedUrl(url));
-  }, [activeTab]);
+  const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
     if (tab !== undefined) {
       setActiveTab(tab);
+      setError(null);
       return;
     }
+
     chrome.tabs
       .query({ active: true, lastFocusedWindow: true })
-      .then((tabs) => setActiveTab(tabs[0] ?? null))
-      .catch(console.error);
+      .then((tabs) => {
+        setActiveTab(tabs[0] ?? null);
+        setError(null);
+      })
+      .catch((queryError) => {
+        console.error(queryError);
+        setError(toError(queryError));
+      });
   }, [tab]);
 
   const createUrlRule = useCallback(
     (matchType: MatchType, patternType: 'domain' | 'path'): BlockRule | null => {
       const url = activeTab?.url;
-      if (!url || !isSupported) {
+      if (!url || !RulesService.isSupportedUrl(url)) {
         return null;
       }
 
@@ -49,16 +55,16 @@ const useCreateRuleFromTab = (tab?: chrome.tabs.Tab | null) => {
         enabled: true,
       };
     },
-    [activeTab, isSupported],
+    [activeTab],
   );
 
   return {
     activeTab,
-    url: activeTab?.url ?? null,
-    isSupported,
+    error,
     createExactUrlRule: () => createUrlRule('exact', 'path'),
     createPrefixUrlRule: () => createUrlRule('prefix', 'path'),
     createDomainPrefixRule: () => createUrlRule('prefix', 'domain'),
   };
 };
+
 export default useCreateRuleFromTab;

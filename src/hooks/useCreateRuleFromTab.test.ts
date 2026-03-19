@@ -24,10 +24,10 @@ describe('useCreateRuleFromActiveTab', () => {
 
     await waitFor(() => {
       expect(result.current.activeTab?.url).toBe('https://www.theguardian.com/');
-      expect(result.current.isSupported).toBe(true);
     });
 
     expect(chromeMock.tabs.query).not.toHaveBeenCalled();
+    expect(result.current.error).toBeNull();
     expect(result.current.createDomainPrefixRule()?.pattern).toBe('theguardian.com');
   });
 
@@ -40,10 +40,10 @@ describe('useCreateRuleFromActiveTab', () => {
 
     await waitFor(() => {
       expect(result.current.activeTab?.url).toBe('chrome://extensions');
-      expect(result.current.isSupported).toBe(false);
     });
 
     expect(chromeMock.tabs.query).not.toHaveBeenCalled();
+    expect(result.current.error).toBeNull();
   });
 
   it('loads active tab and marks supported URLs', async () => {
@@ -53,8 +53,22 @@ describe('useCreateRuleFromActiveTab', () => {
 
     await waitFor(() => {
       expect(result.current.activeTab?.url).toBe('https://www.reddit.com/r/aita');
-      expect(result.current.isSupported).toBe(true);
     });
+
+    expect(result.current.error).toBeNull();
+  });
+
+  it('preserves query errors instead of treating them as empty loaded state', async () => {
+    const queryError = new Error('failed to query tabs');
+    chromeMock.tabs.query.mockRejectedValue(queryError);
+
+    const { result } = renderHook(() => useCreateRuleFromTab());
+
+    await waitFor(() => {
+      expect(result.current.error).toBe(queryError);
+    });
+
+    expect(result.current.activeTab).toBeNull();
   });
 
   it('creates exact and prefix URL rules from active tab', async () => {
@@ -63,7 +77,7 @@ describe('useCreateRuleFromActiveTab', () => {
     const { result } = renderHook(() => useCreateRuleFromTab());
 
     await waitFor(() => {
-      expect(result.current.isSupported).toBe(true);
+      expect(result.current.activeTab?.url).toBe('https://www.reddit.com/r/aita/');
     });
 
     const exactRule = result.current.createExactUrlRule();
@@ -82,7 +96,7 @@ describe('useCreateRuleFromActiveTab', () => {
     const { result } = renderHook(() => useCreateRuleFromTab());
 
     await waitFor(() => {
-      expect(result.current.isSupported).toBe(true);
+      expect(result.current.activeTab?.url).toBe('https://www.reddit.com/r/aita?sort=new');
     });
 
     const rule = result.current.createDomainPrefixRule();
@@ -97,7 +111,7 @@ describe('useCreateRuleFromActiveTab', () => {
     const { result } = renderHook(() => useCreateRuleFromTab());
 
     await waitFor(() => {
-      expect(result.current.isSupported).toBe(false);
+      expect(result.current.activeTab?.url).toBe('chrome://extensions');
     });
 
     expect(result.current.createExactUrlRule()).toBeNull();
