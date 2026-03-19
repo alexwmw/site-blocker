@@ -162,9 +162,9 @@
   display: grid;
   gap: 14px;
   grid-template-areas:
-          'header header'
-          'days   days'
-          'start  end ';
+    'header header'
+    'days   days'
+    'start  end ';
 }
 
 .scheduleWindowHeader {
@@ -176,7 +176,8 @@
 }
 
 .scheduleWindowDays {
-  grid-area: days;  display: grid;
+  grid-area: days;
+  display: grid;
   gap: 10px;
 }
 

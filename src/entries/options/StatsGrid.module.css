@@ -1,19 +1,19 @@
 .statsGrid {
-    margin-top: 18px;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 12px;
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
 }
 
 .stat {
-    padding: 14px;
+  padding: 14px;
 }
 
 .statText {
-    margin: 0;
-    color: var(--color-text-secondary);
+  margin: 0;
+  color: var(--color-text-secondary);
 }
 
 .statValue {
-    font-size: 1.8rem;
+  font-size: 1.8rem;
 }

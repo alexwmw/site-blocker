@@ -1,51 +1,50 @@
-
 .statusItem {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 10px;
-    padding: 8px 10px;
-    border-radius: var(--radius-sm);
-    border: 1px solid var(--color-border-muted);
-    background: var(--color-bg-muted);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border-muted);
+  background: var(--color-bg-muted);
 }
 
 .statusLabel {
-    margin: 0;
-    color: var(--color-text-secondary);
-    font-size: 0.85rem;
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: 0.85rem;
 }
 
 .statusValue {
-    margin: 0;
+  margin: 0;
 }
 
 .pillBase {
-    display: inline-block;
-    border-radius: var(--radius-pill);
-    padding: 3px 10px;
-    font-weight: 700;
-    font-size: 0.78rem;
-    border: 1px solid transparent;
+  display: inline-block;
+  border-radius: var(--radius-pill);
+  padding: 3px 10px;
+  font-weight: 700;
+  font-size: 0.78rem;
+  border: 1px solid transparent;
 }
 
 .pillGood {
-    composes: pillBase;
-    color: var(--color-accent);
-    background: var(--color-bg-elevated);
-    border-color: var(--color-accent-soft);
+  composes: pillBase;
+  color: var(--color-accent);
+  background: var(--color-bg-elevated);
+  border-color: var(--color-accent-soft);
 }
 
 .pillBad {
-    composes: pillBase;
-    color: var(--color-danger);
-    background: var(--color-bg-elevated);
-    border-color: var(--color-danger);
+  composes: pillBase;
+  color: var(--color-danger);
+  background: var(--color-bg-elevated);
+  border-color: var(--color-danger);
 }
 
 .pillNeutral {
-    composes: pillBase;
-    color: var(--color-text-primary);
-    background: var(--color-bg-elevated);
-    border-color: var(--color-border-strong);
+  composes: pillBase;
+  color: var(--color-text-primary);
+  background: var(--color-bg-elevated);
+  border-color: var(--color-border-strong);
 }
