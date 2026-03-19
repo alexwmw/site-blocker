@@ -11,6 +11,15 @@ type PreferencesProps = {
 };
 
 const Preferences = ({ className, settings, updateSettings }: PreferencesProps) => {
+  if (!settings) {
+    return (
+      <OptionsTab
+        title='Preference'
+        className={className}
+      />
+    );
+  }
+
   const handleThemeChange = (theme: Theme) => {
     updateSettings({ theme }).catch(console.error);
   };
@@ -33,7 +42,7 @@ const Preferences = ({ className, settings, updateSettings }: PreferencesProps) 
           Theme
           <select
             className={styles.settingsInput}
-            value={settings?.theme ?? 'mindful-light'}
+            value={settings.theme}
             onChange={(event) => {
               handleThemeChange(event.target.value as Theme);
             }}
@@ -54,7 +63,7 @@ const Preferences = ({ className, settings, updateSettings }: PreferencesProps) 
             type='number'
             min={3}
             max={99}
-            value={settings?.holdDurationSeconds ?? 3}
+            value={settings.holdDurationSeconds}
             onChange={(event) => {
               handleHoldDurationChange(Number(event.target.value));
             }}

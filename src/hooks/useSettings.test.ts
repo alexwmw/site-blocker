@@ -7,6 +7,17 @@ import defaultSettings from '@/services/defaultSettings';
 import { StorageService } from '@/services/StorageService';
 import type { Settings } from '@/types/schema';
 
+const createDeferred = <T>() => {
+  let resolve!: (value: T | PromiseLike<T>) => void;
+  let reject!: (reason?: unknown) => void;
+  const promise = new Promise<T>((res, rej) => {
+    resolve = res;
+    reject = rej;
+  });
+
+  return { promise, resolve, reject };
+};
+
 // Mock Chrome API
 let listeners: Array<(changes: unknown) => void> = [];
 const chromeMock = {
@@ -32,6 +43,22 @@ describe('useSettings Hook', () => {
       return {
         [key]: defaultSettings,
       };
+    });
+  });
+
+  it('preserves an unresolved initial state until settings load completes', async () => {
+    const deferred = createDeferred<Settings>();
+    vi.spyOn(StorageService, 'getSettings').mockReturnValue(deferred.promise);
+
+    const { result } = renderHook(() => useSettings());
+
+    expect(result.current.settings).toBeNull();
+    expect(result.current.error).toBeNull();
+
+    deferred.resolve(defaultSettings);
+
+    await waitFor(() => {
+      expect(result.current.settings).toEqual(defaultSettings);
     });
   });
 

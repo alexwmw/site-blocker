@@ -6,6 +6,17 @@ import useBlockRules from './useBlockRules';
 import { StorageService } from '@/services/StorageService';
 import type { BlockRule } from '@/types/schema';
 
+const createDeferred = <T>() => {
+  let resolve!: (value: T | PromiseLike<T>) => void;
+  let reject!: (reason?: unknown) => void;
+  const promise = new Promise<T>((res, rej) => {
+    resolve = res;
+    reject = rej;
+  });
+
+  return { promise, resolve, reject };
+};
+
 const DEFAULT_RULE: BlockRule = {
   id: '111',
   pattern: 'abc.com',
@@ -13,6 +24,8 @@ const DEFAULT_RULE: BlockRule = {
   enabled: true,
   createdAt: '2026-03-06T00:00:00.000Z',
 };
+
+const DEFAULT_RULES: BlockRule[] = [DEFAULT_RULE, { ...DEFAULT_RULE, id: '222' }, { ...DEFAULT_RULE, id: '333' }];
 
 // Mock Chrome API
 let listeners: Array<(changes: unknown) => void> = [];
@@ -37,8 +50,24 @@ describe('useBlockRules Hook', () => {
 
     chromeMock.storage.local.get.mockImplementation(async (key: string) => {
       return {
-        [key]: [DEFAULT_RULE, { ...DEFAULT_RULE, id: '222' } as BlockRule, { ...DEFAULT_RULE, id: '333' } as BlockRule],
+        [key]: DEFAULT_RULES,
       };
+    });
+  });
+
+  it('preserves an unresolved initial state until rules load completes', async () => {
+    const deferred = createDeferred<BlockRule[]>();
+    vi.spyOn(StorageService, 'getRules').mockReturnValue(deferred.promise);
+
+    const { result } = renderHook(() => useBlockRules());
+
+    expect(result.current.blockRules).toBeNull();
+    expect(result.current.error).toBeNull();
+
+    deferred.resolve(DEFAULT_RULES);
+
+    await waitFor(() => {
+      expect(result.current.blockRules).toEqual(DEFAULT_RULES);
     });
   });
 
@@ -51,6 +80,18 @@ describe('useBlockRules Hook', () => {
 
     expect(result.current.blockRules?.[0].id).toBe('111');
     expect(result.current.blockRules?.[1].id).toBe('222');
+    expect(result.current.error).toBeNull();
+  });
+
+  it('returns an empty ready state when the stored rules list is truly empty', async () => {
+    vi.spyOn(StorageService, 'getRules').mockResolvedValue([]);
+
+    const { result } = renderHook(() => useBlockRules());
+
+    await waitFor(() => {
+      expect(result.current.blockRules).toEqual([]);
+    });
+
     expect(result.current.error).toBeNull();
   });
 
@@ -78,17 +119,8 @@ describe('useBlockRules Hook', () => {
       expect(listeners).toHaveLength(1);
       listeners[0]({
         rules: {
-          newValue: [
-            DEFAULT_RULE,
-            { ...DEFAULT_RULE, id: '222' } as BlockRule,
-            { ...DEFAULT_RULE, id: '333' } as BlockRule,
-            { ...DEFAULT_RULE, id: '444' } as BlockRule,
-          ],
-          oldValue: [
-            DEFAULT_RULE,
-            { ...DEFAULT_RULE, id: '222' } as BlockRule,
-            { ...DEFAULT_RULE, id: '333' } as BlockRule,
-          ],
+          newValue: [...DEFAULT_RULES, { ...DEFAULT_RULE, id: '444' }],
+          oldValue: DEFAULT_RULES,
         },
       });
     });

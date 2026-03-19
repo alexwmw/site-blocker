@@ -92,6 +92,22 @@ describe('useSchedule', () => {
     expect(result.current.error).toBe(loadError);
   });
 
+  it('does not update scheduling enabled state before settings are ready', async () => {
+    vi.mocked(useSettings).mockReturnValue({
+      settings: null,
+      error: null,
+      updateSettings: mockUpdateSettings,
+    });
+
+    const { result } = renderHook(() => useSchedule());
+
+    await act(async () => {
+      await result.current.setSchedulingEnabled(true);
+    });
+
+    expect(mockUpdateSettings).not.toHaveBeenCalled();
+  });
+
   it('calls updateSettings when setSchedulingEnabled is called', async () => {
     const { result } = renderHook(() => useSchedule());
 

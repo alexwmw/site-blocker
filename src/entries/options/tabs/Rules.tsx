@@ -11,7 +11,7 @@ import Switch from '@/components/ui/Switch';
 import type { BlockRule, Schedule } from '@/types/schema';
 
 type RulesProps = {
-  blockRules: BlockRule[];
+  blockRules: BlockRule[] | null;
   className: string;
   onClickEditSchedule: MouseEventHandler;
   removeRule: (id: string) => Promise<void>;
@@ -104,7 +104,7 @@ const Rules = ({ blockRules, className, onClickEditSchedule, removeRule, schedul
           <Button onClick={onClickEditSchedule}>Edit schedule</Button>
         </div>
       ) : null}
-      {!blockRules.length ? (
+      {blockRules === null ? null : !blockRules.length ? (
         <Card className={styles.emptyState}>
           <p>No rules yet.</p>
           <p className={styles.subtle}>Add rules from the popup to start blocking distracting sites.</p>
