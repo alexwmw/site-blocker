@@ -56,7 +56,7 @@ const OptionsApp = () => {
       {activeTab === 'rules' ? (
         <Rules
           className={styles.section}
-          onEditSchedule={() => setActiveTab('scheduling')}
+          onClickEditSchedule={() => setActiveTab('scheduling')}
         />
       ) : null}
     </main>

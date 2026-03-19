@@ -1,5 +1,3 @@
-import { useMemo } from 'react';
-
 import styles from '../OptionsApp.module.css';
 import OptionsTab from '../OptionsTab';
 
@@ -7,33 +5,12 @@ import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import Switch from '@/components/ui/Switch';
 import SchedulingWindow from '@/entries/options/tabs/scheduling/SchedulingWindow';
-import useSettings from '@/hooks/useSettings';
+import useSchedule from '@/hooks/useSchedule';
 import type { ScheduleWindow } from '@/types/schema';
 
 const Scheduling = ({ className }: { className: string }) => {
-  const {
-    settings,
-    updateSettings,
-    isLoading,
-    addScheduleWindow,
-    removeScheduleWindow,
-    updateScheduleWindow,
-    isSchedulingEnabled,
-  } = useSettings();
-
-  const schedule = useMemo(() => settings?.schedule, [settings]);
-
-  const handleScheduleEnabledChange = (enabled: boolean) => {
-    if (!schedule) {
-      return;
-    }
-    updateSettings({
-      schedule: {
-        ...schedule,
-        enabled,
-      },
-    }).catch(console.error);
-  };
+  const { schedule, isLoading, addScheduleWindow, removeScheduleWindow, updateScheduleWindow, setSchedulingEnabled } =
+    useSchedule();
 
   return (
     <OptionsTab
@@ -49,12 +26,12 @@ const Scheduling = ({ className }: { className: string }) => {
           id='scheduling_enabled'
           label='Enable scheduled blocking'
           onChange={(event) => {
-            handleScheduleEnabledChange(event.target.checked);
+            setSchedulingEnabled(event.target.checked).catch(console.error);
           }}
           disabled={!schedule}
-          checked={Boolean(schedule?.enabled)}
+          checked={schedule?.enabled}
           reverse
-          tight
+          compact
         />
         <div className={styles.scheduleAssistiveCopy}>
           <p className={styles.subtle}>
@@ -71,7 +48,7 @@ const Scheduling = ({ className }: { className: string }) => {
               <p className={styles.subtle}>Add weekly rules, adjust days and times, and set multiple schedules.</p>
             </div>
             <Button
-              disabled={!isSchedulingEnabled}
+              disabled={!schedule?.enabled}
               onClick={() => {
                 addScheduleWindow().catch(console.error);
               }}
@@ -85,7 +62,7 @@ const Scheduling = ({ className }: { className: string }) => {
               <li key={win.id}>
                 <SchedulingWindow
                   window={win}
-                  disabled={!schedule || !isSchedulingEnabled}
+                  disabled={!schedule || !schedule.enabled}
                   windowIndex={index}
                   removeWindow={() => removeScheduleWindow(win.id)}
                   updateWindow={(update: Partial<ScheduleWindow>) => updateScheduleWindow(win.id, update)}

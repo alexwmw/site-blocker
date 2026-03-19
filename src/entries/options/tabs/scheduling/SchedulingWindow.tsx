@@ -43,6 +43,7 @@ const SchedulingWindow = ({ window, windowIndex, disabled, removeWindow, updateW
         <SchedulingDaysPresetButtons
           disabled={disabled}
           updateWindow={updateWindow}
+          days={window.days}
         />
         <SchedulingDays
           days={window.days}

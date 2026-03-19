@@ -32,6 +32,10 @@
   background: var(--color-bg-input);
 }
 
+.secondary.selected {
+  border-color: var(--color-accent);
+}
+
 .ghost {
   background: transparent;
   border-color: var(--color-border);

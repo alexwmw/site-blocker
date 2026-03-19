@@ -8,14 +8,14 @@ type SwitchProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> & {
   description?: string;
   id: string;
   reverse?: boolean;
-  tight?: boolean;
+  compact?: boolean;
 };
 
-const Switch = ({ label, description, className, reverse, tight, id: switchId, ...rest }: SwitchProps) => {
+const Switch = ({ label, description, className, reverse, compact, id: switchId, ...rest }: SwitchProps) => {
   return (
     <label
       htmlFor={switchId}
-      className={clsx(styles.switchLabel, reverse && styles.reverse, tight && styles.tight, className)}
+      className={clsx(styles.switchLabel, reverse && styles.reverse, compact && styles.compact, className)}
     >
       <span className={styles.textGroup}>
         <span>{label}</span>

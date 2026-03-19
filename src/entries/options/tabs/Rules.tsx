@@ -9,7 +9,7 @@ import Card from '@/components/ui/Card';
 import StatusItem from '@/components/ui/StatusItem';
 import Switch from '@/components/ui/Switch';
 import useBlockRules from '@/hooks/useBlockRules';
-import useSettings from '@/hooks/useSettings';
+import useSchedule from '@/hooks/useSchedule';
 import type { BlockRule } from '@/types/schema';
 
 const readableDate = (dateIso: string) => {
@@ -17,11 +17,11 @@ const readableDate = (dateIso: string) => {
   return Number.isNaN(date.valueOf()) ? 'Unknown date' : date.toLocaleString();
 };
 
-const Rules = ({ className, onEditSchedule }: { className: string; onEditSchedule: MouseEventHandler }) => {
+const Rules = ({ className, onClickEditSchedule }: { className: string; onClickEditSchedule: MouseEventHandler }) => {
   const { blockRules, removeRule, updateRule, isLoading: isRulesLoading } = useBlockRules();
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const [pendingMatchTypeRuleId, setPendingMatchTypeRuleId] = useState<string | null>(null);
-  const { isSchedulingEnabled } = useSettings();
+  const { isScheduleEnabled } = useSchedule();
 
   const handleRemove = async (ruleId: string) => {
     setPendingDeleteId(ruleId);
@@ -89,14 +89,14 @@ const Rules = ({ className, onEditSchedule }: { className: string; onEditSchedul
       isContentLoaded={isRulesLoading}
       className={className}
     >
-      {isSchedulingEnabled ? (
+      {isScheduleEnabled ? (
         <div className={styles.statusGrid}>
           <StatusItem
             label='Scheduling is:'
             value='On'
             tone='bad'
           />
-          <Button onClick={onEditSchedule}>Edit schedule</Button>
+          <Button onClick={onClickEditSchedule}>Edit schedule</Button>
         </div>
       ) : null}
       {!blockRules?.length ? (

@@ -9,6 +9,7 @@ import SectionHeader from '@/components/ui/SectionHeader';
 import StatusItem from '@/components/ui/StatusItem';
 import useBlockRules from '@/hooks/useBlockRules';
 import useCreateRuleFromTab from '@/hooks/useCreateRuleFromTab';
+import useSchedule from '@/hooks/useSchedule';
 import useSettings from '@/hooks/useSettings';
 import useThemeEffect from '@/hooks/useThemeEffect';
 import { getBlockPageUrl } from '@/services/blocking/getBlockPageUrl';
@@ -31,7 +32,8 @@ const PopupApp = () => {
   useThemeEffect();
   const { activeTab, url, isSupported, createDomainPrefixRule, createPrefixUrlRule } = useCreateRuleFromTab();
   const { blockRules, addRule, isLoading: isRulesLoading } = useBlockRules();
-  const { settings, isLoading: isSettingsLoading, isSchedulingEnabled } = useSettings();
+  const { settings, isLoading: isSettingsLoading } = useSettings();
+  const { isScheduleEnabled } = useSchedule();
   const [tickNow, setTickNow] = useState(Date.now());
 
   const isBlockPageUrl = useMemo(() => Boolean(activeTab?.url?.startsWith(getBlockPageUrl())), [activeTab]);
@@ -82,7 +84,7 @@ const PopupApp = () => {
     if (matchingTemporarilyUnblockedRules.length > 0) {
       return 'This page matches a rule but is temporarily unblocked.';
     }
-    if (isSchedulingEnabled && !isBlockingTime) {
+    if (isScheduleEnabled && !isBlockingTime) {
       return 'This page matches a rule, but blocking is currently outside your scheduled window.';
     }
     return null;
@@ -129,8 +131,8 @@ const PopupApp = () => {
           />
           <StatusItem
             label='Scheduling enabled'
-            value={isSchedulingEnabled ? 'Yes' : 'No'}
-            tone={isSchedulingEnabled ? 'neutral' : 'good'}
+            value={isScheduleEnabled ? 'Yes' : 'No'}
+            tone={isScheduleEnabled ? 'neutral' : 'good'}
           />
           <StatusItem
             label='URL supported'

@@ -7,12 +7,13 @@ type ButtonVariant = 'primary' | 'secondary' | 'ghost';
 
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   variant?: ButtonVariant;
+  selected?: boolean;
 };
 
-const Button = ({ variant = 'primary', className, type = 'button', ...rest }: ButtonProps) => {
+const Button = ({ variant = 'primary', selected, className, type = 'button', ...rest }: ButtonProps) => {
   return (
     <button
-      className={clsx(styles.button, styles[variant], className)}
+      className={clsx(styles.button, styles[variant], selected && styles.selected, className)}
       type={type}
       {...rest}
     />

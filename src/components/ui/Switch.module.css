@@ -10,7 +10,7 @@
   flex-direction: row-reverse;
 }
 
-.switchLabel.tight {
+.switchLabel.compact {
   justify-content: start;
 }
 

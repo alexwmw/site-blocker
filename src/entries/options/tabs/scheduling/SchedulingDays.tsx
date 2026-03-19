@@ -22,9 +22,14 @@ type SchedulingDaysProps = {
 type SchedulingDaysPresetButtonsProps = {
   disabled: boolean;
   updateWindow: (update: Partial<ScheduleWindow>) => Promise<void>;
+  days: ScheduleDays;
 };
 
-export const SchedulingDaysPresetButtons = ({ updateWindow, disabled }: SchedulingDaysPresetButtonsProps) => {
+const isMatchingDays = (days1: ScheduleDays, days2: ScheduleDays) => {
+  return days1.every((day, i) => days2[i] === day);
+};
+
+export const SchedulingDaysPresetButtons = ({ updateWindow, disabled, days }: SchedulingDaysPresetButtonsProps) => {
   return (
     <div className={styles.presetRow}>
       {QUICK_DAY_PRESETS.map((preset) => (
@@ -35,6 +40,7 @@ export const SchedulingDaysPresetButtons = ({ updateWindow, disabled }: Scheduli
           onClick={() => {
             updateWindow({ days: preset.days }).catch(console.error);
           }}
+          selected={isMatchingDays(days, preset.days)}
         >
           {preset.label}
         </Button>
