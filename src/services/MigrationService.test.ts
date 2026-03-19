@@ -162,13 +162,57 @@ describe('MigrationService - Deep Logic Tests', () => {
   });
 
   describe('Full Migration - Real World Scenario', () => {
-    it('should not migrate if version 3 already exists', async () => {
-      // Simulate version 3 already being there
-      chromeMock.storage.local.get.mockResolvedValue({ version: 3 });
+    it('should not migrate if the latest version already exists', async () => {
+      // Simulate latest version already being there
+      chromeMock.storage.local.get.mockResolvedValue({ version: 4 });
 
       await MigrationService.migrate();
 
       // Verify sync.get was never even called
+      expect(chromeMock.storage.sync.get).not.toHaveBeenCalled();
+    });
+
+    it('should upgrade existing local settings to safe defaults for the latest schema', async () => {
+      const existingRule = {
+        id: 'rule-1',
+        pattern: 'news.ycombinator.com',
+        matchType: 'prefix',
+        createdAt: '2025-02-16T22:15:14.000Z',
+        enabled: true,
+      };
+
+      chromeMock.storage.local.get.mockResolvedValue({
+        version: 3,
+        settings: {
+          ...LEGACY_DATA_1.options,
+          theme: 'invalid-theme',
+          blockPageHeadline: '   ',
+          holdDurationSeconds: 1,
+          isRated: true,
+          schedule: {
+            enabled: false,
+            windows: [
+              { id: '_initial', days: [true, true, true, true, true, false, false], start: '09:00', end: '17:00' },
+            ],
+          },
+          extendedUnblock: {
+            enabled: true,
+            durationMinutes: 999,
+          },
+        },
+        rules: [existingRule],
+      });
+
+      await MigrationService.migrate();
+
+      const [calls] = chromeMock.storage.local.set.mock.calls[0];
+
+      expect(calls.version).toBe(4);
+      expect(calls.settings.theme).toBe('mindful-light');
+      expect(calls.settings.blockPageHeadline).toBe('Stay on track');
+      expect(calls.settings.holdDurationSeconds).toBe(3);
+      expect(calls.settings.extendedUnblock.durationMinutes).toBe(240);
+      expect(calls.rules).toEqual([existingRule]);
       expect(chromeMock.storage.sync.get).not.toHaveBeenCalled();
     });
 

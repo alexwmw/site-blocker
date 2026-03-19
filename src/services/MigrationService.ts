@@ -2,7 +2,14 @@ import defaultSettings from './defaultSettings';
 
 import type { LegacyOptions, LegacyProvider } from '@/types/legacy-schema';
 import type { BlockRule, Schedule, ScheduleDays, ScheduleWindow, Settings, StorageSchema, Theme } from '@/types/schema';
-import { storageSchema, THEMES, TIME_REGEX } from '@/types/schema';
+import {
+  blockRulesSchema,
+  CURRENT_STORAGE_VERSION,
+  SETTINGS_LIMITS,
+  storageSchema,
+  THEMES,
+  TIME_REGEX,
+} from '@/types/schema';
 import { createUniqueId } from '@/utils/createUniqueId';
 
 export class MigrationService {
@@ -23,6 +30,24 @@ export class MigrationService {
       return fallback;
     }
     return n;
+  }
+
+  private static clampNumber(value: number, min: number, max: number, fallback: number): number {
+    if (!Number.isFinite(value)) {
+      return fallback;
+    }
+
+    return Math.max(min, Math.min(max, Math.round(value)));
+  }
+
+  private static sanitizeText(value: unknown, fallback: string, maxLength: number): string {
+    if (typeof value !== 'string') {
+      return fallback;
+    }
+
+    const trimmed = value.trim().slice(0, maxLength);
+
+    return trimmed.length > 0 ? trimmed : fallback;
   }
 
   private static toHoursMinutesString(value: string | undefined, fallback: string): string {
@@ -186,8 +211,46 @@ export class MigrationService {
     };
   }
 
-  private static mapSettings(old: LegacyOptions): Settings {
+  private static normalizeSettings(settings: Partial<Settings> | undefined): Settings {
+    const candidate = settings ?? {};
+
     return {
+      ...defaultSettings,
+      theme: this.isTheme(candidate.theme) ? candidate.theme : defaultSettings.theme,
+      holdDurationSeconds: this.clampNumber(
+        typeof candidate.holdDurationSeconds === 'number'
+          ? candidate.holdDurationSeconds
+          : defaultSettings.holdDurationSeconds,
+        SETTINGS_LIMITS.holdDurationMinSeconds,
+        SETTINGS_LIMITS.holdDurationMaxSeconds,
+        defaultSettings.holdDurationSeconds,
+      ),
+      isRated: typeof candidate.isRated === 'boolean' ? candidate.isRated : defaultSettings.isRated,
+      blockPageHeadline: this.sanitizeText(
+        candidate.blockPageHeadline,
+        defaultSettings.blockPageHeadline,
+        SETTINGS_LIMITS.blockPageHeadlineMaxLength,
+      ),
+      schedule: candidate.schedule ?? defaultSettings.schedule,
+      extendedUnblock: {
+        enabled:
+          typeof candidate.extendedUnblock?.enabled === 'boolean'
+            ? candidate.extendedUnblock.enabled
+            : defaultSettings.extendedUnblock.enabled,
+        durationMinutes: this.clampNumber(
+          typeof candidate.extendedUnblock?.durationMinutes === 'number'
+            ? candidate.extendedUnblock.durationMinutes
+            : defaultSettings.extendedUnblock.durationMinutes,
+          SETTINGS_LIMITS.extendedUnblockDurationMinMinutes,
+          SETTINGS_LIMITS.extendedUnblockDurationMaxMinutes,
+          defaultSettings.extendedUnblock.durationMinutes,
+        ),
+      },
+    };
+  }
+
+  private static mapSettings(old: LegacyOptions): Settings {
+    return this.normalizeSettings({
       ...defaultSettings,
 
       // Migrated theme (legacy light/dark values are mapped to the new set).
@@ -201,7 +264,7 @@ export class MigrationService {
       },
       isRated: this.toBool(old.isRated?.value, defaultSettings.isRated),
       schedule: this.mapSchedule(old),
-    };
+    });
   }
 
   private static mapRules(oldRules: unknown): BlockRule[] {
@@ -230,12 +293,34 @@ export class MigrationService {
     return newRules;
   }
 
-  static async migrate(): Promise<void> {
-    const current = await chrome.storage.local.get('version');
+  private static getValidRules(rules: unknown): BlockRule[] {
+    const validated = blockRulesSchema.safeParse(rules);
 
-    if (current?.version === 3) {
+    return validated.success ? validated.data : [];
+  }
+
+  static async migrate(): Promise<void> {
+    const current = await chrome.storage.local.get(['version', 'settings', 'rules']);
+
+    if (current?.version === CURRENT_STORAGE_VERSION) {
       console.log('Current data does not require migration.');
       return;
+    }
+
+    if (typeof current?.version === 'number' && current.version >= 3) {
+      console.log('Existing local data found - applying safe defaults for the latest schema.');
+
+      const result = storageSchema.safeParse({
+        version: CURRENT_STORAGE_VERSION,
+        settings: this.normalizeSettings(current.settings as Partial<Settings> | undefined),
+        rules: this.getValidRules(current.rules),
+      });
+
+      if (result.success) {
+        await chrome.storage.local.set(result.data);
+        console.log('Migration complete:', result.data);
+        return;
+      }
     }
 
     const legacy = await chrome.storage.sync.get();
@@ -247,7 +332,7 @@ export class MigrationService {
     }
 
     const rawMigratedData: StorageSchema = {
-      version: 3,
+      version: CURRENT_STORAGE_VERSION,
       settings: legacy.options ? this.mapSettings(legacy.options) : defaultSettings,
       rules: legacy.providers ? this.mapRules(legacy.providers) : [],
     };
@@ -262,7 +347,7 @@ export class MigrationService {
     } else {
       console.error('Migration failed validation:', result.error.flatten());
       await chrome.storage.local.set({
-        version: 3,
+        version: CURRENT_STORAGE_VERSION,
         settings: defaultSettings,
         rules: [],
       });

@@ -29,9 +29,9 @@ describe('useCreateRuleFromActiveTab', () => {
   it('does not query tabs if a tab argument is present', async () => {
     chromeMock.tabs.query.mockResolvedValue([{ url: 'https://www.reddit.com/r/aita' }]);
 
-    const myTab = { url: 'https://www.theguardian.com/' };
+    const myTab = { url: 'https://www.theguardian.com/' } as chrome.tabs.Tab;
 
-    const { result } = renderHook(() => useCreateRuleFromTab(myTab as chrome.tabs.Tab));
+    const { result } = renderHook(() => useCreateRuleFromTab(myTab));
 
     await waitFor(() => {
       expect(result.current.activeTab?.url).toBe('https://www.theguardian.com/');
@@ -46,9 +46,9 @@ describe('useCreateRuleFromActiveTab', () => {
   it('does not query tabs when a provided tab is unsupported', async () => {
     chromeMock.tabs.query.mockResolvedValue([{ url: 'https://www.reddit.com/r/aita' }]);
 
-    const myTab = { url: 'chrome://extensions' };
+    const myTab = { url: 'chrome://extensions' } as chrome.tabs.Tab;
 
-    const { result } = renderHook(() => useCreateRuleFromTab(myTab as chrome.tabs.Tab));
+    const { result } = renderHook(() => useCreateRuleFromTab(myTab));
 
     await waitFor(() => {
       expect(result.current.activeTab?.url).toBe('chrome://extensions');
@@ -69,7 +69,7 @@ describe('useCreateRuleFromActiveTab', () => {
     expect(result.current.error).toBeNull();
     expect(result.current.isResolved).toBe(false);
 
-    deferred.resolve([{ url: 'https://www.reddit.com/r/aita' }]);
+    deferred.resolve([{ url: 'https://www.reddit.com/r/aita' } as chrome.tabs.Tab]);
 
     await waitFor(() => {
       expect(result.current.activeTab?.url).toBe('https://www.reddit.com/r/aita');
