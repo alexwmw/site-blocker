@@ -24,6 +24,15 @@ const Scheduling = ({
   setSchedulingEnabled,
   updateScheduleWindow,
 }: SchedulingProps) => {
+  if (!schedule) {
+    return (
+      <OptionsTab
+        title='Scheduling'
+        className={className}
+      />
+    );
+  }
+
   return (
     <OptionsTab
       title='Scheduling'
@@ -39,7 +48,7 @@ const Scheduling = ({
           onChange={(event) => {
             setSchedulingEnabled(event.target.checked).catch(console.error);
           }}
-          checked={schedule?.enabled ?? false}
+          checked={schedule.enabled}
           reverse
           compact
         />
@@ -57,7 +66,7 @@ const Scheduling = ({
           <p className={styles.subtle}>Add weekly rules, adjust days and times, and set multiple schedules.</p>
         </div>
         <Button
-          disabled={!schedule?.enabled}
+          disabled={!schedule.enabled}
           onClick={() => {
             addScheduleWindow().catch(console.error);
           }}
@@ -67,11 +76,11 @@ const Scheduling = ({
       </div>
 
       <ul className={styles.windowsList}>
-        {schedule?.windows.map((win, index) => (
+        {schedule.windows.map((win, index) => (
           <li key={win.id}>
             <SchedulingWindow
               window={win}
-              disabled={!schedule?.enabled}
+              disabled={!schedule.enabled}
               windowIndex={index}
               removeWindow={() => removeScheduleWindow(win.id)}
               updateWindow={(update: Partial<ScheduleWindow>) => updateScheduleWindow(win.id, update)}

@@ -3,6 +3,17 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import useCreateRuleFromTab from './useCreateRuleFromTab';
 
+const createDeferred = <T>() => {
+  let resolve!: (value: T | PromiseLike<T>) => void;
+  let reject!: (reason?: unknown) => void;
+  const promise = new Promise<T>((res, rej) => {
+    resolve = res;
+    reject = rej;
+  });
+
+  return { promise, resolve, reject };
+};
+
 const chromeMock = {
   tabs: {
     query: vi.fn(),
@@ -48,6 +59,25 @@ describe('useCreateRuleFromActiveTab', () => {
     expect(result.current.isResolved).toBe(true);
   });
 
+  it('stays unresolved while the active tab query is still pending', async () => {
+    const deferred = createDeferred<chrome.tabs.Tab[]>();
+    chromeMock.tabs.query.mockReturnValue(deferred.promise);
+
+    const { result } = renderHook(() => useCreateRuleFromTab());
+
+    expect(result.current.activeTab).toBeNull();
+    expect(result.current.error).toBeNull();
+    expect(result.current.isResolved).toBe(false);
+
+    deferred.resolve([{ url: 'https://www.reddit.com/r/aita' }]);
+
+    await waitFor(() => {
+      expect(result.current.activeTab?.url).toBe('https://www.reddit.com/r/aita');
+    });
+
+    expect(result.current.isResolved).toBe(true);
+  });
+
   it('loads active tab and marks supported URLs', async () => {
     chromeMock.tabs.query.mockResolvedValue([{ url: 'https://www.reddit.com/r/aita' }]);
 
@@ -61,6 +91,19 @@ describe('useCreateRuleFromActiveTab', () => {
 
     expect(result.current.error).toBeNull();
     expect(result.current.isResolved).toBe(true);
+  });
+
+  it('returns a true empty ready state when no active tab is found', async () => {
+    chromeMock.tabs.query.mockResolvedValue([]);
+
+    const { result } = renderHook(() => useCreateRuleFromTab());
+
+    await waitFor(() => {
+      expect(result.current.isResolved).toBe(true);
+    });
+
+    expect(result.current.activeTab).toBeNull();
+    expect(result.current.error).toBeNull();
   });
 
   it('preserves query errors instead of treating them as empty loaded state', async () => {
