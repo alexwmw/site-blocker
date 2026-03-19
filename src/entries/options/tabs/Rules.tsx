@@ -6,26 +6,27 @@ import OptionsTab from '../OptionsTab';
 
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
-import RenderBoundary from '@/components/ui/RenderBoundary';
 import StatusItem from '@/components/ui/StatusItem';
 import Switch from '@/components/ui/Switch';
-import useBlockRules from '@/hooks/useBlockRules';
-import useSchedule from '@/hooks/useSchedule';
-import type { BlockRule } from '@/types/schema';
+import type { BlockRule, Schedule } from '@/types/schema';
+
+type RulesProps = {
+  blockRules: BlockRule[];
+  className: string;
+  onClickEditSchedule: MouseEventHandler;
+  removeRule: (id: string) => Promise<void>;
+  schedule: Schedule | null;
+  updateRule: (id: string, updates: Partial<BlockRule>) => Promise<void>;
+};
 
 const readableDate = (dateIso: string) => {
   const date = new Date(dateIso);
   return Number.isNaN(date.valueOf()) ? 'Unknown date' : date.toLocaleString();
 };
 
-const Rules = ({ className, onClickEditSchedule }: { className: string; onClickEditSchedule: MouseEventHandler }) => {
-  const { blockRules, error: blockRulesError, removeRule, updateRule } = useBlockRules();
-  const { schedule, error: scheduleError } = useSchedule();
+const Rules = ({ blockRules, className, onClickEditSchedule, removeRule, schedule, updateRule }: RulesProps) => {
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const [pendingMatchTypeRuleId, setPendingMatchTypeRuleId] = useState<string | null>(null);
-  const rulesData = blockRules && schedule ? { blockRules, schedule } : null;
-  const resolvedBlockRules = rulesData?.blockRules ?? [];
-  const resolvedSchedule = rulesData?.schedule;
 
   const handleRemove = async (ruleId: string) => {
     setPendingDeleteId(ruleId);
@@ -93,29 +94,24 @@ const Rules = ({ className, onClickEditSchedule }: { className: string; onClickE
       title='Rules'
       className={className}
     >
-      <RenderBoundary
-        data={rulesData}
-        error={blockRulesError ?? scheduleError}
-      >
-        {resolvedSchedule?.enabled ? (
-          <div className={styles.statusGrid}>
-            <StatusItem
-              label='Scheduling is:'
-              value='On'
-              tone='bad'
-            />
-            <Button onClick={onClickEditSchedule}>Edit schedule</Button>
-          </div>
-        ) : null}
-        {!resolvedBlockRules.length ? (
-          <Card className={styles.emptyState}>
-            <p>No rules yet.</p>
-            <p className={styles.subtle}>Add rules from the popup to start blocking distracting sites.</p>
-          </Card>
-        ) : (
-          <ul className={styles.rulesList}>{resolvedBlockRules.map(renderRule)}</ul>
-        )}
-      </RenderBoundary>
+      {schedule?.enabled ? (
+        <div className={styles.statusGrid}>
+          <StatusItem
+            label='Scheduling is:'
+            value='On'
+            tone='bad'
+          />
+          <Button onClick={onClickEditSchedule}>Edit schedule</Button>
+        </div>
+      ) : null}
+      {!blockRules.length ? (
+        <Card className={styles.emptyState}>
+          <p>No rules yet.</p>
+          <p className={styles.subtle}>Add rules from the popup to start blocking distracting sites.</p>
+        </Card>
+      ) : (
+        <ul className={styles.rulesList}>{blockRules.map(renderRule)}</ul>
+      )}
     </OptionsTab>
   );
 };

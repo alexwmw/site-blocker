@@ -2,13 +2,15 @@ import styles from '../OptionsApp.module.css';
 import OptionsTab from '../OptionsTab';
 
 import Card from '@/components/ui/Card';
-import RenderBoundary from '@/components/ui/RenderBoundary';
-import useSettings from '@/hooks/useSettings';
-import type { Theme } from '@/types/schema';
+import type { Settings, Theme } from '@/types/schema';
 
-const Preferences = ({ className }: { className?: string }) => {
-  const { settings, updateSettings, error } = useSettings();
+type PreferencesProps = {
+  className?: string;
+  settings: Settings | null;
+  updateSettings: (updates: Partial<Settings>) => Promise<void>;
+};
 
+const Preferences = ({ className, settings, updateSettings }: PreferencesProps) => {
   const handleThemeChange = (theme: Theme) => {
     updateSettings({ theme }).catch(console.error);
   };
@@ -23,45 +25,40 @@ const Preferences = ({ className }: { className?: string }) => {
       title='Preference'
       className={className}
     >
-      <RenderBoundary
-        data={settings}
-        error={error}
+      <Card
+        padding
+        className={styles.settingsGrid}
       >
-        <Card
-          padding
-          className={styles.settingsGrid}
-        >
-          <label className={styles.settingsLabel}>
-            Theme
-            <select
-              className={styles.settingsInput}
-              value={settings?.theme ?? 'mindful-light'}
-              onChange={(event) => {
-                handleThemeChange(event.target.value as Theme);
-              }}
-            >
-              <option value='mindful-light'>Mindful light</option>
-              <option value='mindful-dark'>Mindful dark</option>
-              <option value='focus-light'>Focus light</option>
-              <option value='focus-dark'>Focus dark</option>
-            </select>
-          </label>
+        <label className={styles.settingsLabel}>
+          Theme
+          <select
+            className={styles.settingsInput}
+            value={settings?.theme ?? 'mindful-light'}
+            onChange={(event) => {
+              handleThemeChange(event.target.value as Theme);
+            }}
+          >
+            <option value='mindful-light'>Mindful light</option>
+            <option value='mindful-dark'>Mindful dark</option>
+            <option value='focus-light'>Focus light</option>
+            <option value='focus-dark'>Focus dark</option>
+          </select>
+        </label>
 
-          <label className={styles.settingsLabel}>
-            Hold to unblock (seconds)
-            <input
-              className={styles.settingsInput}
-              type='number'
-              min={3}
-              max={99}
-              value={settings?.holdDurationSeconds ?? 3}
-              onChange={(event) => {
-                handleHoldDurationChange(Number(event.target.value));
-              }}
-            />
-          </label>
-        </Card>
-      </RenderBoundary>
+        <label className={styles.settingsLabel}>
+          Hold to unblock (seconds)
+          <input
+            className={styles.settingsInput}
+            type='number'
+            min={3}
+            max={99}
+            value={settings?.holdDurationSeconds ?? 3}
+            onChange={(event) => {
+              handleHoldDurationChange(Number(event.target.value));
+            }}
+          />
+        </label>
+      </Card>
     </OptionsTab>
   );
 };
