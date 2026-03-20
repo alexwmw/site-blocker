@@ -1,6 +1,10 @@
 :root {
   --font-family-base: Inter, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif;
 
+  --block-page-focus-image: url('https://commons.wikimedia.org/wiki/Special:Redirect/file/Bokeh_raindrops_on_a_window_1.jpg?width=2560');
+  --block-page-mindful-image: url('https://commons.wikimedia.org/wiki/Special:Redirect/file/Lush_green_pine_forest_(Unsplash).jpg?width=2560');
+  --block-page-intention-image: url('https://commons.wikimedia.org/wiki/Special:Redirect/file/Bright,_white_clouds_(Unsplash).jpg?width=2560');
+
   --radius-sm: 10px;
   --radius-md: 14px;
   --radius-lg: 18px;
@@ -28,7 +32,9 @@
   --color-accent-soft: #6e9da2;
   --color-danger: #b85c63;
 
-  --color-block-page-bg: radial-gradient(circle at top, #efede8 0%, #f5f2ee 36%, #fbfaf8 100%);
+  --color-block-page-bg: #f5f2ee;
+  --image-block-page-bg: none;
+  --image-block-page-overlay: linear-gradient(180deg, rgb(251 250 248 / 88%), rgb(245 242 238 / 78%));
 
   color-scheme: light;
   font-family: var(--font-family-base), sans-serif;
@@ -58,7 +64,9 @@
   --color-accent-soft: #6e9da2;
   --color-danger: #b85c63;
 
-  --color-block-page-bg: radial-gradient(circle at top, #efede8 0%, #f5f2ee 36%, #fbfaf8 100%);
+  --color-block-page-bg: #f5f2ee;
+  --image-block-page-bg: var(--block-page-intention-image);
+  --image-block-page-overlay: linear-gradient(180deg, rgb(251 248 245 / 82%), rgb(245 239 233 / 72%));
 
   color-scheme: light;
 }
@@ -87,7 +95,9 @@
   --color-accent-soft: #98c5c9;
   --color-danger: #d4888d;
 
-  --color-block-page-bg: radial-gradient(circle at top, #22292d 0%, #1a1f23 36%, #13171a 100%);
+  --color-block-page-bg: #13171a;
+  --image-block-page-bg: var(--block-page-intention-image);
+  --image-block-page-overlay: linear-gradient(180deg, rgb(18 21 24 / 78%), rgb(10 12 14 / 84%));
 
   color-scheme: dark;
 }
@@ -116,7 +126,9 @@
   --color-accent-soft: #56a07d;
   --color-danger: #bc4b5d;
 
-  --color-block-page-bg: radial-gradient(circle at top, #e3f1e9 0%, #edf7f1 36%, #f5fbf7 100%);
+  --color-block-page-bg: #edf7f1;
+  --image-block-page-bg: var(--block-page-mindful-image);
+  --image-block-page-overlay: linear-gradient(180deg, rgb(245 251 247 / 84%), rgb(232 244 237 / 74%));
 
   color-scheme: light;
 }
@@ -144,7 +156,9 @@
   --color-accent-soft: #79bc98;
   --color-danger: #de8593;
 
-  --color-block-page-bg: radial-gradient(circle at top, #1d2722 0%, #171d1a 36%, #111613 100%);
+  --color-block-page-bg: #111613;
+  --image-block-page-bg: var(--block-page-mindful-image);
+  --image-block-page-overlay: linear-gradient(180deg, rgb(18 26 21 / 74%), rgb(10 14 12 / 82%));
 
   color-scheme: dark;
 }
@@ -172,7 +186,9 @@
   --color-accent-soft: #7889f0;
   --color-danger: #cd3e54;
 
-  --color-block-page-bg: radial-gradient(circle at top, #edf2ff 0%, #f4f7ff 36%, #fafbff 100%);
+  --color-block-page-bg: #f4f7ff;
+  --image-block-page-bg: var(--block-page-focus-image);
+  --image-block-page-overlay: linear-gradient(180deg, rgb(250 251 255 / 84%), rgb(237 243 255 / 74%));
 
   color-scheme: light;
 }
@@ -200,7 +216,9 @@
   --color-accent-soft: #b2abfb;
   --color-danger: #f081a0;
 
-  --color-block-page-bg: radial-gradient(circle at top, #1d2350 0%, #151a3a 36%, #10142b 100%);
+  --color-block-page-bg: #10142b;
+  --image-block-page-bg: var(--block-page-focus-image);
+  --image-block-page-overlay: linear-gradient(180deg, rgb(18 22 46 / 76%), rgb(9 11 26 / 84%));
 
   color-scheme: dark;
 }
