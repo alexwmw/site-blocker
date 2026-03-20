@@ -6,12 +6,22 @@ import styles from './Switch.module.css';
 type SwitchProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> & {
   label: string;
   description?: string;
+  descriptionClassName?: string;
   id: string;
   reverse?: boolean;
   compact?: boolean;
 };
 
-const Switch = ({ label, description, className, reverse, compact, id: switchId, ...rest }: SwitchProps) => {
+const Switch = ({
+  label,
+  description,
+  descriptionClassName,
+  className,
+  reverse,
+  compact,
+  id: switchId,
+  ...rest
+}: SwitchProps) => {
   return (
     <label
       htmlFor={switchId}
@@ -19,7 +29,7 @@ const Switch = ({ label, description, className, reverse, compact, id: switchId,
     >
       <span className={styles.textGroup}>
         <span>{label}</span>
-        {description ? <span className={styles.description}>{description}</span> : null}
+        {description ? <span className={descriptionClassName ?? styles.description}>{description}</span> : null}
       </span>
       <span className={styles.controlWrap}>
         <input

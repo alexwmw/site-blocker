@@ -9,7 +9,7 @@
   --shadow-card: 0 10px 30px rgb(32 37 41 / 8%);
   --shadow-soft: 0 2px 8px rgb(28 34 38 / 6%);
 
-  --color-bg: #f3f1ed;
+  --color-bg: #f3f2f1;
   --color-bg-elevated: #fcfbf8;
   --color-bg-muted: #f7f4f0;
   --color-bg-input: #faf7f3;
@@ -96,7 +96,7 @@
   --shadow-card: 0 10px 30px rgb(20 44 34 / 8%);
   --shadow-soft: 0 2px 8px rgb(20 42 34 / 6%);
 
-  --color-bg: #edf6f1;
+  --color-bg: #f0f4f2;
   --color-bg-elevated: #fbfdfb;
   --color-bg-muted: #f2f8f4;
   --color-bg-input: #f4faf6;
@@ -205,13 +205,6 @@
   color-scheme: dark;
 }
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
-
 body {
-  margin: 0;
   font-family: var(--font-family-base), sans-serif;
 }

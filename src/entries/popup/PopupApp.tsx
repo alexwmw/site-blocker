@@ -12,9 +12,9 @@ import useBlockRules from '@/hooks/useBlockRules';
 import useCreateRuleFromTab from '@/hooks/useCreateRuleFromTab';
 import useSettings from '@/hooks/useSettings';
 import useThemeEffect from '@/hooks/useThemeEffect';
-import { getBlockPageUrl } from '@/services/blocking/getBlockPageUrl';
 import { RulesService } from '@/services/RulesService';
 import { SchedulingService } from '@/services/SchedulingService';
+import { isExtensionUrl } from '@/utils/extensionUrls';
 
 const formatRemainingTime = (milliseconds: number) => {
   const totalSeconds = Math.max(0, Math.floor(milliseconds / 1000));
@@ -44,7 +44,7 @@ const PopupApp = () => {
   const popupData = blockRules && settings && isResolved ? { activeTab, blockRules, settings } : null;
   const url = activeTab?.url ?? null;
   const isSupported = Boolean(url && RulesService.isSupportedUrl(url));
-  const isBlockPageUrl = useMemo(() => Boolean(activeTab?.url?.startsWith(getBlockPageUrl())), [activeTab]);
+  const isExtensionPageUrl = isExtensionUrl(url);
 
   const matchingRules = useMemo(() => {
     return url && blockRules ? RulesService.findMatchingRules(url, blockRules) : [];
@@ -130,7 +130,7 @@ const PopupApp = () => {
         data={popupData}
         error={activeTabError ?? blockRulesError ?? settingsError}
       >
-        {!isBlockPageUrl ? <p className={styles.subtle}>{activeTab?.url ?? 'No active tab found.'}</p> : null}
+        {!isExtensionPageUrl ? <p className={styles.subtle}>{activeTab?.url ?? 'No active tab found.'}</p> : null}
 
         <Card
           as='section'
@@ -170,7 +170,7 @@ const PopupApp = () => {
           className={styles.section}
         >
           <SectionHeader title='Quick actions' />
-          {!isBlockPageUrl ? (
+          {!isExtensionPageUrl ? (
             <div className={styles.actions}>
               <Button
                 disabled={!canAddRule}

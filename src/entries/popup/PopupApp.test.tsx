@@ -43,23 +43,27 @@ vi.stubGlobal('chrome', {
   },
 });
 
+const createRuleHookResult = (overrides: Partial<ReturnType<typeof useCreateRuleFromTab>> = {}) => ({
+  activeTab: { url: 'https://example.com' } as chrome.tabs.Tab,
+  createDomainPrefixRule: vi.fn(() => null),
+  createExactUrlRule: vi.fn(() => null),
+  createPrefixUrlRule: vi.fn(() => null),
+  error: null,
+  isResolved: true,
+  ...overrides,
+});
+
 describe('PopupApp', () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
-    vi.mocked(useCreateRuleFromTab).mockReturnValue({
-      activeTab: { url: 'https://example.com' } as chrome.tabs.Tab,
-      createDomainPrefixRule: vi.fn(() => null),
-      createPrefixUrlRule: vi.fn(() => null),
-      error: null,
-      isResolved: true,
-    });
+    vi.mocked(useCreateRuleFromTab).mockReturnValue(createRuleHookResult());
     vi.mocked(useBlockRules).mockReturnValue({
       blockRules: [],
-      addRule: vi.fn(async () => ({ ok: true })),
+      addRule: vi.fn(async () => {}),
       error: null,
       removeRule: vi.fn(async () => {}),
-      updateRule: vi.fn(async () => null),
+      updateRule: vi.fn(async () => {}),
     });
     vi.mocked(useSettings).mockReturnValue({
       settings: defaultSettings,
@@ -72,13 +76,12 @@ describe('PopupApp', () => {
   });
 
   it('shows the shared loading boundary until popup data is fully resolved', () => {
-    vi.mocked(useCreateRuleFromTab).mockReturnValue({
-      activeTab: null,
-      createDomainPrefixRule: vi.fn(() => null),
-      createPrefixUrlRule: vi.fn(() => null),
-      error: null,
-      isResolved: false,
-    });
+    vi.mocked(useCreateRuleFromTab).mockReturnValue(
+      createRuleHookResult({
+        activeTab: null,
+        isResolved: false,
+      }),
+    );
 
     const { container } = render(<PopupApp />);
 
@@ -87,13 +90,12 @@ describe('PopupApp', () => {
   });
 
   it('shows an inline error when popup data loading fails', () => {
-    vi.mocked(useCreateRuleFromTab).mockReturnValue({
-      activeTab: null,
-      createDomainPrefixRule: vi.fn(() => null),
-      createPrefixUrlRule: vi.fn(() => null),
-      error: new Error('Failed to query tabs.'),
-      isResolved: true,
-    });
+    vi.mocked(useCreateRuleFromTab).mockReturnValue(
+      createRuleHookResult({
+        activeTab: null,
+        error: new Error('Failed to query tabs.'),
+      }),
+    );
 
     render(<PopupApp />);
 

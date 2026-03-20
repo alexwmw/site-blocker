@@ -3,6 +3,9 @@ import { z } from 'zod';
 /** 24-hour time in `HH:mm` format. */
 export const TIME_REGEX = /^([01][0-9]|2[0-3]):[0-5][0-9]$/;
 
+/** Current persisted storage schema version. */
+export const CURRENT_STORAGE_VERSION = 4;
+
 /** Supported UI themes. */
 export const THEMES = [
   'intention-light',
@@ -17,6 +20,15 @@ export const THEMES = [
 export const themeSchema = z.enum(THEMES);
 
 export type Theme = z.infer<typeof themeSchema>;
+
+/** Settings value constraints used across validation and migrations. */
+export const SETTINGS_LIMITS = {
+  blockPageHeadlineMaxLength: 80,
+  extendedUnblockDurationMaxMinutes: 240,
+  extendedUnblockDurationMinMinutes: 1,
+  holdDurationMaxSeconds: 99,
+  holdDurationMinSeconds: 3,
+} as const;
 
 /**
  * Day-of-week index used throughout the scheduling system.
@@ -102,7 +114,11 @@ export const settingsSchema = z.object({
   theme: themeSchema,
 
   /** Number of seconds the unblock button must be held. */
-  holdDurationSeconds: z.number().min(3).max(99),
+  holdDurationSeconds: z
+    .number()
+    .int()
+    .min(SETTINGS_LIMITS.holdDurationMinSeconds)
+    .max(SETTINGS_LIMITS.holdDurationMaxSeconds),
 
   /** Whether the user has rated or reviewed the extension. */
   isRated: z.boolean(),
@@ -111,7 +127,7 @@ export const settingsSchema = z.object({
   schedule: scheduleSchema,
 
   /** H1 on the block page */
-  blockPageHeadline: z.string(),
+  blockPageHeadline: z.string().trim().min(1).max(SETTINGS_LIMITS.blockPageHeadlineMaxLength),
 
   /**
    * Extended unblock behaviour allowing a site to remain unblocked
@@ -122,7 +138,11 @@ export const settingsSchema = z.object({
     enabled: z.boolean(),
 
     /** How long a site remains unblocked, in minutes. */
-    durationMinutes: z.number(),
+    durationMinutes: z
+      .number()
+      .int()
+      .min(SETTINGS_LIMITS.extendedUnblockDurationMinMinutes)
+      .max(SETTINGS_LIMITS.extendedUnblockDurationMaxMinutes),
   }),
 });
 

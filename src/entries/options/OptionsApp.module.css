@@ -17,6 +17,28 @@
   margin-top: 28px;
 }
 
+.preferenceSectionStack {
+  display: grid;
+  gap: 16px;
+}
+
+.preferenceCard {
+  display: grid;
+  gap: 16px;
+}
+
+.preferenceActions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.fieldHint {
+  color: var(--color-text-secondary);
+  font-size: 0.75rem;
+  font-weight: 400;
+  line-height: 1.4;
+}
+
 .statusGrid {
   margin: 10px 0;
   display: flex;
@@ -38,6 +60,7 @@
   display: grid;
   gap: 8px;
   font-weight: 600;
+  grid-template-rows: auto auto 1fr;
 }
 
 .scheduleSettings {
