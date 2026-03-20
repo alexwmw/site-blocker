@@ -12,8 +12,8 @@ chrome.runtime.onInstalled.addListener((details) => {
   (async (details) => {
     console.log('Extension installed/updated. Reason:', details.reason);
 
-    // Migrate users from v2 (legacy) storage schema to v3 and persist in storage.
-    // Defaults are set here.
+    // Migrate legacy sync storage and upgrade existing local settings to the latest schema version.
+    // Defaults and safe setting clamps are applied here.
     await MigrationService.migrate();
     console.log('Migration finished.');
     const settings = await StorageService.getSettings();
