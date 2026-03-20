@@ -2,7 +2,9 @@ import { useEffect, useMemo, useState } from 'react';
 
 import styles from './PopupApp.module.css';
 
+import BrandMark from '@/components/branding/BrandMark';
 import Button from '@/components/ui/Button';
+import Callout from '@/components/ui/Callout';
 import Card from '@/components/ui/Card';
 import EyebrowLabel from '@/components/ui/EyebrowLabel';
 import RenderBoundary from '@/components/ui/RenderBoundary';
@@ -88,10 +90,10 @@ const PopupApp = () => {
       return 'This URL type is not supported by rules.';
     }
     if (matchingRules.length === 0) {
-      return 'No matching rules for this page.';
+      return 'No matching rules for this page yet.';
     }
     if (matchingTemporarilyUnblockedRules.length > 0) {
-      return 'This page matches a rule but is temporarily unblocked.';
+      return 'This page matches a rule but is temporarily allowed.';
     }
     if (isScheduleEnabled && !isBlockingTime) {
       return 'This page matches a rule, but blocking is currently outside your scheduled window.';
@@ -100,6 +102,7 @@ const PopupApp = () => {
   })();
 
   const canAddRule = Boolean(activeTab && isSupported);
+  const showOnboarding = !isExtensionPageUrl && (blockRules?.length ?? 0) === 0;
 
   const handleAddDomainClick = () => {
     const rule = createDomainPrefixRule();
@@ -121,9 +124,13 @@ const PopupApp = () => {
 
   return (
     <main className={styles.page}>
-      <header>
-        <EyebrowLabel>Hold</EyebrowLabel>
-        <h1 className={styles.heroTitle}>Active page status</h1>
+      <header className={styles.header}>
+        <BrandMark compact />
+        <div className={styles.headerCopy}>
+          <EyebrowLabel>Hold</EyebrowLabel>
+          <h1 className={styles.heroTitle}>Active page status</h1>
+          <p className={styles.heroText}>See whether this tab is protected and add the right amount of friction fast.</p>
+        </div>
       </header>
 
       <RenderBoundary
@@ -131,6 +138,26 @@ const PopupApp = () => {
         error={activeTabError ?? blockRulesError ?? settingsError}
       >
         {!isExtensionPageUrl ? <p className={styles.subtle}>{activeTab?.url ?? 'No active tab found.'}</p> : null}
+
+        {showOnboarding ? (
+          <Callout
+            title='Good enough setup: block one distracting domain first.'
+            className={styles.callout}
+            action={
+              <Button
+                disabled={!canAddRule}
+                onClick={handleAddDomainClick}
+              >
+                Add this domain
+              </Button>
+            }
+          >
+            <p>
+              Start with a single rule for the site in front of you. You can refine exact pages and schedules later if
+              you still need more structure.
+            </p>
+          </Callout>
+        ) : null}
 
         <Card
           as='section'
@@ -162,7 +189,15 @@ const PopupApp = () => {
             ) : null}
           </dl>
 
-          {notBlockedReason ? <p className={styles.reasonBanner}>{notBlockedReason}</p> : null}
+          {notBlockedReason ? (
+            <Callout
+              title={isBlockedNow ? 'Protection is active.' : 'What to know'}
+              tone={matchingTemporarilyUnblockedRules.length > 0 || isScheduleEnabled ? 'warning' : 'info'}
+              className={styles.reasonBanner}
+            >
+              <p>{notBlockedReason}</p>
+            </Callout>
+          ) : null}
         </Card>
 
         <Card

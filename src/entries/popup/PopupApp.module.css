@@ -5,36 +5,51 @@
   color: var(--color-text-primary);
 }
 
-.heroTitle {
-  margin: 6px 0 0;
-  font-size: 1.2rem;
+.header {
+  display: grid;
+  gap: 12px;
 }
 
+.headerCopy {
+  display: grid;
+  gap: 6px;
+}
+
+.heroTitle {
+  margin: 0;
+  font-size: 1.25rem;
+  letter-spacing: -0.03em;
+}
+
+.heroText,
 .subtle {
-  margin: 8px 0 0;
+  margin: 0;
   color: var(--color-text-secondary);
   font-size: 0.92rem;
 }
 
+.subtle {
+  margin-top: 10px;
+  word-break: break-word;
+}
+
+.callout,
 .section {
   margin-top: 14px;
-  padding: 12px;
+}
+
+.section {
+  padding: 14px;
 }
 
 .statusGrid {
-  margin: 10px 0 0;
+  margin: 12px 0 0;
   display: grid;
   gap: 8px;
 }
 
 .reasonBanner {
-  margin: 10px 0 0;
-  padding: 9px 10px;
-  border-radius: var(--radius-sm);
-  background: var(--color-bg-input);
-  border: 1px solid var(--color-border);
-  color: var(--color-text-secondary);
-  font-size: 0.88rem;
+  margin-top: 12px;
 }
 
 .actions {

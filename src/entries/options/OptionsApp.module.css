@@ -9,6 +9,10 @@
   padding: 32px 20px 48px;
 }
 
+.callout {
+  margin-top: 18px;
+}
+
 .subtle {
   color: var(--color-text-secondary);
 }
@@ -42,8 +46,9 @@
 .statusGrid {
   margin: 10px 0;
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  align-items: center;
 }
 
 .settingsGrid {
@@ -78,6 +83,12 @@
   background: var(--color-bg-input);
 }
 
+.settingsInput:focus-visible {
+  outline: none;
+  border-color: var(--color-brand);
+  box-shadow: var(--focus-ring);
+}
+
 .rulesList {
   list-style: none;
   margin: 0;
@@ -90,7 +101,7 @@
   display: flex;
   justify-content: space-between;
   gap: 16px;
-  padding: 14px;
+  padding: 16px;
 }
 
 .rulePattern {
@@ -106,7 +117,7 @@
 }
 
 .ruleSwitch {
-  margin-top: 10px;
+  margin-top: 12px;
 }
 
 .windowsList {
@@ -129,9 +140,19 @@
   background: var(--color-danger);
   color: var(--color-text-inverse);
   padding: 10px 14px;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
   height: fit-content;
+  transition: opacity 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.dangerButton:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.dangerButton:active:enabled {
+  transform: translateY(1px);
 }
 
 .dangerButton:disabled {

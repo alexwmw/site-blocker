@@ -1,0 +1,49 @@
+.callout {
+  display: grid;
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--callout-border, var(--color-border));
+  background: var(--callout-bg, var(--color-bg-muted));
+  box-shadow: var(--shadow-soft);
+}
+
+.body {
+  display: grid;
+  gap: 6px;
+}
+
+.title {
+  font-size: 0.95rem;
+  line-height: 1.3;
+}
+
+.content {
+  color: var(--color-text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.content > * {
+  margin: 0;
+}
+
+.action {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.info {
+  --callout-bg: var(--color-brand-surface);
+  --callout-border: color-mix(in srgb, var(--color-brand) 24%, var(--color-border));
+}
+
+.success {
+  --callout-bg: var(--color-success-surface);
+  --callout-border: color-mix(in srgb, var(--color-success) 30%, var(--color-border));
+}
+
+.warning {
+  --callout-bg: var(--color-warning-surface);
+  --callout-border: color-mix(in srgb, var(--color-warning) 36%, var(--color-border));
+}

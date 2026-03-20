@@ -6,7 +6,32 @@
 }
 
 .stat {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: start;
   padding: 14px;
+}
+
+.info,
+.success,
+.warning {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-top: 7px;
+}
+
+.info {
+  background: var(--color-brand);
+}
+
+.success {
+  background: var(--color-success);
+}
+
+.warning {
+  background: var(--color-warning);
 }
 
 .statText {
@@ -16,4 +41,5 @@
 
 .statValue {
   font-size: 1.8rem;
+  letter-spacing: -0.03em;
 }

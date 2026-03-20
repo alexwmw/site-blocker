@@ -7,6 +7,8 @@ import useBlockPageParams from './useBlockPageParams';
 import useButtonEvents from './useButtonEvents';
 import useNavigateOnUnblock from './useNavigateOnUnblock';
 
+import BrandMark from '@/components/branding/BrandMark';
+import Callout from '@/components/ui/Callout';
 import Card from '@/components/ui/Card';
 import EyebrowLabel from '@/components/ui/EyebrowLabel';
 import useSettings from '@/hooks/useSettings';
@@ -41,14 +43,22 @@ const BlockPageApp = () => {
         as='section'
         className={styles.blockedCard}
       >
+        <BrandMark compact className={styles.brandMark} />
         <EyebrowLabel>Hold to Unblock</EyebrowLabel>
         <h1 className={styles.title}>{settings?.blockPageHeadline ?? 'Stay on track'}</h1>
         <p className={styles.subtitle}>
           You tried to open <strong>{urlLabel}</strong>. This page is blocked by your focus rules.
         </p>
-        <p>
-          <strong>If you wish to proceed, hold the button.</strong>
-        </p>
+        <Callout
+          title='Pause before proceeding.'
+          tone='warning'
+          className={styles.callout}
+        >
+          <p>
+            If you still need this page, press and hold the button. Releasing early resets the timer so the friction
+            stays intentional.
+          </p>
+        </Callout>
         <dl className={styles.details}>
           <div className={styles.detailsItem}>
             <dt className={styles.detailTerm}>Match type</dt>

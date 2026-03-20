@@ -5,6 +5,7 @@ import styles from '../OptionsApp.module.css';
 import OptionsTab from '../OptionsTab';
 
 import Button from '@/components/ui/Button';
+import Callout from '@/components/ui/Callout';
 import Card from '@/components/ui/Card';
 import StatusItem from '@/components/ui/StatusItem';
 import Switch from '@/components/ui/Switch';
@@ -99,16 +100,26 @@ const Rules = ({ blockRules, className, onClickEditSchedule, removeRule, schedul
           <StatusItem
             label='Scheduling is:'
             value='On'
-            tone='bad'
+            tone='neutral'
           />
           <Button onClick={onClickEditSchedule}>Edit schedule</Button>
         </div>
       ) : null}
       {blockRules === null ? null : !blockRules.length ? (
-        <Card className={styles.emptyState}>
-          <p>No rules yet.</p>
-          <p className={styles.subtle}>Add rules from the popup to start blocking distracting sites.</p>
-        </Card>
+        <Callout
+          title='No rules yet. Start with the biggest distraction.'
+          tone='info'
+          action={
+            <Button
+              variant='secondary'
+              onClick={onClickEditSchedule}
+            >
+              Plan schedule first
+            </Button>
+          }
+        >
+          <p>Add your first rule from the popup, then come back here to tighten match types or layer in a schedule.</p>
+        </Callout>
       ) : (
         <ul className={styles.rulesList}>{blockRules.map(renderRule)}</ul>
       )}

@@ -1,9 +1,12 @@
+import BrandMark from '@/components/branding/BrandMark';
+
 import EyebrowLabel from './EyebrowLabel';
 import styles from './Hero.module.css';
 
 const Hero = ({ label = 'Hold', title, subheading }: { label?: string; title: string; subheading: string }) => {
   return (
     <header className={styles.hero}>
+      <BrandMark compact className={styles.brandMark} />
       <EyebrowLabel>{label}</EyebrowLabel>
       <h1 className={styles.heroTitle}>{title}</h1>
       <p className={styles.subtle}>{subheading}</p>

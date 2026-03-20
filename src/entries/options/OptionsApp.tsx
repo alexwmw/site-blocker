@@ -6,6 +6,7 @@ import Preferences from './tabs/Preferences';
 import Rules from './tabs/Rules';
 import Scheduling from './tabs/Scheduling';
 
+import Callout from '@/components/ui/Callout';
 import Hero from '@/components/ui/Hero';
 import RenderBoundary from '@/components/ui/RenderBoundary';
 import Tabs, { type TabItem } from '@/components/ui/Tabs';
@@ -83,6 +84,16 @@ const OptionsApp = () => {
         data={optionsData}
         error={blockRulesError ?? settingsError}
       >
+        <Callout
+          title='Good enough now beats perfect later.'
+          tone='info'
+          className={styles.callout}
+        >
+          <p>
+            Ship the basics first: one or two rules, a usable schedule, and a hold duration that feels intentional.
+            Deeper refinements can wait until the current setup stops working.
+          </p>
+        </Callout>
         <StatsGrid
           stats={{
             'Total rules': blockRules?.length ?? 0,

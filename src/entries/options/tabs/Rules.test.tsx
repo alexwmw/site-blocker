@@ -34,7 +34,7 @@ describe('Rules', () => {
       />,
     );
 
-    expect(screen.queryByText('No rules yet.')).toBeNull();
+    expect(screen.queryByText('No rules yet. Start with the biggest distraction.')).toBeNull();
     expect(screen.queryByRole('list')).toBeNull();
   });
 
@@ -50,8 +50,11 @@ describe('Rules', () => {
       />,
     );
 
-    expect(screen.getByText('No rules yet.')).not.toBeNull();
-    expect(screen.getByText('Add rules from the popup to start blocking distracting sites.')).not.toBeNull();
+    expect(screen.getByText('No rules yet. Start with the biggest distraction.')).not.toBeNull();
+    expect(
+      screen.getByText('Add your first rule from the popup, then come back here to tighten match types or layer in a schedule.'),
+    ).not.toBeNull();
+    expect(screen.getByRole('button', { name: 'Plan schedule first' })).not.toBeNull();
   });
 
   it('renders rule content once rules are ready', () => {

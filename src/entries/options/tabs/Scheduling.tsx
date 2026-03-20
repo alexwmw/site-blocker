@@ -2,6 +2,7 @@ import styles from '../OptionsApp.module.css';
 import OptionsTab from '../OptionsTab';
 
 import Button from '@/components/ui/Button';
+import Callout from '@/components/ui/Callout';
 import Card from '@/components/ui/Card';
 import Switch from '@/components/ui/Switch';
 import SchedulingWindow from '@/entries/options/tabs/scheduling/SchedulingWindow';
@@ -59,6 +60,16 @@ const Scheduling = ({
           </p>
         </div>
       </Card>
+
+      {!schedule.enabled ? (
+        <Callout
+          title='Good enough schedule: start with one weekday window.'
+          tone='warning'
+          className={styles.warningState}
+        >
+          <p>Most contributors only need a single workday block to ship. Add more windows later if you notice gaps.</p>
+        </Callout>
+      ) : null}
 
       <div className={styles.scheduleHeadingRow}>
         <div>

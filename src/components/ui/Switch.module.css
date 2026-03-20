@@ -47,6 +47,7 @@
   border-radius: 999px;
   background: var(--color-border-strong);
   transition: background-color 0.18s ease;
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 8%);
 }
 
 .slider::after {
@@ -57,12 +58,13 @@
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: var(--color-bg);
+  background: var(--color-bg-elevated);
   transition: transform 0.18s ease;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 16%);
 }
 
 .input:checked + .slider {
-  background: var(--color-accent);
+  background: var(--color-brand);
 }
 
 .input:checked + .slider::after {
@@ -70,8 +72,8 @@
 }
 
 .input:focus-visible + .slider {
-  outline: 2px solid var(--color-accent);
-  outline-offset: 2px;
+  outline: none;
+  box-shadow: var(--focus-ring);
 }
 
 .input:disabled + .slider,

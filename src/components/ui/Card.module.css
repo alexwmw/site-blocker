@@ -1,9 +1,10 @@
 .card {
   background: var(--color-bg-elevated);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  border: var(--surface-outline);
   box-shadow: var(--shadow-soft);
 }
+
 .padding {
   padding: 16px;
 }

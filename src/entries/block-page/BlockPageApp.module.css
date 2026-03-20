@@ -12,18 +12,28 @@
 }
 
 .blockedCard {
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
   box-shadow: var(--shadow-card);
   padding: 28px;
 }
 
+.brandMark {
+  margin-bottom: 10px;
+}
+
 .title {
   margin: 8px 0 12px;
+  font-size: clamp(2rem, 4vw, 3rem);
+  letter-spacing: -0.04em;
 }
 
 .subtitle {
   margin: 0;
   color: var(--color-text-secondary);
+}
+
+.callout {
+  margin-top: 18px;
 }
 
 .details {
@@ -36,7 +46,7 @@
 .detailsItem {
   border: 1px solid var(--color-border-muted);
   border-radius: 12px;
-  padding: 10px;
+  padding: 12px;
   background: var(--color-bg-muted);
 }
 

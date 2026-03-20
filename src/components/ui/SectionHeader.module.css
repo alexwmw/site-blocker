@@ -2,4 +2,11 @@
   display: flex;
   justify-content: space-between;
   align-items: baseline;
+  gap: var(--space-3);
+}
+
+.sectionHeader h2 {
+  margin: 0;
+  font-size: 1.05rem;
+  letter-spacing: -0.02em;
 }
