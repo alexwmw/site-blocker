@@ -40,32 +40,36 @@ describe('Preferences', () => {
     expect(screen.getByText('Blocking behavior')).toBeTruthy();
     expect(screen.getByText('Appearance')).toBeTruthy();
 
-    const themeSelect = screen.getByRole('combobox');
+    const themeSelect = screen.getAllByRole('combobox')[0];
+    const modeSelect = screen.getAllByRole('combobox')[1];
     const spinbuttons = screen.getAllByRole('spinbutton') as HTMLInputElement[];
     const holdDurationInput = spinbuttons[0];
     const unblockDurationInput = spinbuttons[1];
     const headlineInput = screen.getByRole('textbox', { name: /block page headline/i }) as HTMLInputElement;
     const [unblockEnabledSwitch] = screen.getAllByRole('checkbox') as HTMLInputElement[];
 
-    expect((themeSelect as HTMLSelectElement).value).toBe('mindful-dark');
+    expect((themeSelect as HTMLSelectElement).value).toBe('mindful');
+    expect((modeSelect as HTMLSelectElement).value).toBe('dark');
     expect(holdDurationInput.value).toBe('15');
     expect(headlineInput.value).toBe('Keep going');
     expect(unblockDurationInput.value).toBe('10');
     expect(unblockEnabledSwitch.checked).toBe(true);
 
-    fireEvent.change(themeSelect, { target: { value: 'focus-light' } });
+    fireEvent.change(themeSelect, { target: { value: 'focus' } });
+    fireEvent.change(modeSelect, { target: { value: 'light' } });
     fireEvent.change(holdDurationInput, { target: { value: '25' } });
     fireEvent.change(headlineInput, { target: { value: 'Deep work only' } });
     fireEvent.click(unblockEnabledSwitch);
     fireEvent.change(unblockDurationInput, { target: { value: '45' } });
 
-    expect(updateSettings).toHaveBeenNthCalledWith(1, { theme: 'focus-light' });
-    expect(updateSettings).toHaveBeenNthCalledWith(2, { holdDurationSeconds: 25 });
-    expect(updateSettings).toHaveBeenNthCalledWith(3, { blockPageHeadline: 'Deep work only' });
-    expect(updateSettings).toHaveBeenNthCalledWith(4, {
+    expect(updateSettings).toHaveBeenNthCalledWith(1, { theme: 'focus-dark' });
+    expect(updateSettings).toHaveBeenNthCalledWith(2, { theme: 'mindful-light' });
+    expect(updateSettings).toHaveBeenNthCalledWith(3, { holdDurationSeconds: 25 });
+    expect(updateSettings).toHaveBeenNthCalledWith(4, { blockPageHeadline: 'Deep work only' });
+    expect(updateSettings).toHaveBeenNthCalledWith(5, {
       extendedUnblock: { enabled: false, durationMinutes: 10 },
     });
-    expect(updateSettings).toHaveBeenNthCalledWith(5, {
+    expect(updateSettings).toHaveBeenNthCalledWith(6, {
       extendedUnblock: { enabled: true, durationMinutes: 45 },
     });
   });
