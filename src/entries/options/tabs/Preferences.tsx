@@ -149,6 +149,7 @@ const Preferences = ({ className, settings, updateSettings }: PreferencesProps) 
             id='extended-unblock-enabled'
             label='Allow temporary unblock after a successful hold'
             description='Keep a blocked site available for a limited time before the rule starts blocking it again.'
+            descriptionClassName={styles.fieldHint}
             checked={settings.extendedUnblock.enabled}
             onChange={(event) => {
               handleExtendedUnblockEnabledChange(event.target.checked);

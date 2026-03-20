@@ -4,6 +4,7 @@
   justify-content: space-between;
   gap: 12px;
   font-weight: 600;
+  cursor: pointer;
 }
 
 .switchLabel.reverse {
