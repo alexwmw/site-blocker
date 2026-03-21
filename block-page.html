@@ -3,6 +3,33 @@
   <head>
     <meta charset="UTF-8" />
     <title>Hold - Mindful Website Blocking</title>
+    <script>
+      (() => {
+        const themeKey = 'site-blocker.theme';
+        const defaultTheme = 'mindful-light';
+        const themeBackgroundColors = {
+          'intention-light': '#f5f2ee',
+          'intention-dark': '#13171a',
+          'mindful-light': '#edf7f1',
+          'mindful-dark': '#111613',
+          'focus-light': '#f4f7ff',
+          'focus-dark': '#10142b',
+        };
+
+        let theme = defaultTheme;
+
+        try {
+          theme = localStorage.getItem(themeKey) || defaultTheme;
+        } catch (error) {
+          console.warn('Failed to read cached theme preference.', error);
+        }
+
+        const root = document.documentElement;
+        root.dataset.theme = theme;
+        root.style.backgroundColor = themeBackgroundColors[theme] || themeBackgroundColors[defaultTheme];
+        root.style.colorScheme = theme.endsWith('-dark') ? 'dark' : 'light';
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
