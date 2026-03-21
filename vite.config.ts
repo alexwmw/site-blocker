@@ -25,6 +25,9 @@ export default defineConfig({
     emptyOutDir: true,
     outDir: 'dist',
     rollupOptions: {
+      input: {
+        blockPage: path.resolve(__dirname, 'block-page.html'),
+      },
       output: {
         entryFileNames: 'public/[name].js',
         chunkFileNames: 'public/[name]-[hash].js',
