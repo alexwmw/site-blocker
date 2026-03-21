@@ -25,6 +25,10 @@ export default defineConfig({
     emptyOutDir: true,
     outDir: 'dist',
     rollupOptions: {
+      input: {
+        // popup and options are not required as they are explicitly referenced in the manifest
+        blockPage: path.resolve(__dirname, 'block-page.html'),
+      },
       output: {
         entryFileNames: 'public/[name].js',
         chunkFileNames: 'public/[name]-[hash].js',
