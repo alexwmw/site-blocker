@@ -1,0 +1,11 @@
+.backgroundCredit {
+  color: var(--color-text-primary);
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  opacity: 0.5;
+  font-size: 0.52rem;
+  * {
+    color: unset;
+  }
+}

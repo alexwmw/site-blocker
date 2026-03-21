@@ -1,17 +1,18 @@
-import { useEffect } from 'react';
+import { useLayoutEffect } from 'react';
 
 import useSettings from './useSettings';
 
 const useThemeEffect = () => {
   const { settings } = useSettings();
+  const theme = settings?.theme;
 
-  useEffect(() => {
-    if (settings?.theme) {
-      document.documentElement.dataset.theme = settings.theme;
+  useLayoutEffect(() => {
+    if (theme) {
+      document.documentElement.dataset.theme = theme;
     }
-  }, [settings?.theme]);
+  }, [theme]);
 
-  return null;
+  return theme;
 };
 
 export default useThemeEffect;

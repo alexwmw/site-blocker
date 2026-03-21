@@ -1,8 +1,7 @@
 import { StrictMode } from 'react';
 import ReactDOM from 'react-dom/client';
 import '@/assets/global.css';
-
-import '../shared/theme.css';
+import '@/assets/theme.css';
 
 import PopupApp from './PopupApp';
 

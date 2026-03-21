@@ -7,13 +7,14 @@ import useBlockPageParams from './useBlockPageParams';
 import useButtonEvents from './useButtonEvents';
 import useNavigateOnUnblock from './useNavigateOnUnblock';
 
+import BackgroundCredit from '@/components/ui/BackgroundCredit';
 import Card from '@/components/ui/Card';
 import EyebrowLabel from '@/components/ui/EyebrowLabel';
 import useSettings from '@/hooks/useSettings';
 import useThemeEffect from '@/hooks/useThemeEffect';
 
 const BlockPageApp = () => {
-  useThemeEffect();
+  const theme = useThemeEffect();
   const player = useRef<LottieRefCurrentProps>(null);
   const { onMouseDown, onKeyDown, timeRemaining, timeTotal } = useButtonEvents(player);
   const { ruleIds, targetUrl, patternHost, patternPath, matchType } = useBlockPageParams();
@@ -36,7 +37,10 @@ const BlockPageApp = () => {
   }, [targetUrl]);
 
   return (
-    <main className={styles.page}>
+    <main
+      id='block-page'
+      className={styles.page}
+    >
       <Card
         as='section'
         className={styles.blockedCard}
@@ -76,6 +80,7 @@ const BlockPageApp = () => {
           onKeyDown={onKeyDown}
         />
       </Card>
+      <BackgroundCredit theme={theme} />
     </main>
   );
 };

@@ -1,8 +1,8 @@
 import { StrictMode } from 'react';
 import ReactDOM from 'react-dom/client';
 import '@/assets/global.css';
+import '@/assets/theme.css';
 
-import '../shared/theme.css';
 import BlockPageApp from './BlockPageApp';
 import styles from './BlockPageApp.module.css';
 
