@@ -38,7 +38,6 @@
 
   color-scheme: light;
   font-family: var(--font-family-base), sans-serif;
-  background-color: #6e6e6e;
 }
 
 :root[data-theme='intention-light'] {
