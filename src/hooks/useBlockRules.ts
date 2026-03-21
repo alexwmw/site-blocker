@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 
 import type { StorageListener } from '@/services/StorageService';
-import { StorageService } from '@/services/StorageService';
+import { StorageService, type AddRuleResult } from '@/services/StorageService';
 import type { BlockRule } from '@/types/schema';
 import { blockRulesSchema } from '@/types/schema';
 
@@ -48,8 +48,8 @@ const useBlockRules = () => {
     return () => StorageService.removeListener(listener);
   }, [loadBlockRules]);
 
-  const addRule = async (rule: BlockRule) => {
-    await StorageService.addRule(rule);
+  const addRule = async (rule: BlockRule): Promise<AddRuleResult> => {
+    return StorageService.addRule(rule);
   };
 
   const removeRule = async (id: string) => {

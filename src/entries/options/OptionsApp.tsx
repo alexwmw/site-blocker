@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 
 import styles from './OptionsApp.module.css';
 import StatsGrid from './StatsGrid';
+import PopularSites from './tabs/PopularSites';
 import Preferences from './tabs/Preferences';
 import Rules from './tabs/Rules';
 import Scheduling from './tabs/Scheduling';
@@ -16,10 +17,11 @@ import { StorageService } from '@/services/StorageService';
 import type { ScheduleWindow, Settings } from '@/types/schema';
 import { createUniqueId } from '@/utils/createUniqueId';
 
-type OptionsTab = 'rules' | 'scheduling' | 'preferences';
+type OptionsTab = 'rules' | 'popular-sites' | 'scheduling' | 'preferences';
 
 const OPTIONS_TABS: ReadonlyArray<TabItem<OptionsTab>> = [
   { id: 'rules', label: 'Rules' },
+  { id: 'popular-sites', label: 'Popular Sites' },
   { id: 'scheduling', label: 'Scheduling' },
   { id: 'preferences', label: 'Preferences' },
 ];
@@ -33,7 +35,7 @@ const createNewScheduleWindow: () => ScheduleWindow = () => ({
 
 const OptionsApp = () => {
   useThemeEffect();
-  const { blockRules, error: blockRulesError, removeRule, updateRule } = useBlockRules();
+  const { addRule, blockRules, error: blockRulesError, removeRule, updateRule } = useBlockRules();
   const { settings, error: settingsError, updateSettings } = useSettings();
   const [activeTab, setActiveTab] = useState<OptionsTab>('rules');
 
@@ -103,6 +105,14 @@ const OptionsApp = () => {
             className={styles.section}
             settings={settings}
             updateSettings={handleUpdateSettings}
+          />
+        ) : null}
+        {activeTab === 'popular-sites' ? (
+          <PopularSites
+            addRule={addRule}
+            className={styles.section}
+            blockRules={blockRules ?? []}
+            removeRule={removeRule}
           />
         ) : null}
         {activeTab === 'scheduling' ? (

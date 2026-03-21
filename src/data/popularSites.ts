@@ -1,0 +1,141 @@
+import { popularSitesCatalogSchema, type PopularSiteCategory, type PopularSitesCatalog } from '@/types/schema';
+
+export const POPULAR_SITE_CATEGORY_LABELS: Readonly<Record<PopularSiteCategory, string>> = {
+  social: 'Social',
+  video: 'Video',
+  news: 'News',
+  shopping: 'Shopping',
+  community: 'Community',
+  gaming: 'Gaming',
+};
+
+const curatedPopularSites = [
+  {
+    id: 'youtube',
+    category: 'video',
+    displayName: 'YouTube',
+    domainPatterns: ['youtube.com', 'youtu.be'],
+    icon: 'play',
+  },
+  {
+    id: 'netflix',
+    category: 'video',
+    displayName: 'Netflix',
+    domainPatterns: ['netflix.com'],
+    icon: 'tv',
+  },
+  {
+    id: 'tiktok',
+    category: 'video',
+    displayName: 'TikTok',
+    domainPatterns: ['tiktok.com'],
+    icon: 'music',
+  },
+  {
+    id: 'instagram',
+    category: 'social',
+    displayName: 'Instagram',
+    domainPatterns: ['instagram.com'],
+    icon: 'camera',
+  },
+  {
+    id: 'facebook',
+    category: 'social',
+    displayName: 'Facebook',
+    domainPatterns: ['facebook.com'],
+    icon: 'users',
+  },
+  {
+    id: 'x',
+    category: 'social',
+    displayName: 'X / Twitter',
+    domainPatterns: ['x.com', 'twitter.com'],
+    icon: 'messages',
+  },
+  {
+    id: 'reddit',
+    category: 'community',
+    displayName: 'Reddit',
+    domainPatterns: ['reddit.com'],
+    icon: 'messages',
+  },
+  {
+    id: 'hacker-news',
+    category: 'community',
+    displayName: 'Hacker News',
+    domainPatterns: ['news.ycombinator.com'],
+    icon: 'newspaper',
+  },
+  {
+    id: 'pinterest',
+    category: 'social',
+    displayName: 'Pinterest',
+    domainPatterns: ['pinterest.com'],
+    icon: 'image',
+  },
+  {
+    id: 'bluesky',
+    category: 'social',
+    displayName: 'Bluesky',
+    domainPatterns: ['bsky.app'],
+    icon: 'cloud',
+  },
+  {
+    id: 'linkedin',
+    category: 'social',
+    displayName: 'LinkedIn',
+    domainPatterns: ['linkedin.com'],
+    icon: 'briefcase',
+  },
+  {
+    id: 'amazon',
+    category: 'shopping',
+    displayName: 'Amazon',
+    domainPatterns: ['amazon.com'],
+    icon: 'shopping-bag',
+  },
+  {
+    id: 'etsy',
+    category: 'shopping',
+    displayName: 'Etsy',
+    domainPatterns: ['etsy.com'],
+    icon: 'shopping-bag',
+  },
+  {
+    id: 'espn',
+    category: 'news',
+    displayName: 'ESPN',
+    domainPatterns: ['espn.com'],
+    icon: 'sparkles',
+  },
+  {
+    id: 'cnn',
+    category: 'news',
+    displayName: 'CNN',
+    domainPatterns: ['cnn.com'],
+    icon: 'newspaper',
+  },
+  {
+    id: 'nytimes',
+    category: 'news',
+    displayName: 'The New York Times',
+    domainPatterns: ['nytimes.com'],
+    icon: 'newspaper',
+  },
+  {
+    id: 'twitch',
+    category: 'gaming',
+    displayName: 'Twitch',
+    domainPatterns: ['twitch.tv'],
+    icon: 'gamepad',
+  },
+  {
+    id: 'steam',
+    category: 'gaming',
+    displayName: 'Steam Community',
+    domainPatterns: ['steamcommunity.com'],
+    icon: 'gamepad',
+  },
+] satisfies PopularSitesCatalog;
+
+export const POPULAR_SITES = popularSitesCatalogSchema.parse(curatedPopularSites);

@@ -245,3 +245,130 @@
 .warningState {
   margin-top: 12px;
 }
+
+.popularSitesIntroCard,
+.popularSitesToolbar,
+.popularSitesConfirmation {
+  display: grid;
+  gap: 16px;
+  padding: 18px;
+}
+
+.popularSitesIntroCard,
+.popularSitesConfirmation {
+  align-items: center;
+}
+
+.popularSitesIntroCard,
+.popularSitesConfirmation,
+.popularSiteHeadingRow,
+.popularSitesActionRow {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.popularSitesIntroCopy {
+  display: grid;
+  gap: 6px;
+}
+
+.popularSitesIntroCopy p,
+.popularSitesConfirmation p,
+.popularSiteCardBody p {
+  margin: 0;
+}
+
+.popularSitesConfirmation {
+  margin-top: 16px;
+  border: 1px solid var(--color-border-strong);
+  background: var(--color-bg-muted);
+}
+
+.popularSitesConfirmationTitle {
+  font-size: 0.98rem;
+  font-weight: 700;
+}
+
+.popularSitesFilterLabel {
+  margin: 0 0 8px;
+  font-weight: 600;
+}
+
+.popularSitesGrid {
+  list-style: none;
+  margin: 18px 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 12px;
+}
+
+.popularSiteCard {
+  height: 100%;
+}
+
+.popularSiteCheckboxLabel {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 16px;
+  cursor: pointer;
+}
+
+.popularSiteCheckboxLabel input {
+  margin-top: 3px;
+}
+
+.popularSiteCheckboxLabel:has(input:disabled) {
+  cursor: not-allowed;
+}
+
+.popularSiteCardBody {
+  display: grid;
+  gap: 10px;
+  width: 100%;
+}
+
+.popularSiteHeadingRow {
+  align-items: flex-start;
+}
+
+.popularSiteTitleRow {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.popularSiteIconWrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--color-bg-muted);
+  color: var(--color-accent-strong);
+}
+
+.popularSiteStatusBadge,
+.popularSiteStatusBadgeMuted {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.popularSiteStatusBadge {
+  background: var(--color-bg-muted);
+  color: var(--color-accent-strong);
+}
+
+.popularSiteStatusBadgeMuted {
+  background: var(--color-bg-input);
+  color: var(--color-text-secondary);
+}

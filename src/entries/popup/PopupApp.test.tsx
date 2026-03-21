@@ -60,7 +60,7 @@ describe('PopupApp', () => {
     vi.mocked(useCreateRuleFromTab).mockReturnValue(createRuleHookResult());
     vi.mocked(useBlockRules).mockReturnValue({
       blockRules: [],
-      addRule: vi.fn(async () => {}),
+      addRule: vi.fn(async () => ({ ok: true })),
       error: null,
       removeRule: vi.fn(async () => {}),
       updateRule: vi.fn(async () => {}),

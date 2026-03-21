@@ -157,6 +157,67 @@ export const matchTypeSchema = z.enum(MATCH_TYPES);
 
 export type MatchType = z.infer<typeof matchTypeSchema>;
 
+/** Shared popular-site categories that can be reused across onboarding and options flows. */
+export const POPULAR_SITE_CATEGORIES = ['social', 'video', 'news', 'shopping', 'community', 'gaming'] as const;
+
+/** Category metadata used by curated popular-site experiences. */
+export const popularSiteCategorySchema = z.enum(POPULAR_SITE_CATEGORIES);
+
+export type PopularSiteCategory = z.infer<typeof popularSiteCategorySchema>;
+
+/** Icon tokens for curated popular-site surfaces. */
+export const POPULAR_SITE_ICONS = [
+  'briefcase',
+  'camera',
+  'cloud',
+  'gamepad',
+  'image',
+  'messages',
+  'music',
+  'newspaper',
+  'play',
+  'shopping-bag',
+  'sparkles',
+  'tv',
+  'users',
+] as const;
+
+/** Icon token attached to a curated popular-site entry. */
+export const popularSiteIconSchema = z.enum(POPULAR_SITE_ICONS);
+
+export type PopularSiteIcon = z.infer<typeof popularSiteIconSchema>;
+
+/**
+ * Contract for curated popular-site entries shared by options, onboarding,
+ * and any future rule-creation flows.
+ */
+export const popularSiteSchema = z.object({
+  /** Stable identifier for app code and analytics-friendly tracking. */
+  id: z.string().trim().min(1),
+
+  /** High-level category for filtering grouped popular sites. */
+  category: popularSiteCategorySchema,
+
+  /** User-facing label shown across selection surfaces. */
+  displayName: z.string().trim().min(1),
+
+  /**
+   * Canonical domain patterns that should be added to the blocklist for this site.
+   * Values use the same rule-pattern format as manual block rules.
+   */
+  domainPatterns: z.array(z.string().trim().min(1)).min(1),
+
+  /** Icon token so the same data can render consistently in multiple flows. */
+  icon: popularSiteIconSchema,
+});
+
+export type PopularSite = z.infer<typeof popularSiteSchema>;
+
+/** Shared ordered list contract for curated popular-site catalogs. */
+export const popularSitesCatalogSchema = z.array(popularSiteSchema);
+
+export type PopularSitesCatalog = z.infer<typeof popularSitesCatalogSchema>;
+
 /**
  * A single blocking rule.
  */

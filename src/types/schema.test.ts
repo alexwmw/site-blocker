@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import type { Schedule } from './schema';
-import { settingsSchema } from './schema';
+import { popularSiteSchema, settingsSchema } from './schema';
 
 describe('Schema Validation', () => {
   it('should accept valid military time', () => {
@@ -119,4 +119,28 @@ describe('Schema Validation', () => {
 
     expect(result.success).toBe(false);
   });
+  it('should validate the shared popular-site contract for onboarding-ready entries', () => {
+    const result = popularSiteSchema.safeParse({
+      id: 'youtube',
+      category: 'video',
+      displayName: 'YouTube',
+      domainPatterns: ['youtube.com', 'youtu.be'],
+      icon: 'play',
+    });
+
+    expect(result.success).toBe(true);
+  });
+
+  it('should reject curated popular-site entries without domain patterns', () => {
+    const result = popularSiteSchema.safeParse({
+      id: 'youtube',
+      category: 'video',
+      displayName: 'YouTube',
+      domainPatterns: [],
+      icon: 'play',
+    });
+
+    expect(result.success).toBe(false);
+  });
+
 });
