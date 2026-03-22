@@ -30,6 +30,7 @@ const readableDate = (dateIso: string) => {
 const Rules = ({ blockRules, className, onClickEditSchedule, removeRule, schedule, updateRule }: RulesProps) => {
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const [pendingMatchTypeRuleId, setPendingMatchTypeRuleId] = useState<string | null>(null);
+  const emptyRuleList = blockRules !== null && blockRules.length === 0;
 
   const handleRemove = async (ruleId: string) => {
     setPendingDeleteId(ruleId);
@@ -110,22 +111,19 @@ const Rules = ({ blockRules, className, onClickEditSchedule, removeRule, schedul
           <Button onClick={onClickEditSchedule}>Edit schedule</Button>
         </div>
       ) : null}
-      <Stack
-        gap='small'
-        asList
-      >
-        {blockRules === null ? null : !blockRules.length ? (
-          <Card
-            as='li'
-            className={styles.emptyState}
-          >
-            <p>No rules yet.</p>
-            <Paragraph subtle>Add rules from the popup to start blocking distracting sites.</Paragraph>
-          </Card>
-        ) : (
-          <>{blockRules.map(renderRule)}</>
-        )}
-      </Stack>
+      {emptyRuleList ? (
+        <Card className={styles.emptyState}>
+          <p>No rules yet.</p>
+          <Paragraph subtle>Add rules from the popup to start blocking distracting sites.</Paragraph>
+        </Card>
+      ) : blockRules ? (
+        <Stack
+          gap='small'
+          asList
+        >
+          {blockRules.map(renderRule)}
+        </Stack>
+      ) : null}
     </OptionsTab>
   );
 };

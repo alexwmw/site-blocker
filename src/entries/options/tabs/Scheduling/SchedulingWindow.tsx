@@ -57,6 +57,7 @@ const SchedulingWindow = ({ window, windowIndex, disabled, removeWindow, updateW
       </div>
       <div className={styles.scheduleWindowStart}>
         <Setting
+          settingId='startTime'
           label='Start time'
           type='time'
           step={900}
@@ -69,6 +70,7 @@ const SchedulingWindow = ({ window, windowIndex, disabled, removeWindow, updateW
       </div>
       <div className={styles.scheduleWindowEnd}>
         <Setting
+          settingId='endTime'
           label='End time'
           type='time'
           step={900}

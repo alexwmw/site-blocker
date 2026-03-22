@@ -117,6 +117,7 @@ const Preferences = ({ className, settings, updateSettings }: PreferencesProps) 
           <SectionHeader title='Blocking behavior' />
           <SettingsGrid>
             <Setting
+              settingId='holdToUnblock'
               label='Hold to unblock (seconds)'
               type='number'
               min={SETTINGS_LIMITS.holdDurationMinSeconds}
@@ -128,6 +129,7 @@ const Preferences = ({ className, settings, updateSettings }: PreferencesProps) 
               fieldHint={`Require between ${SETTINGS_LIMITS.holdDurationMinSeconds} and ${SETTINGS_LIMITS.holdDurationMaxSeconds} seconds before a blocked page can be reopened.`}
             />
             <Setting
+              settingId='blockPageHeadline'
               label='Block page headline'
               type='text'
               maxLength={SETTINGS_LIMITS.blockPageHeadlineMaxLength}
@@ -150,6 +152,7 @@ const Preferences = ({ className, settings, updateSettings }: PreferencesProps) 
           />
 
           <Setting
+            settingId='extendedUnblock'
             label='Temporary unblock duration (minutes)'
             type='number'
             min={SETTINGS_LIMITS.extendedUnblockDurationMinMinutes}
@@ -170,6 +173,7 @@ const Preferences = ({ className, settings, updateSettings }: PreferencesProps) 
           <SectionHeader title='Appearance' />
           <SettingsGrid>
             <Setting
+              settingId='theme'
               as='select'
               label='Theme'
               value={theme}
@@ -183,6 +187,7 @@ const Preferences = ({ className, settings, updateSettings }: PreferencesProps) 
               ]}
             />
             <Setting
+              settingId='mode'
               as='select'
               label='Mode'
               value={mode}

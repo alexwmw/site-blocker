@@ -138,7 +138,6 @@ const PopupApp = () => {
           <Card
             padding
             as='section'
-            className={styles.section}
           >
             <SectionHeader title='Blocking' />
             <Stack gap='x-small'>
@@ -172,7 +171,6 @@ const PopupApp = () => {
           <Card
             padding
             as='section'
-            className={styles.section}
           >
             <SectionHeader title='Quick actions' />
             {!isExtensionPageUrl ? (

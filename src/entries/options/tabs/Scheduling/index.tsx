@@ -50,7 +50,6 @@ const Scheduling = ({
             onChange={(event) => {
               setSchedulingEnabled(event.target.checked).catch(console.error);
             }}
-            reverse
             checked={schedule.enabled}
             fieldHint='When this is off, blocking stays active all day. Turn it on to block only during the recurring windows below.'
           />

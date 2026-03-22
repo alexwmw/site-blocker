@@ -19,10 +19,14 @@ const Stack = <T extends ElementType = 'div'>({
   topMargin,
   className,
   gap = 'medium',
+  ...props
 }: StackProps<T>) => {
   const Component = asList ? 'ul' : (as ?? 'div');
   return (
-    <Component className={clsx(styles.stack, styles[`${gap}-gap`], topMargin && styles.topMargin, className)}>
+    <Component
+      className={clsx(styles.stack, styles[`${gap}-gap`], topMargin && styles.topMargin, className)}
+      {...props}
+    >
       {children}
     </Component>
   );

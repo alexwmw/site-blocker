@@ -9,6 +9,7 @@ type BaseProps = {
   className?: string;
   label: string;
   fieldHint?: string;
+  settingId: string;
 };
 
 type SelectProps = BaseProps & {
@@ -23,9 +24,14 @@ type InputProps = BaseProps & {
 
 type SettingProps = SelectProps | InputProps;
 
-const Select = ({ options, ...props }: Omit<ComponentProps<'select'>, 'className'> & { options: Option[] }) => {
+const Select = ({
+  options,
+  settingId,
+  ...props
+}: Omit<ComponentProps<'select'>, 'className'> & { options: Option[]; settingId: string }) => {
   return (
     <select
+      id={settingId}
       className={styles.settingsInput}
       {...props}
     >
@@ -42,23 +48,39 @@ const Select = ({ options, ...props }: Omit<ComponentProps<'select'>, 'className
 };
 
 const Setting = (props: SettingProps) => {
-  const { className, label, fieldHint } = props;
-
+  const { settingId, className, label, fieldHint, options, as, ...inputProps } = props;
+  const describedById = settingId + '-field-hint';
   return (
-    <label className={clsx(styles.settingsLabel, className)}>
-      {label}
+    <div>
+      <label
+        htmlFor={settingId}
+        className={clsx(styles.settingsLabel, className)}
+      >
+        {label}
 
-      {props.as === 'select' ? (
-        <Select {...props} />
-      ) : (
-        <input
-          className={styles.settingsInput}
-          {...props}
-        />
-      )}
-
-      {fieldHint ? <span className={styles.settingsFieldHint}>{fieldHint}</span> : null}
-    </label>
+        {as === 'select' ? (
+          <Select
+            aria-describedby={describedById}
+            {...props}
+          />
+        ) : (
+          <input
+            id={settingId}
+            aria-describedby={describedById}
+            className={styles.settingsInput}
+            {...(inputProps as ComponentProps<'input'>)}
+          />
+        )}
+      </label>
+      {fieldHint ? (
+        <span
+          id={describedById}
+          className={styles.settingsFieldHint}
+        >
+          {fieldHint}
+        </span>
+      ) : null}
+    </div>
   );
 };
 
