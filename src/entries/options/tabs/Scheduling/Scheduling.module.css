@@ -1,5 +1,5 @@
 .scheduleHeadingRow {
-  margin-top: 20px;
+  margin: 20px 0 10px;
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
@@ -50,14 +50,6 @@
 
 .scheduleWindowHeader p {
   margin: 4px 0 0;
-}
-
-.scheduleWindowList {
-  list-style: none;
-  padding: 0;
-  display: grid;
-  margin: 12px 0 0;
-  gap: 12px;
 }
 
 .scheduleWindowListButtonRow {

@@ -1,11 +1,3 @@
-.rulesList {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  gap: 12px;
-}
-
 .ruleCard {
   display: flex;
   justify-content: space-between;
@@ -38,7 +30,7 @@
 }
 
 .ruleScheduleStatusRow {
-  margin: 10px 0;
+  margin: 0 0 10px 0;
   display: flex;
   gap: 8px;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));

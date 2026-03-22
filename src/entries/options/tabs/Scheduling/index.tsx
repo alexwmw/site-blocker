@@ -5,6 +5,7 @@ import styles from './Scheduling.module.css';
 import Button from '@/components/primitives/Button';
 import Card from '@/components/primitives/Card';
 import Paragraph from '@/components/primitives/Paragraph';
+import Stack from '@/components/primitives/Stack';
 import Switch from '@/components/primitives/Switch';
 import SettingsGrid from '@/components/shared/SettingsGrid';
 import SchedulingWindow from '@/entries/options/tabs/Scheduling/SchedulingWindow';
@@ -55,7 +56,6 @@ const Scheduling = ({
           />
         </SettingsGrid>
       </Card>
-
       <div className={styles.scheduleHeadingRow}>
         <div>
           <h3>Schedule windows</h3>
@@ -70,8 +70,11 @@ const Scheduling = ({
           Add new schedule window
         </Button>
       </div>
-
-      <ul className={styles.scheduleWindowList}>
+      <Stack
+        gap='small'
+        topMargin
+        asList
+      >
         {schedule.windows.map((win, index) => (
           <li key={win.id}>
             <SchedulingWindow
@@ -83,7 +86,7 @@ const Scheduling = ({
             />
           </li>
         ))}
-      </ul>
+      </Stack>
     </OptionsTab>
   );
 };

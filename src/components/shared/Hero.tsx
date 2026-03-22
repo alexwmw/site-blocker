@@ -1,14 +1,26 @@
+import clsx from 'clsx';
+
 import EyebrowLabel from './EyebrowLabel';
 import styles from './Hero.module.css';
 
 import Paragraph from '@/components/primitives/Paragraph';
 
-const Hero = ({ label = 'Hold', title, subheading }: { label?: string; title: string; subheading: string }) => {
+const Hero = ({
+  label = 'Hold',
+  title,
+  subheading,
+  variant,
+}: {
+  label?: string;
+  title: string;
+  subheading?: string;
+  variant?: string;
+}) => {
   return (
-    <header className={styles.hero}>
+    <header className={clsx(styles.hero, variant && styles[variant])}>
       <EyebrowLabel>{label}</EyebrowLabel>
       <h1 className={styles.heroTitle}>{title}</h1>
-      <Paragraph subtle>{subheading}</Paragraph>
+      {subheading ? <Paragraph subtle>{subheading}</Paragraph> : null}
     </header>
   );
 };

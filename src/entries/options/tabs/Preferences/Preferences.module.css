@@ -1,8 +1,3 @@
-.preferenceSectionStack {
-  display: grid;
-  gap: 16px;
-}
-
 .preferenceCard {
   display: grid;
   gap: 16px;

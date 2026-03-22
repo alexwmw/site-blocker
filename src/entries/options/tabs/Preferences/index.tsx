@@ -7,6 +7,7 @@ import styles from './Preferences.module.css';
 import Button from '@/components/primitives/Button';
 import Card from '@/components/primitives/Card';
 import Setting from '@/components/primitives/Setting';
+import Stack from '@/components/primitives/Stack';
 import Switch from '@/components/primitives/Switch';
 import SectionHeader from '@/components/shared/SectionHeader';
 import SettingsGrid from '@/components/shared/SettingsGrid';
@@ -108,7 +109,7 @@ const Preferences = ({ className, settings, updateSettings }: PreferencesProps) 
       title='Preference'
       className={className}
     >
-      <div className={styles.preferenceSectionStack}>
+      <Stack>
         <Card
           padding
           className={styles.preferenceCard}
@@ -204,7 +205,7 @@ const Preferences = ({ className, settings, updateSettings }: PreferencesProps) 
             Reset preferences to defaults
           </Button>
         </div>
-      </div>
+      </Stack>
     </OptionsTab>
   );
 };

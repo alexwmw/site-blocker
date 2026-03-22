@@ -8,6 +8,7 @@ import styles from './Rules.module.css';
 import Button from '@/components/primitives/Button';
 import Card from '@/components/primitives/Card';
 import Paragraph from '@/components/primitives/Paragraph';
+import Stack from '@/components/primitives/Stack';
 import Switch from '@/components/primitives/Switch';
 import StatusItem from '@/components/shared/StatusItem';
 import type { BlockRule, Schedule } from '@/types/schema';
@@ -109,14 +110,22 @@ const Rules = ({ blockRules, className, onClickEditSchedule, removeRule, schedul
           <Button onClick={onClickEditSchedule}>Edit schedule</Button>
         </div>
       ) : null}
-      {blockRules === null ? null : !blockRules.length ? (
-        <Card className={styles.emptyState}>
-          <p>No rules yet.</p>
-          <Paragraph subtle>Add rules from the popup to start blocking distracting sites.</Paragraph>
-        </Card>
-      ) : (
-        <ul className={styles.rulesList}>{blockRules.map(renderRule)}</ul>
-      )}
+      <Stack
+        gap='small'
+        asList
+      >
+        {blockRules === null ? null : !blockRules.length ? (
+          <Card
+            as='li'
+            className={styles.emptyState}
+          >
+            <p>No rules yet.</p>
+            <Paragraph subtle>Add rules from the popup to start blocking distracting sites.</Paragraph>
+          </Card>
+        ) : (
+          <>{blockRules.map(renderRule)}</>
+        )}
+      </Stack>
     </OptionsTab>
   );
 };
