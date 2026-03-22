@@ -1,9 +1,12 @@
-import styles from '../../OptionsApp.module.css';
 import OptionsTab from '../OptionsTab';
+
+import styles from './Scheduling.module.css';
 
 import Button from '@/components/primitives/Button';
 import Card from '@/components/primitives/Card';
+import Paragraph from '@/components/primitives/Paragraph';
 import Switch from '@/components/primitives/Switch';
+import SettingsGrid from '@/components/shared/SettingsGrid';
 import SchedulingWindow from '@/entries/options/tabs/Scheduling/SchedulingWindow';
 import type { Schedule, ScheduleWindow } from '@/types/schema';
 
@@ -38,32 +41,25 @@ const Scheduling = ({
       title='Scheduling'
       className={className}
     >
-      <Card
-        className={styles.settingsGrid}
-        padding
-      >
-        <Switch
-          id='scheduling_enabled'
-          label='Enable scheduled blocking'
-          onChange={(event) => {
-            setSchedulingEnabled(event.target.checked).catch(console.error);
-          }}
-          checked={schedule.enabled}
-          reverse
-          compact
-        />
-        <div className={styles.scheduleAssistiveCopy}>
-          <p className={styles.subtle}>
-            When this is off, blocking stays active all day. Turn it on to block only during the recurring windows
-            below.
-          </p>
-        </div>
+      <Card padding>
+        <SettingsGrid>
+          <Switch
+            id='scheduling_enabled'
+            label='Enable scheduled blocking'
+            onChange={(event) => {
+              setSchedulingEnabled(event.target.checked).catch(console.error);
+            }}
+            reverse
+            checked={schedule.enabled}
+            fieldHint='When this is off, blocking stays active all day. Turn it on to block only during the recurring windows below.'
+          />
+        </SettingsGrid>
       </Card>
 
       <div className={styles.scheduleHeadingRow}>
         <div>
           <h3>Schedule windows</h3>
-          <p className={styles.subtle}>Add weekly rules, adjust days and times, and set multiple schedules.</p>
+          <Paragraph subtle>Add weekly rules, adjust days and times, and set multiple schedules.</Paragraph>
         </div>
         <Button
           disabled={!schedule.enabled}
@@ -75,7 +71,7 @@ const Scheduling = ({
         </Button>
       </div>
 
-      <ul className={styles.windowsList}>
+      <ul className={styles.scheduleWindowList}>
         {schedule.windows.map((win, index) => (
           <li key={win.id}>
             <SchedulingWindow

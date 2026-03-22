@@ -1,12 +1,15 @@
 import { useEffect, useState } from 'react';
 
-import styles from '../../OptionsApp.module.css';
 import OptionsTab from '../OptionsTab';
+
+import styles from './Preferences.module.css';
 
 import Button from '@/components/primitives/Button';
 import Card from '@/components/primitives/Card';
+import Setting from '@/components/primitives/Setting';
 import Switch from '@/components/primitives/Switch';
 import SectionHeader from '@/components/shared/SectionHeader';
+import SettingsGrid from '@/components/shared/SettingsGrid';
 import { defaultPreferenceSettings } from '@/services/defaultSettings';
 import { type Settings, SETTINGS_LIMITS, type Theme } from '@/types/schema';
 
@@ -111,69 +114,52 @@ const Preferences = ({ className, settings, updateSettings }: PreferencesProps) 
           className={styles.preferenceCard}
         >
           <SectionHeader title='Blocking behavior' />
-          <div className={styles.settingsGrid}>
-            <label className={styles.settingsLabel}>
-              Hold to unblock (seconds)
-              <input
-                className={styles.settingsInput}
-                type='number'
-                min={SETTINGS_LIMITS.holdDurationMinSeconds}
-                max={SETTINGS_LIMITS.holdDurationMaxSeconds}
-                value={settings.holdDurationSeconds}
-                onChange={(event) => {
-                  handleHoldDurationChange(event.target.value);
-                }}
-              />
-              <span className={styles.fieldHint}>
-                Require between {SETTINGS_LIMITS.holdDurationMinSeconds} and {SETTINGS_LIMITS.holdDurationMaxSeconds}{' '}
-                seconds before a blocked page can be reopened.
-              </span>
-            </label>
-
-            <label className={styles.settingsLabel}>
-              Block page headline
-              <input
-                className={styles.settingsInput}
-                type='text'
-                maxLength={SETTINGS_LIMITS.blockPageHeadlineMaxLength}
-                value={settings.blockPageHeadline}
-                onChange={(event) => {
-                  handleHeadlineChange(event.target.value);
-                }}
-              />
-              <span className={styles.fieldHint}>Short motivational title shown on the block page.</span>
-            </label>
-          </div>
+          <SettingsGrid>
+            <Setting
+              label='Hold to unblock (seconds)'
+              type='number'
+              min={SETTINGS_LIMITS.holdDurationMinSeconds}
+              max={SETTINGS_LIMITS.holdDurationMaxSeconds}
+              value={settings.holdDurationSeconds}
+              onChange={(event) => {
+                handleHoldDurationChange(event.target.value);
+              }}
+              fieldHint={`Require between ${SETTINGS_LIMITS.holdDurationMinSeconds} and ${SETTINGS_LIMITS.holdDurationMaxSeconds} seconds before a blocked page can be reopened.`}
+            />
+            <Setting
+              label='Block page headline'
+              type='text'
+              maxLength={SETTINGS_LIMITS.blockPageHeadlineMaxLength}
+              value={settings.blockPageHeadline}
+              onChange={(event) => {
+                handleHeadlineChange(event.target.value);
+              }}
+              fieldHint='Short motivational title shown on the block page.'
+            />
+          </SettingsGrid>
 
           <Switch
             id='extended-unblock-enabled'
             label='Allow temporary unblock after a successful hold'
-            description='Keep a blocked site available for a limited time before the rule starts blocking it again.'
-            descriptionClassName={styles.fieldHint}
+            fieldHint='Keep a blocked site available for a limited time before the rule starts blocking it again.'
             checked={settings.extendedUnblock.enabled}
             onChange={(event) => {
               handleExtendedUnblockEnabledChange(event.target.checked);
             }}
           />
 
-          <label className={styles.settingsLabel}>
-            Temporary unblock duration (minutes)
-            <input
-              className={styles.settingsInput}
-              type='number'
-              min={SETTINGS_LIMITS.extendedUnblockDurationMinMinutes}
-              max={SETTINGS_LIMITS.extendedUnblockDurationMaxMinutes}
-              value={settings.extendedUnblock.durationMinutes}
-              disabled={!settings.extendedUnblock.enabled}
-              onChange={(event) => {
-                handleExtendedUnblockDurationChange(event.target.value);
-              }}
-            />
-            <span className={styles.fieldHint}>
-              When enabled, each unblock can stay active for {SETTINGS_LIMITS.extendedUnblockDurationMinMinutes}–
-              {SETTINGS_LIMITS.extendedUnblockDurationMaxMinutes} minutes.
-            </span>
-          </label>
+          <Setting
+            label='Temporary unblock duration (minutes)'
+            type='number'
+            min={SETTINGS_LIMITS.extendedUnblockDurationMinMinutes}
+            max={SETTINGS_LIMITS.extendedUnblockDurationMaxMinutes}
+            value={settings.extendedUnblock.durationMinutes}
+            disabled={!settings.extendedUnblock.enabled}
+            onChange={(event) => {
+              handleExtendedUnblockDurationChange(event.target.value);
+            }}
+            fieldHint={`When enabled, each unblock can stay active for ${SETTINGS_LIMITS.extendedUnblockDurationMinMinutes}–${SETTINGS_LIMITS.extendedUnblockDurationMaxMinutes} minutes.`}
+          />
         </Card>
 
         <Card
@@ -181,35 +167,33 @@ const Preferences = ({ className, settings, updateSettings }: PreferencesProps) 
           className={styles.preferenceCard}
         >
           <SectionHeader title='Appearance' />
-          <div className={styles.settingsGrid}>
-            <label className={styles.settingsLabel}>
-              Theme
-              <select
-                className={styles.settingsInput}
-                value={theme}
-                onChange={(event) => {
-                  handleThemeChange((event.target.value + '-' + mode) as Theme);
-                }}
-              >
-                <option value='intention'>Intentional</option>
-                <option value='mindful'>Mindful</option>
-                <option value='focus'>Focused</option>
-              </select>
-            </label>{' '}
-            <label className={styles.settingsLabel}>
-              Mode
-              <select
-                className={styles.settingsInput}
-                value={mode}
-                onChange={(event) => {
-                  handleThemeChange((theme + '-' + event.target.value) as Theme);
-                }}
-              >
-                <option value='light'>Light</option>
-                <option value='dark'>Dark</option>
-              </select>
-            </label>
-          </div>
+          <SettingsGrid>
+            <Setting
+              as='select'
+              label='Theme'
+              value={theme}
+              onChange={(event) => {
+                handleThemeChange((event.target.value + '-' + mode) as Theme);
+              }}
+              options={[
+                { value: 'intention', label: 'Intentional' },
+                { value: 'mindful', label: 'Mindful' },
+                { value: 'focus', label: 'Focused' },
+              ]}
+            />
+            <Setting
+              as='select'
+              label='Mode'
+              value={mode}
+              onChange={(event) => {
+                handleThemeChange((theme + '-' + event.target.value) as Theme);
+              }}
+              options={[
+                { value: 'light', label: 'Light' },
+                { value: 'dark', label: 'Dark' },
+              ]}
+            />
+          </SettingsGrid>
         </Card>
 
         <div className={styles.preferenceActions}>

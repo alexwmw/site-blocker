@@ -4,6 +4,7 @@ import styles from './PopupApp.module.css';
 
 import Button from '@/components/primitives/Button';
 import Card from '@/components/primitives/Card';
+import Paragraph from '@/components/primitives/Paragraph';
 import EyebrowLabel from '@/components/shared/EyebrowLabel';
 import RenderBoundary from '@/components/shared/RenderBoundary';
 import SectionHeader from '@/components/shared/SectionHeader';
@@ -130,7 +131,7 @@ const PopupApp = () => {
         data={popupData}
         error={activeTabError ?? blockRulesError ?? settingsError}
       >
-        {!isExtensionPageUrl ? <p className={styles.subtle}>{activeTab?.url ?? 'No active tab found.'}</p> : null}
+        {!isExtensionPageUrl ? <Paragraph subtle>{activeTab?.url ?? 'No active tab found.'}</Paragraph> : null}
 
         <Card
           as='section'

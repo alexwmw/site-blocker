@@ -9,6 +9,7 @@
 
 .switchLabel.reverse {
   flex-direction: row-reverse;
+  justify-content: start;
 }
 
 .switchLabel.compact {
@@ -20,10 +21,11 @@
   gap: 2px;
 }
 
-.description {
-  font-size: 0.85rem;
-  font-weight: 500;
+.fieldHint {
   color: var(--color-text-secondary);
+  font-size: 0.75rem;
+  font-weight: 400;
+  line-height: 1.4;
 }
 
 .controlWrap {
