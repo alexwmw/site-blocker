@@ -296,6 +296,25 @@
   font-weight: 600;
 }
 
+.popularSitesPrimaryAction {
+  min-width: 150px;
+  box-shadow: 0 10px 24px rgb(59 130 246 / 0.18);
+}
+
+.popularSitesPrimaryAction:disabled {
+  box-shadow: none;
+}
+
+.popularSitesCategoryButtonContent {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.popularSitesCategoryButtonIcon {
+  flex-shrink: 0;
+}
+
 .popularSitesGrid {
   list-style: none;
   margin: 18px 0 0;
@@ -307,6 +326,16 @@
 
 .popularSiteCard {
   height: 100%;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.popularSiteCardSelected {
+  border-color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 10%, transparent);
+  box-shadow: 0 10px 24px rgb(59 130 246 / 0.12);
 }
 
 .popularSiteCheckboxLabel {
@@ -353,7 +382,8 @@
 }
 
 .popularSiteStatusBadge,
-.popularSiteStatusBadgeMuted {
+.popularSiteStatusBadgeMuted,
+.popularSiteStatusBadgeSelected {
   display: inline-flex;
   align-items: center;
   min-height: 28px;
@@ -366,6 +396,11 @@
 .popularSiteStatusBadge {
   background: var(--color-bg-muted);
   color: var(--color-accent-strong);
+}
+
+.popularSiteStatusBadgeSelected {
+  background: var(--color-accent);
+  color: var(--color-text-inverse);
 }
 
 .popularSiteStatusBadgeMuted {

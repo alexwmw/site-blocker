@@ -34,15 +34,18 @@ const existingRules: BlockRule[] = [
 describe('PopularSites', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    createUniqueIdMock.mockReset();
     createUniqueIdMock
       .mockReturnValueOnce('rule-1')
       .mockReturnValueOnce('rule-2')
       .mockReturnValueOnce('rule-3')
-      .mockReturnValueOnce('rule-4');
+      .mockReturnValueOnce('rule-4')
+      .mockReturnValueOnce('rule-5')
+      .mockReturnValueOnce('rule-6');
   });
 
-  it('filters the curated list and shows already-added sites as unavailable', () => {
-    render(
+  it('filters the curated list, shows category buttons with icons, and marks already-added sites as unavailable', () => {
+    const { container } = render(
       <PopularSites
         addRule={addRule}
         blockRules={existingRules}
@@ -53,13 +56,63 @@ describe('PopularSites', () => {
 
     expect(screen.getByText('Already added')).not.toBeNull();
     expect(screen.getByRole('checkbox', { name: /youtube/i }).hasAttribute('disabled')).toBe(true);
+    expect(screen.getByRole('button', { name: /shopping/i }).querySelector('svg')).not.toBeNull();
+
+    fireEvent.click(screen.getByRole('button', { name: /shopping/i }));
+    expect(screen.getByText('Amazon')).not.toBeNull();
+    expect(screen.queryByText('Netflix')).toBeNull();
+
+    fireEvent.click(screen.getByRole('button', { name: /^all$/i }));
 
     fireEvent.change(screen.getByPlaceholderText('Search by site or domain'), {
       target: { value: 'reddit' },
     });
 
     expect(screen.getByText('Reddit')).not.toBeNull();
-    expect(screen.queryByText('Netflix')).toBeNull();
+    expect(screen.queryByText('Amazon')).toBeNull();
+    expect(container.querySelector('.popular-sites')).not.toBeNull();
+  });
+
+  it('highlights selected items and adds regional domain patterns for sites like Amazon', async () => {
+    render(
+      <PopularSites
+        addRule={addRule}
+        blockRules={[]}
+        className='popular-sites'
+        removeRule={removeRule}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole('checkbox', { name: /amazon/i }));
+
+    expect(screen.getByText('Selected')).not.toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Add 1 site' }));
+
+    await waitFor(() => {
+      expect(addRule).toHaveBeenCalledTimes(5);
+    });
+
+    expect(addRule).toHaveBeenNthCalledWith(
+      1,
+      expect.objectContaining({ id: 'rule-1', pattern: 'amazon.com', matchType: 'prefix' }),
+    );
+    expect(addRule).toHaveBeenNthCalledWith(
+      2,
+      expect.objectContaining({ id: 'rule-2', pattern: 'amazon.co.uk', matchType: 'prefix' }),
+    );
+    expect(addRule).toHaveBeenNthCalledWith(
+      3,
+      expect.objectContaining({ id: 'rule-3', pattern: 'amazon.de', matchType: 'prefix' }),
+    );
+    expect(addRule).toHaveBeenNthCalledWith(
+      4,
+      expect.objectContaining({ id: 'rule-4', pattern: 'amazon.ca', matchType: 'prefix' }),
+    );
+    expect(addRule).toHaveBeenNthCalledWith(
+      5,
+      expect.objectContaining({ id: 'rule-5', pattern: 'amazon.com.au', matchType: 'prefix' }),
+    );
+    expect(screen.getByText('Added Amazon to your blocklist.')).not.toBeNull();
   });
 
   it('adds selected sites and supports undoing the latest batch', async () => {

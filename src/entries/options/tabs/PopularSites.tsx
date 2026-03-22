@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import { useMemo, useState } from 'react';
 
 import styles from '../OptionsApp.module.css';
@@ -6,10 +7,10 @@ import OptionsTab from '../OptionsTab';
 import PopularSiteIcon from '@/components/popular-sites/PopularSiteIcon';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
-import { POPULAR_SITE_CATEGORY_LABELS, POPULAR_SITES } from '@/data/popularSites';
+import { POPULAR_SITE_CATEGORIES, POPULAR_SITE_CATEGORY_LABELS, POPULAR_SITES } from '@/data/popularSites';
 import { RulesService } from '@/services/RulesService';
 import type { AddRuleResult } from '@/services/StorageService';
-import type { BlockRule, PopularSite, PopularSiteCategory } from '@/types/schema';
+import type { BlockRule, PopularSite, PopularSiteCategory, PopularSiteIcon as PopularSiteIconToken } from '@/types/schema';
 import { createUniqueId } from '@/utils/createUniqueId';
 
 type PopularSitesProps = {
@@ -25,6 +26,7 @@ type LastAddAction = {
 };
 
 const ALL_CATEGORIES = 'all';
+const ALL_CATEGORY_ICON: PopularSiteIconToken = 'sparkles';
 
 type CategoryFilter = PopularSiteCategory | typeof ALL_CATEGORIES;
 
@@ -181,12 +183,9 @@ const PopularSites = ({ addRule, blockRules, className, removeRule }: PopularSit
     }
   };
 
-  const categoryButtons: ReadonlyArray<{ id: CategoryFilter; label: string }> = [
-    { id: ALL_CATEGORIES, label: 'All' },
-    ...Object.entries(POPULAR_SITE_CATEGORY_LABELS).map(([id, label]) => ({
-      id: id as PopularSiteCategory,
-      label,
-    })),
+  const categoryButtons: ReadonlyArray<{ id: CategoryFilter; icon: PopularSiteIconToken; label: string }> = [
+    { id: ALL_CATEGORIES, label: 'All', icon: ALL_CATEGORY_ICON },
+    ...POPULAR_SITE_CATEGORIES,
   ];
 
   return (
@@ -198,8 +197,8 @@ const PopularSites = ({ addRule, blockRules, className, removeRule }: PopularSit
         <div className={styles.popularSitesIntroCopy}>
           <p className={styles.rulePattern}>Curated site shortcuts</p>
           <p className={styles.subtle}>
-            Quickly add common distractions to your blocklist. This curated list is shared-friendly so onboarding can
-            reuse the same site metadata later.
+            Quickly add common distractions to your blocklist. Regional domains like Amazon UK can live alongside their
+            main site, so this shared catalog can power onboarding later without reshaping the data.
           </p>
         </div>
         <div className={styles.popularSitesActionRow}>
@@ -218,6 +217,7 @@ const PopularSites = ({ addRule, blockRules, className, removeRule }: PopularSit
             Clear
           </Button>
           <Button
+            className={styles.popularSitesPrimaryAction}
             onClick={() => {
               handleAddSelected().catch(console.error);
             }}
@@ -276,7 +276,13 @@ const PopularSites = ({ addRule, blockRules, className, removeRule }: PopularSit
                   setActiveCategory(category.id);
                 }}
               >
-                {category.label}
+                <span className={styles.popularSitesCategoryButtonContent}>
+                  <PopularSiteIcon
+                    icon={category.icon}
+                    className={styles.popularSitesCategoryButtonIcon}
+                  />
+                  <span>{category.label}</span>
+                </span>
               </Button>
             ))}
           </div>
@@ -295,7 +301,7 @@ const PopularSites = ({ addRule, blockRules, className, removeRule }: PopularSit
 
             return (
               <li key={site.id}>
-                <Card className={styles.popularSiteCard}>
+                <Card className={clsx(styles.popularSiteCard, isSelected && styles.popularSiteCardSelected)}>
                   <label className={styles.popularSiteCheckboxLabel}>
                     <input
                       type='checkbox'
@@ -316,11 +322,19 @@ const PopularSites = ({ addRule, blockRules, className, removeRule }: PopularSit
                             <p className={styles.ruleMeta}>{site.categoryLabel}</p>
                           </div>
                         </div>
-                        <span className={site.isFullyBlocked ? styles.popularSiteStatusBadgeMuted : styles.popularSiteStatusBadge}>
-                          {site.isFullyBlocked ? 'Already added' : `${site.missingPatterns.length} rule${site.missingPatterns.length === 1 ? '' : 's'} ready`}
+                        <span
+                          className={clsx(
+                            site.isFullyBlocked
+                              ? styles.popularSiteStatusBadgeMuted
+                              : isSelected
+                                ? styles.popularSiteStatusBadgeSelected
+                                : styles.popularSiteStatusBadge,
+                          )}
+                        >
+                          {site.isFullyBlocked ? 'Already added' : isSelected ? 'Selected' : 'Ready to add'}
                         </span>
                       </div>
-                      <p className={styles.ruleMeta}>Will add: {site.domainPatterns.join(', ')}</p>
+                      <p className={styles.ruleMeta}>{site.domainPatterns.join(' • ')}</p>
                     </div>
                   </label>
                 </Card>

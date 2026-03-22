@@ -1,13 +1,26 @@
-import { popularSitesCatalogSchema, type PopularSiteCategory, type PopularSitesCatalog } from '@/types/schema';
+import {
+  popularSitesCatalogSchema,
+  type PopularSiteCategory,
+  type PopularSiteIcon,
+  type PopularSitesCatalog,
+} from '@/types/schema';
 
-export const POPULAR_SITE_CATEGORY_LABELS: Readonly<Record<PopularSiteCategory, string>> = {
-  social: 'Social',
-  video: 'Video',
-  news: 'News',
-  shopping: 'Shopping',
-  community: 'Community',
-  gaming: 'Gaming',
-};
+export const POPULAR_SITE_CATEGORIES: ReadonlyArray<{
+  id: PopularSiteCategory;
+  icon: PopularSiteIcon;
+  label: string;
+}> = [
+  { id: 'social', label: 'Social', icon: 'users' },
+  { id: 'video', label: 'Video', icon: 'play' },
+  { id: 'news', label: 'News', icon: 'newspaper' },
+  { id: 'shopping', label: 'Shopping', icon: 'shopping-bag' },
+  { id: 'community', label: 'Community', icon: 'messages' },
+  { id: 'gaming', label: 'Gaming', icon: 'gamepad' },
+] as const;
+
+export const POPULAR_SITE_CATEGORY_LABELS: Readonly<Record<PopularSiteCategory, string>> = Object.fromEntries(
+  POPULAR_SITE_CATEGORIES.map((category) => [category.id, category.label]),
+) as Readonly<Record<PopularSiteCategory, string>>;
 
 const curatedPopularSites = [
   {
@@ -30,6 +43,27 @@ const curatedPopularSites = [
     displayName: 'TikTok',
     domainPatterns: ['tiktok.com'],
     icon: 'music',
+  },
+  {
+    id: 'disney-plus',
+    category: 'video',
+    displayName: 'Disney+',
+    domainPatterns: ['disneyplus.com'],
+    icon: 'tv',
+  },
+  {
+    id: 'bbc-iplayer',
+    category: 'video',
+    displayName: 'BBC iPlayer',
+    domainPatterns: ['bbc.co.uk/iplayer', 'bbc.com/iplayer'],
+    icon: 'tv',
+  },
+  {
+    id: 'itvx',
+    category: 'video',
+    displayName: 'ITVX',
+    domainPatterns: ['itv.com/watch'],
+    icon: 'tv',
   },
   {
     id: 'instagram',
@@ -88,10 +122,31 @@ const curatedPopularSites = [
     icon: 'briefcase',
   },
   {
+    id: 'discord',
+    category: 'community',
+    displayName: 'Discord',
+    domainPatterns: ['discord.com', 'discord.gg'],
+    icon: 'messages',
+  },
+  {
+    id: 'threads',
+    category: 'social',
+    displayName: 'Threads',
+    domainPatterns: ['threads.net'],
+    icon: 'messages',
+  },
+  {
     id: 'amazon',
     category: 'shopping',
     displayName: 'Amazon',
-    domainPatterns: ['amazon.com'],
+    domainPatterns: ['amazon.com', 'amazon.co.uk', 'amazon.de', 'amazon.ca', 'amazon.com.au'],
+    icon: 'shopping-bag',
+  },
+  {
+    id: 'ebay',
+    category: 'shopping',
+    displayName: 'eBay',
+    domainPatterns: ['ebay.com', 'ebay.co.uk'],
     icon: 'shopping-bag',
   },
   {
@@ -99,6 +154,34 @@ const curatedPopularSites = [
     category: 'shopping',
     displayName: 'Etsy',
     domainPatterns: ['etsy.com'],
+    icon: 'shopping-bag',
+  },
+  {
+    id: 'asos',
+    category: 'shopping',
+    displayName: 'ASOS',
+    domainPatterns: ['asos.com'],
+    icon: 'shopping-bag',
+  },
+  {
+    id: 'argos',
+    category: 'shopping',
+    displayName: 'Argos',
+    domainPatterns: ['argos.co.uk'],
+    icon: 'shopping-bag',
+  },
+  {
+    id: 'john-lewis',
+    category: 'shopping',
+    displayName: 'John Lewis',
+    domainPatterns: ['johnlewis.com'],
+    icon: 'shopping-bag',
+  },
+  {
+    id: 'tesco',
+    category: 'shopping',
+    displayName: 'Tesco',
+    domainPatterns: ['tesco.com'],
     icon: 'shopping-bag',
   },
   {
@@ -123,6 +206,27 @@ const curatedPopularSites = [
     icon: 'newspaper',
   },
   {
+    id: 'bbc-news',
+    category: 'news',
+    displayName: 'BBC News',
+    domainPatterns: ['bbc.com/news', 'bbc.co.uk/news'],
+    icon: 'newspaper',
+  },
+  {
+    id: 'guardian',
+    category: 'news',
+    displayName: 'The Guardian',
+    domainPatterns: ['theguardian.com'],
+    icon: 'newspaper',
+  },
+  {
+    id: 'daily-mail',
+    category: 'news',
+    displayName: 'Daily Mail',
+    domainPatterns: ['dailymail.co.uk'],
+    icon: 'newspaper',
+  },
+  {
     id: 'twitch',
     category: 'gaming',
     displayName: 'Twitch',
@@ -135,6 +239,20 @@ const curatedPopularSites = [
     displayName: 'Steam Community',
     domainPatterns: ['steamcommunity.com'],
     icon: 'gamepad',
+  },
+  {
+    id: 'ign',
+    category: 'gaming',
+    displayName: 'IGN',
+    domainPatterns: ['ign.com'],
+    icon: 'gamepad',
+  },
+  {
+    id: 'imdb',
+    category: 'community',
+    displayName: 'IMDb',
+    domainPatterns: ['imdb.com'],
+    icon: 'sparkles',
   },
 ] satisfies PopularSitesCatalog;
 
