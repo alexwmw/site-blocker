@@ -1,13 +1,13 @@
 import type { MouseEventHandler } from 'react';
 import { useState } from 'react';
 
-import styles from '../OptionsApp.module.css';
+import styles from '../../OptionsApp.module.css';
 import OptionsTab from '../OptionsTab';
 
-import Button from '@/components/ui/Button';
-import Card from '@/components/ui/Card';
-import StatusItem from '@/components/ui/StatusItem';
-import Switch from '@/components/ui/Switch';
+import Button from '@/components/primitives/Button';
+import Card from '@/components/primitives/Card';
+import Switch from '@/components/primitives/Switch';
+import StatusItem from '@/components/shared/StatusItem';
 import type { BlockRule, Schedule } from '@/types/schema';
 
 type RulesProps = {

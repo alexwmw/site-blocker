@@ -1,6 +1,6 @@
 import type { ChangeEvent } from 'react';
 
-import Button from '@/components/ui/Button';
+import Button from '@/components/primitives/Button';
 import styles from '@/entries/options/OptionsApp.module.css';
 import type { ScheduleDays, ScheduleWindow } from '@/types/schema';
 

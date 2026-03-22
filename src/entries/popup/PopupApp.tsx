@@ -2,12 +2,12 @@ import { useEffect, useMemo, useState } from 'react';
 
 import styles from './PopupApp.module.css';
 
-import Button from '@/components/ui/Button';
-import Card from '@/components/ui/Card';
-import EyebrowLabel from '@/components/ui/EyebrowLabel';
-import RenderBoundary from '@/components/ui/RenderBoundary';
-import SectionHeader from '@/components/ui/SectionHeader';
-import StatusItem from '@/components/ui/StatusItem';
+import Button from '@/components/primitives/Button';
+import Card from '@/components/primitives/Card';
+import EyebrowLabel from '@/components/shared/EyebrowLabel';
+import RenderBoundary from '@/components/shared/RenderBoundary';
+import SectionHeader from '@/components/shared/SectionHeader';
+import StatusItem from '@/components/shared/StatusItem';
 import useBlockRules from '@/hooks/useBlockRules';
 import useCreateRuleFromTab from '@/hooks/useCreateRuleFromTab';
 import useSettings from '@/hooks/useSettings';

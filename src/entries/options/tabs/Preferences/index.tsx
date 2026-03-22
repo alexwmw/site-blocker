@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 
-import styles from '../OptionsApp.module.css';
+import styles from '../../OptionsApp.module.css';
 import OptionsTab from '../OptionsTab';
 
-import Button from '@/components/ui/Button';
-import Card from '@/components/ui/Card';
-import SectionHeader from '@/components/ui/SectionHeader';
-import Switch from '@/components/ui/Switch';
+import Button from '@/components/primitives/Button';
+import Card from '@/components/primitives/Card';
+import Switch from '@/components/primitives/Switch';
+import SectionHeader from '@/components/shared/SectionHeader';
 import { defaultPreferenceSettings } from '@/services/defaultSettings';
 import { type Settings, SETTINGS_LIMITS, type Theme } from '@/types/schema';
 

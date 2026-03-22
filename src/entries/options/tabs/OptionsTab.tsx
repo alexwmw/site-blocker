@@ -1,6 +1,6 @@
 import type { ComponentProps } from 'react';
 
-import SectionHeader from '@/components/ui/SectionHeader';
+import SectionHeader from '@/components/shared/SectionHeader';
 
 const OptionsTab = ({ title, ...props }: { title: string } & ComponentProps<'section'>) => {
   return (

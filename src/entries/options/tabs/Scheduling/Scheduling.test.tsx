@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 
-import Scheduling from './Scheduling';
+import Scheduling from './';
 
 import type { Schedule } from '@/types/schema';
 

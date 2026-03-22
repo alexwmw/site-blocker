@@ -1,10 +1,10 @@
-import styles from '../OptionsApp.module.css';
+import styles from '../../OptionsApp.module.css';
 import OptionsTab from '../OptionsTab';
 
-import Button from '@/components/ui/Button';
-import Card from '@/components/ui/Card';
-import Switch from '@/components/ui/Switch';
-import SchedulingWindow from '@/entries/options/tabs/scheduling/SchedulingWindow';
+import Button from '@/components/primitives/Button';
+import Card from '@/components/primitives/Card';
+import Switch from '@/components/primitives/Switch';
+import SchedulingWindow from '@/entries/options/tabs/Scheduling/SchedulingWindow';
 import type { Schedule, ScheduleWindow } from '@/types/schema';
 
 type SchedulingProps = {

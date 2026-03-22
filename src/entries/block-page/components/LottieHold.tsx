@@ -1,8 +1,8 @@
 import type { LottieRef } from 'lottie-react';
 
-import animationHold from './animationHold.json';
+import animationHold from '../../../assets/lotties/animationHold.json';
 
-import BasicLottie from '@/components/BasicLottie';
+import BasicLottie from '@/components/primitives/BasicLottie';
 
 const LottieHold = ({ lottieRef }: { lottieRef: LottieRef }) => {
   return (

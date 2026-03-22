@@ -2,14 +2,14 @@ import type { LottieRefCurrentProps } from 'lottie-react';
 import { useMemo, useRef } from 'react';
 
 import styles from './BlockPageApp.module.css';
-import BlockPageButton from './BlockPageButton';
-import useBlockPageParams from './useBlockPageParams';
-import useButtonEvents from './useButtonEvents';
-import useNavigateOnUnblock from './useNavigateOnUnblock';
+import BlockPageButton from './components/BlockPageButton';
+import useBlockPageParams from './hooks/useBlockPageParams';
+import useButtonEvents from './hooks/useButtonEvents';
+import useNavigateOnUnblock from './hooks/useNavigateOnUnblock';
 
-import BackgroundCredit from '@/components/ui/BackgroundCredit';
-import Card from '@/components/ui/Card';
-import EyebrowLabel from '@/components/ui/EyebrowLabel';
+import Card from '@/components/primitives/Card';
+import EyebrowLabel from '@/components/shared/EyebrowLabel';
+import BackgroundCredit from '@/entries/block-page/components/BackgroundCredit';
 import useSettings from '@/hooks/useSettings';
 import useThemeEffect from '@/hooks/useThemeEffect';
 

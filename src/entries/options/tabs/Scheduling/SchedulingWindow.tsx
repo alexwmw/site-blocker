@@ -1,9 +1,9 @@
 import clsx from 'clsx';
 
-import Button from '@/components/ui/Button';
-import Card from '@/components/ui/Card';
+import Button from '@/components/primitives/Button';
+import Card from '@/components/primitives/Card';
 import styles from '@/entries/options/OptionsApp.module.css';
-import { SchedulingDays, SchedulingDaysPresetButtons } from '@/entries/options/tabs/scheduling/SchedulingDays';
+import { SchedulingDays, SchedulingDaysPresetButtons } from '@/entries/options/tabs/Scheduling/SchedulingDays';
 import type { ScheduleWindow } from '@/types/schema';
 
 type SchedulingWindowProps = {

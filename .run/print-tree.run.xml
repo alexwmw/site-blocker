@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="print-tree" type="ShConfigurationType">
-    <option name="SCRIPT_TEXT" value="find . -maxdepth 3 -not -path '*/.*' -not -path './node_modules*' -not -path './dist*' " />
+    <option name="SCRIPT_TEXT" value="find . -maxdepth 5 -not -path '*/.*' -not -path './node_modules*' -not -path './dist*' " />
     <option name="INDEPENDENT_SCRIPT_PATH" value="true" />
     <option name="SCRIPT_PATH" value="" />
     <option name="SCRIPT_OPTIONS" value="" />
