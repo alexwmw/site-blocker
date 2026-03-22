@@ -12,20 +12,27 @@ type SwitchProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> & {
 };
 
 const Switch = ({ label, fieldHint, className, reverse, id: switchId, ...rest }: SwitchProps) => {
+  const hintId = fieldHint ? `${switchId}-hint` : undefined;
+
   return (
-    <label
-      htmlFor={switchId}
-      className={clsx(styles.switchLabel, reverse && styles.reverse, className)}
-    >
+    <div className={clsx(styles.switchLabel, reverse && styles.reverse, className)}>
       <span className={styles.textGroup}>
-        <span>{label}</span>
-        {fieldHint ? <span className={styles.fieldHint}>{fieldHint}</span> : null}
+        <label htmlFor={switchId}>{label}</label>
+        {fieldHint ? (
+          <span
+            id={hintId}
+            className={styles.fieldHint}
+          >
+            {fieldHint}
+          </span>
+        ) : null}
       </span>
       <span className={styles.controlWrap}>
         <input
           id={switchId}
           className={styles.input}
           type='checkbox'
+          aria-describedby={hintId}
           {...rest}
         />
         <span
@@ -33,7 +40,7 @@ const Switch = ({ label, fieldHint, className, reverse, id: switchId, ...rest }:
           aria-hidden='true'
         />
       </span>
-    </label>
+    </div>
   );
 };
 

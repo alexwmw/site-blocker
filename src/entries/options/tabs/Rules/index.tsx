@@ -110,22 +110,24 @@ const Rules = ({ blockRules, className, onClickEditSchedule, removeRule, schedul
           <Button onClick={onClickEditSchedule}>Edit schedule</Button>
         </div>
       ) : null}
-      <Stack
-        gap='small'
-        asList
-      >
-        {blockRules === null ? null : !blockRules.length ? (
-          <Card
-            as='li'
-            className={styles.emptyState}
-          >
-            <p>No rules yet.</p>
-            <Paragraph subtle>Add rules from the popup to start blocking distracting sites.</Paragraph>
-          </Card>
-        ) : (
-          <>{blockRules.map(renderRule)}</>
-        )}
-      </Stack>
+      {blockRules === null ? null : (
+        <Stack
+          gap='small'
+          asList
+        >
+          {!blockRules.length ? (
+            <Card
+              as='li'
+              className={styles.emptyState}
+            >
+              <p>No rules yet.</p>
+              <Paragraph subtle>Add rules from the popup to start blocking distracting sites.</Paragraph>
+            </Card>
+          ) : (
+            <>{blockRules.map(renderRule)}</>
+          )}
+        </Stack>
+      )}
     </OptionsTab>
   );
 };

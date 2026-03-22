@@ -50,12 +50,16 @@ const Setting = (props: SettingProps) => {
 
       {props.as === 'select' ? (
         <Select {...props} />
-      ) : (
-        <input
-          className={styles.settingsInput}
-          {...props}
-        />
-      )}
+      ) : (() => {
+          const { as: _as, options: _options, className: _className, label: _label, fieldHint: _fieldHint, ...inputProps } = props;
+
+          return (
+            <input
+              className={styles.settingsInput}
+              {...inputProps}
+            />
+          );
+        })()}
 
       {fieldHint ? <span className={styles.settingsFieldHint}>{fieldHint}</span> : null}
     </label>
