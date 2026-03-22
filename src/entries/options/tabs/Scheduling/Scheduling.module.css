@@ -1,0 +1,80 @@
+.scheduleHeadingRow {
+  margin: 20px 0 10px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: end;
+}
+
+.scheduleWindowCard {
+  align-items: start;
+}
+
+.scheduleSettings {
+  > * {
+    justify-content: start;
+  }
+}
+
+.scheduleWindowSettingsGrid {
+  display: grid;
+  gap: 14px;
+  grid-template-areas:
+    'header header'
+    'days   days'
+    'start  end ';
+}
+
+.scheduleWindowHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: start;
+  grid-area: header;
+}
+
+.scheduleWindowDays {
+  grid-area: days;
+  display: grid;
+  gap: 10px;
+}
+
+.scheduleWindowStart {
+  grid-area: start;
+}
+
+.scheduleWindowEnd {
+  grid-area: end;
+}
+
+.scheduleWindowHeader p {
+  margin: 4px 0 0;
+}
+
+.scheduleWindowListButtonRow {
+  margin: 12px 0 0;
+  display: flex;
+  justify-content: end;
+}
+
+/*SchedulingDays*/
+.dayGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.dayChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.presetRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}

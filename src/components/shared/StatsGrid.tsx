@@ -1,6 +1,6 @@
 import styles from './StatsGrid.module.css';
 
-import Card from '@/components/ui/Card';
+import Card from '@/components/primitives/Card';
 
 type Stats = {
   [label: string]: number;

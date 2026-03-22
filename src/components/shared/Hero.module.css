@@ -1,0 +1,11 @@
+.hero {
+  margin-bottom: 4px;
+}
+
+.heroTitle {
+  margin: 6px 0 0;
+}
+
+.compact .heroTitle {
+  font-size: 1.2rem;
+}

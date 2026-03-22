@@ -1,13 +1,16 @@
 import type { MouseEventHandler } from 'react';
 import { useState } from 'react';
 
-import styles from '../OptionsApp.module.css';
 import OptionsTab from '../OptionsTab';
 
-import Button from '@/components/ui/Button';
-import Card from '@/components/ui/Card';
-import StatusItem from '@/components/ui/StatusItem';
-import Switch from '@/components/ui/Switch';
+import styles from './Rules.module.css';
+
+import Button from '@/components/primitives/Button';
+import Card from '@/components/primitives/Card';
+import Paragraph from '@/components/primitives/Paragraph';
+import Stack from '@/components/primitives/Stack';
+import Switch from '@/components/primitives/Switch';
+import StatusItem from '@/components/shared/StatusItem';
 import type { BlockRule, Schedule } from '@/types/schema';
 
 type RulesProps = {
@@ -27,6 +30,7 @@ const readableDate = (dateIso: string) => {
 const Rules = ({ blockRules, className, onClickEditSchedule, removeRule, schedule, updateRule }: RulesProps) => {
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const [pendingMatchTypeRuleId, setPendingMatchTypeRuleId] = useState<string | null>(null);
+  const emptyRuleList = blockRules !== null && blockRules.length === 0;
 
   const handleRemove = async (ruleId: string) => {
     setPendingDeleteId(ruleId);
@@ -67,7 +71,7 @@ const Rules = ({ blockRules, className, onClickEditSchedule, removeRule, schedul
               id={rule.id + '-switch'}
               className={styles.ruleSwitch}
               label='Block subpages'
-              description={rule.matchType === 'prefix' ? 'On · Prefix match' : 'Off · Exact match'}
+              fieldHint={rule.matchType === 'prefix' ? 'On · Prefix match' : 'Off · Exact match'}
               checked={rule.matchType === 'prefix'}
               disabled={pendingMatchTypeRuleId === rule.id}
               onChange={(event) => {
@@ -75,15 +79,18 @@ const Rules = ({ blockRules, className, onClickEditSchedule, removeRule, schedul
               }}
             />
           </div>
-          <button
-            className={styles.dangerButton}
-            onClick={() => {
-              handleRemove(rule.id).catch(console.error);
-            }}
-            disabled={pendingDeleteId === rule.id}
-          >
-            {pendingDeleteId === rule.id ? 'Removing…' : 'Remove'}
-          </button>
+          <div>
+            <Button
+              variant='danger'
+              className={styles.dangerButton}
+              onClick={() => {
+                handleRemove(rule.id).catch(console.error);
+              }}
+              disabled={pendingDeleteId === rule.id}
+            >
+              {pendingDeleteId === rule.id ? 'Removing…' : 'Remove'}
+            </Button>
+          </div>
         </Card>
       </li>
     );
@@ -95,7 +102,7 @@ const Rules = ({ blockRules, className, onClickEditSchedule, removeRule, schedul
       className={className}
     >
       {schedule?.enabled ? (
-        <div className={styles.statusGrid}>
+        <div className={styles.ruleScheduleStatusRow}>
           <StatusItem
             label='Scheduling is:'
             value='On'
@@ -104,14 +111,19 @@ const Rules = ({ blockRules, className, onClickEditSchedule, removeRule, schedul
           <Button onClick={onClickEditSchedule}>Edit schedule</Button>
         </div>
       ) : null}
-      {blockRules === null ? null : !blockRules.length ? (
+      {emptyRuleList ? (
         <Card className={styles.emptyState}>
           <p>No rules yet.</p>
-          <p className={styles.subtle}>Add rules from the popup to start blocking distracting sites.</p>
+          <Paragraph subtle>Add rules from the popup to start blocking distracting sites.</Paragraph>
         </Card>
-      ) : (
-        <ul className={styles.rulesList}>{blockRules.map(renderRule)}</ul>
-      )}
+      ) : blockRules ? (
+        <Stack
+          gap='small'
+          asList
+        >
+          {blockRules.map(renderRule)}
+        </Stack>
+      ) : null}
     </OptionsTab>
   );
 };

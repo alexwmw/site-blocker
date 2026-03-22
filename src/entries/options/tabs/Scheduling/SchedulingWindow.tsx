@@ -1,9 +1,12 @@
 import clsx from 'clsx';
 
-import Button from '@/components/ui/Button';
-import Card from '@/components/ui/Card';
-import styles from '@/entries/options/OptionsApp.module.css';
-import { SchedulingDays, SchedulingDaysPresetButtons } from '@/entries/options/tabs/scheduling/SchedulingDays';
+import styles from './Scheduling.module.css';
+
+import Button from '@/components/primitives/Button';
+import Card from '@/components/primitives/Card';
+import Paragraph from '@/components/primitives/Paragraph';
+import Setting from '@/components/primitives/Setting';
+import { SchedulingDays, SchedulingDaysPresetButtons } from '@/entries/options/tabs/Scheduling/SchedulingDays';
 import type { ScheduleWindow } from '@/types/schema';
 
 type SchedulingWindowProps = {
@@ -23,7 +26,7 @@ const SchedulingWindow = ({ window, windowIndex, disabled, removeWindow, updateW
       <div className={styles.scheduleWindowHeader}>
         <div>
           <strong>Schedule {windowIndex + 1}</strong>
-          <p className={styles.subtle}>Recurring weekly block</p>
+          <Paragraph subtle>Recurring weekly block</Paragraph>
         </div>
         {window.id !== '_initial' ? (
           <Button
@@ -52,11 +55,10 @@ const SchedulingWindow = ({ window, windowIndex, disabled, removeWindow, updateW
           windowId={window.id}
         />
       </div>
-
-      <label className={clsx(styles.settingsLabel, styles.scheduleWindowStart)}>
-        Start time
-        <input
-          className={styles.settingsInput}
+      <div className={styles.scheduleWindowStart}>
+        <Setting
+          settingId='startTime'
+          label='Start time'
           type='time'
           step={900}
           value={window.start}
@@ -65,12 +67,11 @@ const SchedulingWindow = ({ window, windowIndex, disabled, removeWindow, updateW
             updateWindow({ start: event.target.value }).catch(console.error);
           }}
         />
-      </label>
-
-      <label className={clsx(styles.settingsLabel, styles.scheduleWindowEnd)}>
-        End time
-        <input
-          className={styles.settingsInput}
+      </div>
+      <div className={styles.scheduleWindowEnd}>
+        <Setting
+          settingId='endTime'
+          label='End time'
           type='time'
           step={900}
           value={window.end}
@@ -79,7 +80,7 @@ const SchedulingWindow = ({ window, windowIndex, disabled, removeWindow, updateW
             updateWindow({ end: event.target.value }).catch(console.error);
           }}
         />
-      </label>
+      </div>
     </Card>
   );
 };

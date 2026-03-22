@@ -1,7 +1,8 @@
 import type { ChangeEvent } from 'react';
 
-import Button from '@/components/ui/Button';
-import styles from '@/entries/options/OptionsApp.module.css';
+import styles from './Scheduling.module.css';
+
+import Button from '@/components/primitives/Button';
 import type { ScheduleDays, ScheduleWindow } from '@/types/schema';
 
 const SCHEDULE_DAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as const;

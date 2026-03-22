@@ -32,6 +32,11 @@
   color: var(--color-text-primary);
 }
 
+.danger {
+  background: var(--color-danger);
+  color: var(--color-text-inverse);
+}
+
 .secondary:hover:enabled {
   background: var(--color-bg-input);
 }

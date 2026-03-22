@@ -1,29 +1,37 @@
-.switchLabel {
-  display: flex;
+.switchGrid {
+  display: grid;
+  grid-template-areas: 'label switch' 'hint switch';
+  grid-template-columns: 1fr auto;
+  gap: 8px 12px;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+}
+
+.switchLabel {
+  display: contents;
   font-weight: 600;
   cursor: pointer;
 }
 
-.switchLabel.reverse {
-  flex-direction: row-reverse;
+.switchGrid.reverse {
+  grid-template-areas: 'switch label' 'switch hint';
+  grid-template-columns: auto 1fr;
 }
 
-.switchLabel.compact {
-  justify-content: start;
+/*.switchLabel.compact {*/
+/*  justify-content: start;*/
+/*}*/
+
+.labelText {
+  width: fit-content;
+  grid-area: label;
 }
 
-.textGroup {
-  display: grid;
-  gap: 2px;
-}
-
-.description {
-  font-size: 0.85rem;
-  font-weight: 500;
+.fieldHint {
   color: var(--color-text-secondary);
+  font-size: 0.75rem;
+  font-weight: 400;
+  line-height: 1.4;
+  grid-area: hint;
 }
 
 .controlWrap {
@@ -31,6 +39,7 @@
   display: inline-flex;
   width: 44px;
   height: 24px;
+  grid-area: switch;
 }
 
 .input {

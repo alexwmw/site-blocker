@@ -1,0 +1,26 @@
+.settingsLabel {
+  display: grid;
+  gap: 8px;
+  font-weight: 600;
+  grid-template-rows: auto auto 1fr;
+}
+
+.settingsInput {
+  color: var(--color-text-primary);
+  font: inherit;
+  padding: 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border-strong);
+  background: var(--color-bg-input);
+}
+
+.settingsInput[disabled] {
+  color: var(--color-text-secondary);
+}
+
+.settingsFieldHint {
+  color: var(--color-text-secondary);
+  font-size: 0.75rem;
+  font-weight: 400;
+  line-height: 1.4;
+}

@@ -1,14 +1,15 @@
 import { useMemo, useState } from 'react';
 
+import StatsGrid from '../../components/shared/StatsGrid';
+
 import styles from './OptionsApp.module.css';
-import StatsGrid from './StatsGrid';
 import Preferences from './tabs/Preferences';
 import Rules from './tabs/Rules';
 import Scheduling from './tabs/Scheduling';
 
-import Hero from '@/components/ui/Hero';
-import RenderBoundary from '@/components/ui/RenderBoundary';
-import Tabs, { type TabItem } from '@/components/ui/Tabs';
+import Tabs, { type TabItem } from '@/components/primitives/Tabs';
+import Hero from '@/components/shared/Hero';
+import RenderBoundary from '@/components/shared/RenderBoundary';
 import useBlockRules from '@/hooks/useBlockRules';
 import useSettings from '@/hooks/useSettings';
 import useThemeEffect from '@/hooks/useThemeEffect';

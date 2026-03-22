@@ -1,0 +1,9 @@
+.preferenceCard {
+  display: grid;
+  gap: 16px;
+}
+
+.preferenceActions {
+  display: flex;
+  justify-content: flex-end;
+}

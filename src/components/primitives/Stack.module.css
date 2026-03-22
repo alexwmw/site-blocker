@@ -1,0 +1,42 @@
+.stack {
+  display: grid;
+  gap: 16px;
+}
+
+.x-small-gap {
+  gap: 8px;
+}
+
+.x-small-gap.topMargin {
+  margin-top: 10px;
+}
+
+.small-gap {
+  gap: 12px;
+}
+
+.small-gap.topMargin {
+  margin-top: 12px;
+}
+
+.medium-gap {
+  gap: 16px;
+}
+
+.medium-gap.topMargin {
+  margin-top: 16px;
+}
+
+.large-gap {
+  gap: 22px;
+}
+
+.large-gap.topMargin {
+  margin-top: 22px;
+}
+
+ul.stack {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
