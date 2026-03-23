@@ -7,7 +7,7 @@ const identity = {
   host: 'reddit.com',
   path: '/r/typescript',
   label: 'reddit.com/r/typescript',
-  faviconSrc: 'https://example.com/favicon.ico',
+  faviconSources: ['https://example.com/favicon-primary.ico', 'https://example.com/favicon-secondary.ico'],
 };
 
 describe('SiteIdentity', () => {
@@ -18,13 +18,18 @@ describe('SiteIdentity', () => {
     expect(screen.getByText('/r/typescript')).not.toBeNull();
   });
 
-  it('falls back to the generic icon when the favicon fails to load', () => {
+  it('tries the next favicon source before falling back to the generic icon', () => {
     const { container } = render(<SiteIdentity identity={identity} />);
 
-    const image = container.querySelector('img');
-    expect(image).toBeTruthy();
+    const firstImage = container.querySelector('img');
+    expect(firstImage?.getAttribute('src')).toBe('https://example.com/favicon-primary.ico');
 
-    fireEvent.error(image!);
+    fireEvent.error(firstImage!);
+
+    const secondImage = container.querySelector('img');
+    expect(secondImage?.getAttribute('src')).toBe('https://example.com/favicon-secondary.ico');
+
+    fireEvent.error(secondImage!);
 
     expect(container.querySelector('img')).toBeNull();
     expect(screen.getByLabelText('reddit.com/r/typescript')).not.toBeNull();
@@ -37,7 +42,7 @@ describe('SiteIdentity', () => {
           host: null,
           path: '',
           label: 'Unknown site',
-          faviconSrc: null,
+          faviconSources: [],
         }}
       />,
     );

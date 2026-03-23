@@ -13,13 +13,14 @@ type SiteIdentityProps = {
 };
 
 const SiteIdentity = ({ className, identity, size = 'medium' }: SiteIdentityProps) => {
-  const [iconFailed, setIconFailed] = useState(false);
+  const [iconIndex, setIconIndex] = useState(0);
 
   const labelId = useMemo(() => {
     return identity.path ? `${identity.host ?? 'unknown'}${identity.path}` : (identity.host ?? identity.label);
   }, [identity.host, identity.label, identity.path]);
 
-  const showFallback = iconFailed || !identity.faviconSrc;
+  const faviconSrc = identity.faviconSources[iconIndex] ?? null;
+  const showFallback = !faviconSrc;
 
   return (
     <div
@@ -37,11 +38,11 @@ const SiteIdentity = ({ className, identity, size = 'medium' }: SiteIdentityProp
         ) : (
           <img
             className={styles.icon}
-            src={identity.faviconSrc ?? undefined}
+            src={faviconSrc}
             alt=''
             aria-hidden='true'
             onError={() => {
-              setIconFailed(true);
+              setIconIndex((currentIndex) => currentIndex + 1);
             }}
           />
         )}

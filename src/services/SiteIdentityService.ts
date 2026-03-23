@@ -3,7 +3,7 @@ import { RulesService } from './RulesService';
 import type { BlockRule } from '@/types/schema';
 
 export type SiteIdentityModel = {
-  faviconSrc: string | null;
+  faviconSources: string[];
   host: string | null;
   label: string;
   path: string;
@@ -13,10 +13,15 @@ type FaviconMode = 'host' | 'page';
 
 type IdentityOptions = {
   faviconMode?: FaviconMode;
+  preferredFaviconUrl?: string | null;
 };
 
 export class SiteIdentityService {
-  private static buildFaviconSrc(pageUrl: string | null): string | null {
+  private static dedupe(values: Array<string | null | undefined>): string[] {
+    return [...new Set(values.filter((value): value is string => Boolean(value)))];
+  }
+
+  private static buildChromeFaviconSrc(pageUrl: string | null): string | null {
     if (!pageUrl) {
       return null;
     }
@@ -27,6 +32,14 @@ export class SiteIdentityService {
     faviconUrl.searchParams.set('pageUrl', pageUrl);
     faviconUrl.searchParams.set('size', '32');
     return faviconUrl.toString();
+  }
+
+  private static buildDirectFaviconSrc(host: string | null): string | null {
+    if (!host) {
+      return null;
+    }
+
+    return `https://${host}/favicon.ico`;
   }
 
   private static buildPageUrl(host: string | null, path: string, faviconMode: FaviconMode): string | null {
@@ -44,13 +57,18 @@ export class SiteIdentityService {
   ): SiteIdentityModel {
     const safePath = path && path !== '/' ? path : '';
     const faviconMode = options?.faviconMode ?? 'host';
+    const pageUrl = this.buildPageUrl(host, safePath, faviconMode);
     const label = host ? `${host}${safePath}` : 'Unknown site';
 
     return {
       host,
       path: safePath,
       label,
-      faviconSrc: this.buildFaviconSrc(this.buildPageUrl(host, safePath, faviconMode)),
+      faviconSources: this.dedupe([
+        options?.preferredFaviconUrl,
+        this.buildChromeFaviconSrc(pageUrl),
+        this.buildDirectFaviconSrc(host),
+      ]),
     };
   }
 
@@ -65,7 +83,7 @@ export class SiteIdentityService {
         host: null,
         path: '',
         label: targetUrl ?? 'Unknown site',
-        faviconSrc: null,
+        faviconSources: this.dedupe([options?.preferredFaviconUrl]),
       };
     }
 
@@ -75,7 +93,7 @@ export class SiteIdentityService {
         host: null,
         path: '',
         label: targetUrl,
-        faviconSrc: null,
+        faviconSources: this.dedupe([options?.preferredFaviconUrl]),
       };
     }
 

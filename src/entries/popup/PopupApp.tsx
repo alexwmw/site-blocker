@@ -137,7 +137,9 @@ const PopupApp = () => {
         {!isExtensionPageUrl ? (
           <div className={styles.activePageIdentity}>
             <SiteIdentity
-              identity={SiteIdentityService.fromUrl(activeTab?.url)}
+              identity={SiteIdentityService.fromUrl(activeTab?.url, {
+                preferredFaviconUrl: activeTab?.favIconUrl ?? null,
+              })}
               size='small'
             />
           </div>
