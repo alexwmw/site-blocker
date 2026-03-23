@@ -9,9 +9,11 @@ import useNavigateOnUnblock from './hooks/useNavigateOnUnblock';
 
 import Card from '@/components/primitives/Card';
 import EyebrowLabel from '@/components/shared/EyebrowLabel';
+import SiteIdentity from '@/components/shared/SiteIdentity';
 import BackgroundCredit from '@/entries/block-page/components/BackgroundCredit';
 import useSettings from '@/hooks/useSettings';
 import useThemeEffect from '@/hooks/useThemeEffect';
+import { SiteIdentityService } from '@/services/SiteIdentityService';
 
 const BlockPageApp = () => {
   const theme = useThemeEffect();
@@ -25,16 +27,11 @@ const BlockPageApp = () => {
   /** Executes window.location.replace on hold completion */
   useNavigateOnUnblock(ruleIds, targetUrl, holdIsComplete);
 
-  const urlLabel = useMemo(() => {
-    if (!targetUrl) {
-      return 'Unknown target';
-    }
-    try {
-      return new URL(targetUrl).hostname;
-    } catch {
-      return targetUrl;
-    }
-  }, [targetUrl]);
+  const targetIdentity = useMemo(() => SiteIdentityService.fromUrl(targetUrl, { faviconMode: 'page' }), [targetUrl]);
+  const ruleIdentity = useMemo(
+    () => SiteIdentityService.fromHostAndPath(patternHost, patternPath),
+    [patternHost, patternPath],
+  );
 
   return (
     <main
@@ -47,9 +44,10 @@ const BlockPageApp = () => {
       >
         <EyebrowLabel>Hold to Unblock</EyebrowLabel>
         <h1 className={styles.title}>{settings?.blockPageHeadline ?? 'Stay on track'}</h1>
-        <p className={styles.subtitle}>
-          You tried to open <strong>{urlLabel}</strong>. This page is blocked by your focus rules.
-        </p>
+        <div className={styles.subtitle}>
+          <SiteIdentity identity={targetIdentity} />
+          <p>This page is blocked by your focus rules.</p>
+        </div>
         <p>
           <strong>If you wish to proceed, hold the button.</strong>
         </p>
@@ -59,12 +57,13 @@ const BlockPageApp = () => {
             <dd className={styles.detailValue}>{matchType ?? 'Not provided'}</dd>
           </div>
           <div className={styles.detailsItem}>
-            <dt className={styles.detailTerm}>Rule host</dt>
-            <dd className={styles.detailValue}>{patternHost ?? 'Not provided'}</dd>
-          </div>
-          <div className={styles.detailsItem}>
-            <dt className={styles.detailTerm}>Rule path</dt>
-            <dd className={styles.detailValue}>{patternPath ?? 'Not provided'}</dd>
+            <dt className={styles.detailTerm}>Matched rule</dt>
+            <dd className={styles.detailValue}>
+              <SiteIdentity
+                identity={ruleIdentity}
+                size='small'
+              />
+            </dd>
           </div>
         </dl>
 

@@ -10,7 +10,9 @@ import Card from '@/components/primitives/Card';
 import Paragraph from '@/components/primitives/Paragraph';
 import Stack from '@/components/primitives/Stack';
 import Switch from '@/components/primitives/Switch';
+import SiteIdentity from '@/components/shared/SiteIdentity';
 import StatusItem from '@/components/shared/StatusItem';
+import { SiteIdentityService } from '@/services/SiteIdentityService';
 import type { BlockRule, Schedule } from '@/types/schema';
 
 type RulesProps = {
@@ -62,7 +64,10 @@ const Rules = ({ blockRules, className, onClickEditSchedule, removeRule, schedul
       <li key={rule.id}>
         <Card className={styles.ruleCard}>
           <div>
-            <p className={styles.rulePattern}>{rule.pattern}</p>
+            <SiteIdentity
+              identity={SiteIdentityService.fromRule(rule)}
+              size='small'
+            />
             <p className={styles.ruleMeta}>
               Match: <strong>{rule.matchType}</strong> · Added {readableDate(rule.createdAt)}
             </p>

@@ -4,11 +4,11 @@ import styles from './PopupApp.module.css';
 
 import Button from '@/components/primitives/Button';
 import Card from '@/components/primitives/Card';
-import Paragraph from '@/components/primitives/Paragraph';
 import Stack from '@/components/primitives/Stack';
 import Hero from '@/components/shared/Hero';
 import RenderBoundary from '@/components/shared/RenderBoundary';
 import SectionHeader from '@/components/shared/SectionHeader';
+import SiteIdentity from '@/components/shared/SiteIdentity';
 import StatusItem from '@/components/shared/StatusItem';
 import useBlockRules from '@/hooks/useBlockRules';
 import useCreateRuleFromTab from '@/hooks/useCreateRuleFromTab';
@@ -16,6 +16,7 @@ import useSettings from '@/hooks/useSettings';
 import useThemeEffect from '@/hooks/useThemeEffect';
 import { RulesService } from '@/services/RulesService';
 import { SchedulingService } from '@/services/SchedulingService';
+import { SiteIdentityService } from '@/services/SiteIdentityService';
 import { isExtensionUrl } from '@/utils/extensionUrls';
 
 const formatRemainingTime = (milliseconds: number) => {
@@ -133,7 +134,14 @@ const PopupApp = () => {
         data={popupData}
         error={activeTabError ?? blockRulesError ?? settingsError}
       >
-        {!isExtensionPageUrl ? <Paragraph subtle>{activeTab?.url ?? 'No active tab found.'}</Paragraph> : null}
+        {!isExtensionPageUrl ? (
+          <div className={styles.activePageIdentity}>
+            <SiteIdentity
+              identity={SiteIdentityService.fromUrl(activeTab?.url)}
+              size='small'
+            />
+          </div>
+        ) : null}
         <Stack topMargin>
           <Card
             padding
