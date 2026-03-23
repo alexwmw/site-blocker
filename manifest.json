@@ -4,7 +4,12 @@
   "short_name": "Hold",
   "version": "3.0.0",
   "description": "Stay Focused & Mindful of Your Browsing.",
-  "permissions": ["storage", "tabs", "contextMenus"],
+  "permissions": [
+    "storage",
+    "tabs",
+    "contextMenus",
+    "favicon"
+  ],
   "action": {
     "default_popup": "popup.html",
     "default_title": "Time Out: Page Blocker",
@@ -22,12 +27,20 @@
   },
   "web_accessible_resources": [
     {
-      "resources": ["block-page.html"],
-      "matches": ["<all_urls>"]
+      "resources": [
+        "block-page.html"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
     },
     {
-      "resources": ["public/*"],
-      "matches": ["<all_urls>"]
+      "resources": [
+        "public/*"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
     }
   ]
 }
