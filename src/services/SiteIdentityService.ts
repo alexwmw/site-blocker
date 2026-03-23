@@ -18,6 +18,20 @@ export class SiteIdentityService {
     return [...new Set(values.filter((value): value is string => Boolean(value)))];
   }
 
+  private static buildChromeFaviconSrc(host: string | null, path: string): string | null {
+    if (!host) {
+      return null;
+    }
+
+    const pageUrl = `https://${host}${path || '/'}`;
+    const base =
+      typeof chrome !== 'undefined' && chrome.runtime?.getURL ? chrome.runtime.getURL('/_favicon/') : '/_favicon/';
+    const faviconUrl = new URL(base, window.location.origin);
+    faviconUrl.searchParams.set('pageUrl', pageUrl);
+    faviconUrl.searchParams.set('size', '32');
+    return faviconUrl.toString();
+  }
+
   private static buildGoogleFaviconSrc(host: string | null): string | null {
     if (!host) {
       return null;
@@ -48,6 +62,7 @@ export class SiteIdentityService {
       label,
       faviconSources: this.dedupe([
         options?.preferredFaviconUrl,
+        this.buildChromeFaviconSrc(host, safePath),
         this.buildGoogleFaviconSrc(host),
         this.buildDirectFaviconSrc(host),
       ]),

@@ -1,6 +1,14 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { SiteIdentityService } from './SiteIdentityService';
+
+const chromeMock = {
+  runtime: {
+    getURL: vi.fn((path: string) => `chrome-extension://test${path}`),
+  },
+};
+
+vi.stubGlobal('chrome', chromeMock);
 
 describe('SiteIdentityService', () => {
   it('derives host and path from a rule using the canonical split pattern', () => {
@@ -10,6 +18,7 @@ describe('SiteIdentityService', () => {
     expect(identity.path).toBe('/r/typescript');
     expect(identity.label).toBe('reddit.com/r/typescript');
     expect(identity.faviconSources).toEqual([
+      'chrome-extension://test/_favicon/?pageUrl=https%3A%2F%2Freddit.com%2Fr%2Ftypescript&size=32',
       'https://www.google.com/s2/favicons?domain=reddit.com&sz=32',
       'https://reddit.com/favicon.ico',
     ]);
@@ -24,6 +33,7 @@ describe('SiteIdentityService', () => {
     expect(identity.path).toBe('/r/typescript');
     expect(identity.faviconSources).toEqual([
       'https://www.redditstatic.com/shreddit/assets/favicon/32x32.png',
+      'chrome-extension://test/_favicon/?pageUrl=https%3A%2F%2Freddit.com%2Fr%2Ftypescript&size=32',
       'https://www.google.com/s2/favicons?domain=reddit.com&sz=32',
       'https://reddit.com/favicon.ico',
     ]);
