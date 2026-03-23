@@ -18,8 +18,8 @@ describe('SiteIdentityService', () => {
     expect(identity.path).toBe('/r/typescript');
     expect(identity.label).toBe('reddit.com/r/typescript');
     expect(identity.faviconSources).toEqual([
-      'chrome-extension://test/_favicon/?pageUrl=https%3A%2F%2Freddit.com%2Fr%2Ftypescript&size=32',
-      'https://www.google.com/s2/favicons?domain=reddit.com&sz=32',
+      'chrome-extension://test/_favicon/?pageUrl=https%3A%2F%2Freddit.com%2Fr%2Ftypescript&size=64',
+      'https://www.google.com/s2/favicons?domain=reddit.com&sz=64',
       'https://reddit.com/favicon.ico',
     ]);
   });
@@ -34,8 +34,8 @@ describe('SiteIdentityService', () => {
     expect(identity.label).toBe('localhost:3000/Docs');
     expect(identity.faviconSources).toEqual([
       'https://cdn.example.com/favicon.png',
-      'chrome-extension://test/_favicon/?pageUrl=http%3A%2F%2Flocalhost%3A3000%2FDocs%3Fsort%3Dtop%23intro&size=32',
-      'https://www.google.com/s2/favicons?domain=localhost&sz=32',
+      'chrome-extension://test/_favicon/?pageUrl=http%3A%2F%2Flocalhost%3A3000%2FDocs%3Fsort%3Dtop%23intro&size=64',
+      'https://www.google.com/s2/favicons?domain=localhost&sz=64',
       'http://localhost:3000/favicon.ico',
     ]);
   });

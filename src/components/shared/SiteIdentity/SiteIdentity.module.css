@@ -17,19 +17,20 @@
 }
 
 .small .iconShell {
-  width: 1.75rem;
-  height: 1.75rem;
+  width: 1.5rem;
+  height: 1.5rem;
 }
 
 .medium .iconShell {
-  width: 2.25rem;
-  height: 2.25rem;
+  width: 2rem;
+  height: 2rem;
 }
 
 .icon {
   width: 100%;
   height: 100%;
   display: block;
+  object-fit: contain;
 }
 
 .fallbackIcon {

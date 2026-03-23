@@ -13,6 +13,8 @@ type IdentityOptions = {
   preferredFaviconUrl?: string | null;
 };
 
+const FAVICON_SIZE = 64;
+
 type ParsedDisplayUrl = {
   faviconPageUrl: string;
   host: string;
@@ -34,7 +36,7 @@ export class SiteIdentityService {
       typeof chrome !== 'undefined' && chrome.runtime?.getURL ? chrome.runtime.getURL('/_favicon/') : '/_favicon/';
     const faviconUrl = new URL(base, window.location.origin);
     faviconUrl.searchParams.set('pageUrl', pageUrl);
-    faviconUrl.searchParams.set('size', '32');
+    faviconUrl.searchParams.set('size', String(FAVICON_SIZE));
     return faviconUrl.toString();
   }
 
@@ -43,7 +45,7 @@ export class SiteIdentityService {
       return null;
     }
 
-    return `https://www.google.com/s2/favicons?domain=${host}&sz=32`;
+    return `https://www.google.com/s2/favicons?domain=${host}&sz=${FAVICON_SIZE}`;
   }
 
   private static buildDirectFaviconSrc(pageUrl: string | null): string | null {
