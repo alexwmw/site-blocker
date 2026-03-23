@@ -9,10 +9,7 @@ export type SiteIdentityModel = {
   path: string;
 };
 
-type FaviconMode = 'host' | 'page';
-
 type IdentityOptions = {
-  faviconMode?: FaviconMode;
   preferredFaviconUrl?: string | null;
 };
 
@@ -21,17 +18,12 @@ export class SiteIdentityService {
     return [...new Set(values.filter((value): value is string => Boolean(value)))];
   }
 
-  private static buildChromeFaviconSrc(pageUrl: string | null): string | null {
-    if (!pageUrl) {
+  private static buildGoogleFaviconSrc(host: string | null): string | null {
+    if (!host) {
       return null;
     }
 
-    const base =
-      typeof chrome !== 'undefined' && chrome.runtime?.getURL ? chrome.runtime.getURL('/_favicon/') : '/_favicon/';
-    const faviconUrl = new URL(base, window.location.origin);
-    faviconUrl.searchParams.set('pageUrl', pageUrl);
-    faviconUrl.searchParams.set('size', '32');
-    return faviconUrl.toString();
+    return `https://www.google.com/s2/favicons?domain=${host}&sz=32`;
   }
 
   private static buildDirectFaviconSrc(host: string | null): string | null {
@@ -42,22 +34,12 @@ export class SiteIdentityService {
     return `https://${host}/favicon.ico`;
   }
 
-  private static buildPageUrl(host: string | null, path: string, faviconMode: FaviconMode): string | null {
-    if (!host) {
-      return null;
-    }
-
-    return faviconMode === 'page' ? `https://${host}${path || '/'}` : `https://${host}/`;
-  }
-
   static fromHostAndPath(
     host: string | null,
     path: string | null | undefined,
     options?: IdentityOptions,
   ): SiteIdentityModel {
     const safePath = path && path !== '/' ? path : '';
-    const faviconMode = options?.faviconMode ?? 'host';
-    const pageUrl = this.buildPageUrl(host, safePath, faviconMode);
     const label = host ? `${host}${safePath}` : 'Unknown site';
 
     return {
@@ -66,7 +48,7 @@ export class SiteIdentityService {
       label,
       faviconSources: this.dedupe([
         options?.preferredFaviconUrl,
-        this.buildChromeFaviconSrc(pageUrl),
+        this.buildGoogleFaviconSrc(host),
         this.buildDirectFaviconSrc(host),
       ]),
     };

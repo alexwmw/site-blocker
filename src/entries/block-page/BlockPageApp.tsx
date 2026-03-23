@@ -27,7 +27,7 @@ const BlockPageApp = () => {
   /** Executes window.location.replace on hold completion */
   useNavigateOnUnblock(ruleIds, targetUrl, holdIsComplete);
 
-  const targetIdentity = useMemo(() => SiteIdentityService.fromUrl(targetUrl, { faviconMode: 'page' }), [targetUrl]);
+  const targetIdentity = useMemo(() => SiteIdentityService.fromUrl(targetUrl), [targetUrl]);
   const ruleIdentity = useMemo(
     () => SiteIdentityService.fromHostAndPath(patternHost, patternPath),
     [patternHost, patternPath],
