@@ -24,18 +24,19 @@ describe('SiteIdentityService', () => {
     ]);
   });
 
-  it('keeps a preferred favicon first for page identities created from tabs', () => {
-    const identity = SiteIdentityService.fromUrl('https://www.reddit.com/r/typescript/?sort=top', {
-      preferredFaviconUrl: 'https://www.redditstatic.com/shreddit/assets/favicon/32x32.png',
+  it('preserves protocol, port, and path casing when deriving from a live url', () => {
+    const identity = SiteIdentityService.fromUrl('http://localhost:3000/Docs?sort=top#intro', {
+      preferredFaviconUrl: 'https://cdn.example.com/favicon.png',
     });
 
-    expect(identity.host).toBe('reddit.com');
-    expect(identity.path).toBe('/r/typescript');
+    expect(identity.host).toBe('localhost:3000');
+    expect(identity.path).toBe('/Docs');
+    expect(identity.label).toBe('localhost:3000/Docs');
     expect(identity.faviconSources).toEqual([
-      'https://www.redditstatic.com/shreddit/assets/favicon/32x32.png',
-      'chrome-extension://test/_favicon/?pageUrl=https%3A%2F%2Freddit.com%2Fr%2Ftypescript&size=32',
-      'https://www.google.com/s2/favicons?domain=reddit.com&sz=32',
-      'https://reddit.com/favicon.ico',
+      'https://cdn.example.com/favicon.png',
+      'chrome-extension://test/_favicon/?pageUrl=http%3A%2F%2Flocalhost%3A3000%2FDocs%3Fsort%3Dtop%23intro&size=32',
+      'https://www.google.com/s2/favicons?domain=localhost&sz=32',
+      'http://localhost:3000/favicon.ico',
     ]);
   });
 

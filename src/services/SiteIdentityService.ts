@@ -13,17 +13,23 @@ type IdentityOptions = {
   preferredFaviconUrl?: string | null;
 };
 
+type ParsedDisplayUrl = {
+  faviconPageUrl: string;
+  host: string;
+  path: string;
+  providerHost: string;
+};
+
 export class SiteIdentityService {
   private static dedupe(values: Array<string | null | undefined>): string[] {
     return [...new Set(values.filter((value): value is string => Boolean(value)))];
   }
 
-  private static buildChromeFaviconSrc(host: string | null, path: string): string | null {
-    if (!host) {
+  private static buildChromeFaviconSrc(pageUrl: string | null): string | null {
+    if (!pageUrl) {
       return null;
     }
 
-    const pageUrl = `https://${host}${path || '/'}`;
     const base =
       typeof chrome !== 'undefined' && chrome.runtime?.getURL ? chrome.runtime.getURL('/_favicon/') : '/_favicon/';
     const faviconUrl = new URL(base, window.location.origin);
@@ -40,12 +46,26 @@ export class SiteIdentityService {
     return `https://www.google.com/s2/favicons?domain=${host}&sz=32`;
   }
 
-  private static buildDirectFaviconSrc(host: string | null): string | null {
-    if (!host) {
+  private static buildDirectFaviconSrc(pageUrl: string | null): string | null {
+    if (!pageUrl) {
       return null;
     }
 
-    return `https://${host}/favicon.ico`;
+    return new URL('/favicon.ico', pageUrl).toString();
+  }
+
+  private static parseDisplayUrl(targetUrl: string): ParsedDisplayUrl | null {
+    if (!RulesService.isSupportedUrl(targetUrl)) {
+      return null;
+    }
+
+    const parsedUrl = new URL(targetUrl);
+    return {
+      faviconPageUrl: parsedUrl.toString(),
+      host: parsedUrl.host,
+      path: parsedUrl.pathname === '/' ? '' : parsedUrl.pathname,
+      providerHost: parsedUrl.hostname,
+    };
   }
 
   static fromHostAndPath(
@@ -55,6 +75,7 @@ export class SiteIdentityService {
   ): SiteIdentityModel {
     const safePath = path && path !== '/' ? path : '';
     const label = host ? `${host}${safePath}` : 'Unknown site';
+    const pageUrl = host ? `https://${host}${safePath || '/'}` : null;
 
     return {
       host,
@@ -62,9 +83,9 @@ export class SiteIdentityService {
       label,
       faviconSources: this.dedupe([
         options?.preferredFaviconUrl,
-        this.buildChromeFaviconSrc(host, safePath),
+        this.buildChromeFaviconSrc(pageUrl),
         this.buildGoogleFaviconSrc(host),
-        this.buildDirectFaviconSrc(host),
+        this.buildDirectFaviconSrc(pageUrl),
       ]),
     };
   }
@@ -75,17 +96,17 @@ export class SiteIdentityService {
   }
 
   static fromUrl(targetUrl: string | null | undefined, options?: IdentityOptions): SiteIdentityModel {
-    if (!targetUrl || !RulesService.isSupportedUrl(targetUrl)) {
+    if (!targetUrl) {
       return {
         host: null,
         path: '',
-        label: targetUrl ?? 'Unknown site',
+        label: 'Unknown site',
         faviconSources: this.dedupe([options?.preferredFaviconUrl]),
       };
     }
 
-    const pattern = RulesService.pathPatternFromUrl(targetUrl);
-    if (!pattern) {
+    const parsed = this.parseDisplayUrl(targetUrl);
+    if (!parsed) {
       return {
         host: null,
         path: '',
@@ -94,7 +115,16 @@ export class SiteIdentityService {
       };
     }
 
-    const { host, path } = RulesService.splitPattern(pattern);
-    return this.fromHostAndPath(host || null, path, options);
+    return {
+      host: parsed.host,
+      path: parsed.path,
+      label: `${parsed.host}${parsed.path}`,
+      faviconSources: this.dedupe([
+        options?.preferredFaviconUrl,
+        this.buildChromeFaviconSrc(parsed.faviconPageUrl),
+        this.buildGoogleFaviconSrc(parsed.providerHost),
+        this.buildDirectFaviconSrc(parsed.faviconPageUrl),
+      ]),
+    };
   }
 }
