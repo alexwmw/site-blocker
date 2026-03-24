@@ -12,7 +12,6 @@ import Stack from '@/components/primitives/Stack';
 import Switch from '@/components/primitives/Switch';
 import SiteIdentity from '@/components/shared/SiteIdentity';
 import StatusItem from '@/components/shared/StatusItem';
-import useSettings from '@/hooks/useSettings';
 import { SchedulingService } from '@/services/SchedulingService';
 import { SiteIdentityService } from '@/services/SiteIdentityService';
 import type { BlockRule, Schedule } from '@/types/schema';
@@ -35,7 +34,6 @@ const Rules = ({ blockRules, className, onClickEditSchedule, removeRule, schedul
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const [pendingMatchTypeRuleId, setPendingMatchTypeRuleId] = useState<string | null>(null);
   const emptyRuleList = blockRules !== null && blockRules.length === 0;
-  const { settings } = useSettings();
 
   const handleRemove = async (ruleId: string) => {
     setPendingDeleteId(ruleId);
@@ -57,13 +55,14 @@ const Rules = ({ blockRules, className, onClickEditSchedule, removeRule, schedul
     }
   };
 
+  const isBlockingActiveNow = SchedulingService.isBlockingActiveNow(schedule ?? undefined);
+
   const renderRule = (rule: BlockRule) => {
-    const unblockState =
-      settings && !SchedulingService.isBlockingActiveNow(settings.schedule)
-        ? 'Outside of schedule window'
-        : rule.unblockUntil && rule.unblockUntil > Date.now()
-          ? `Temporarily allowed until ${new Date(rule.unblockUntil).toLocaleTimeString()}`
-          : 'Blocked now';
+    const unblockState = !isBlockingActiveNow
+      ? 'Outside of schedule window'
+      : rule.unblockUntil && rule.unblockUntil > Date.now()
+        ? `Temporarily allowed until ${new Date(rule.unblockUntil).toLocaleTimeString()}`
+        : 'Blocked now';
 
     return (
       <li key={rule.id}>
