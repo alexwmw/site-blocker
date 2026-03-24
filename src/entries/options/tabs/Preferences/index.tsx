@@ -44,7 +44,7 @@ const Preferences = ({ className, settings, updateSettings }: PreferencesProps) 
   if (!settings) {
     return (
       <OptionsTab
-        title='Preference'
+        title='Preferences'
         className={className}
       />
     );
@@ -106,7 +106,7 @@ const Preferences = ({ className, settings, updateSettings }: PreferencesProps) 
 
   return (
     <OptionsTab
-      title='Preference'
+      title='Preferences'
       className={className}
     >
       <Stack>

@@ -113,7 +113,12 @@ const Rules = ({ blockRules, className, onClickEditSchedule, removeRule, schedul
             value='On'
             tone='bad'
           />
-          <Button onClick={onClickEditSchedule}>Edit schedule</Button>
+          <Button
+            variant='secondary'
+            onClick={onClickEditSchedule}
+          >
+            Edit schedule
+          </Button>
         </div>
       ) : null}
       {emptyRuleList ? (
