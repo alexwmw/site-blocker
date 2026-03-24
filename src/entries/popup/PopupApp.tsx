@@ -119,9 +119,7 @@ const PopupApp = () => {
   };
 
   const handleOpenOptions = () => {
-    chrome.runtime.openOptionsPage(() => {
-      alert('me');
-    });
+    chrome.runtime.openOptionsPage().catch(console.error);
   };
   const handleOpenSchedule = () => {
     window.open(getOptionsPageUrl() + '?tabId=scheduling', 'scheduling');
