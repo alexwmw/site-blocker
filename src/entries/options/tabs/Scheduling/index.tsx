@@ -76,7 +76,10 @@ const Scheduling = ({
         asList
       >
         {!schedule.enabled && (
-          <InfoItem text='Scheduled blocking is disabled. Enable scheduled blocking to set a schedule.' />
+          <InfoItem
+            tone='good'
+            text='Scheduled blocking is disabled. Enable scheduled blocking to set a schedule.'
+          />
         )}
         {schedule.windows.map((win, index) => (
           <li key={win.id}>
