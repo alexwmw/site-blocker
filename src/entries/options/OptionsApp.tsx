@@ -32,11 +32,18 @@ const createNewScheduleWindow: () => ScheduleWindow = () => ({
   end: '17:00',
 });
 
+const getTabIdFromUrlParams = (): OptionsTab => {
+  const queryString = window.location.search;
+  const p = new URLSearchParams(queryString);
+  const tabId = p.get('tabId');
+  return OPTIONS_TABS.find((t) => t.id === tabId)?.id ?? 'rules';
+};
+
 const OptionsApp = () => {
   useThemeEffect();
   const { blockRules, error: blockRulesError, removeRule, updateRule } = useBlockRules();
   const { settings, error: settingsError, updateSettings } = useSettings();
-  const [activeTab, setActiveTab] = useState<OptionsTab>('rules');
+  const [activeTab, setActiveTab] = useState<OptionsTab>(getTabIdFromUrlParams());
 
   const optionsData = blockRules && settings ? { blockRules, settings } : null;
   const activeRuleCount = useMemo(() => blockRules?.filter((rule) => rule.enabled).length ?? 0, [blockRules]);

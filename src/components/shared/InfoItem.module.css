@@ -1,0 +1,42 @@
+.infoItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border-muted);
+  background: var(--color-bg-muted);
+}
+.infoIcon {
+  flex-shrink: 0;
+}
+
+.infoTextContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.infoText {
+  margin: 0;
+  color: var(--color-text-secondary);
+  font-size: 0.85rem;
+  text-wrap: pretty;
+}
+
+.infoGood {
+  color: var(--color-accent);
+  background: var(--color-bg-elevated);
+  border-color: var(--color-accent-soft);
+}
+
+.infoBad {
+  color: var(--color-danger);
+  background: var(--color-bg-elevated);
+  border-color: var(--color-danger);
+}
+
+.infoNeutral {
+  border-color: var(--color-border-muted);
+  background: var(--color-bg-muted);
+}
