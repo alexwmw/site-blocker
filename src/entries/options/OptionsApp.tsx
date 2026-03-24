@@ -13,6 +13,7 @@ import RenderBoundary from '@/components/shared/RenderBoundary';
 import useBlockRules from '@/hooks/useBlockRules';
 import useSettings from '@/hooks/useSettings';
 import useThemeEffect from '@/hooks/useThemeEffect';
+import { SchedulingService } from '@/services/SchedulingService';
 import { StorageService } from '@/services/StorageService';
 import type { ScheduleWindow, Settings } from '@/types/schema';
 import { createUniqueId } from '@/utils/createUniqueId';
@@ -21,7 +22,7 @@ type OptionsTab = 'rules' | 'scheduling' | 'preferences';
 
 const OPTIONS_TABS: ReadonlyArray<TabItem<OptionsTab>> = [
   { id: 'rules', label: 'Rules' },
-  { id: 'scheduling', label: 'Scheduling' },
+  { id: 'scheduling', label: 'Schedule' },
   { id: 'preferences', label: 'Preferences' },
 ];
 
@@ -32,11 +33,18 @@ const createNewScheduleWindow: () => ScheduleWindow = () => ({
   end: '17:00',
 });
 
+const getTabIdFromUrlParams = (): OptionsTab => {
+  const queryString = window.location.search;
+  const p = new URLSearchParams(queryString);
+  const tabId = p.get('tabId');
+  return OPTIONS_TABS.find((t) => t.id === tabId)?.id ?? 'rules';
+};
+
 const OptionsApp = () => {
   useThemeEffect();
   const { blockRules, error: blockRulesError, removeRule, updateRule } = useBlockRules();
   const { settings, error: settingsError, updateSettings } = useSettings();
-  const [activeTab, setActiveTab] = useState<OptionsTab>('rules');
+  const [activeTab, setActiveTab] = useState<OptionsTab>(getTabIdFromUrlParams());
 
   const optionsData = blockRules && settings ? { blockRules, settings } : null;
   const activeRuleCount = useMemo(() => blockRules?.filter((rule) => rule.enabled).length ?? 0, [blockRules]);
@@ -74,6 +82,14 @@ const OptionsApp = () => {
     await StorageService.updateScheduleWindow(id, updates);
   };
 
+  const statsToDisplay = useMemo(() => {
+    return {
+      'Total rules': blockRules?.length ?? 0,
+      'Active rules': SchedulingService.isBlockingActiveNow(settings?.schedule) ? activeRuleCount - pausedRuleCount : 0,
+      'Temporarily allowed': pausedRuleCount,
+    };
+  }, [activeRuleCount, blockRules?.length, pausedRuleCount, settings?.schedule]);
+
   return (
     <main className={styles.page}>
       <Hero
@@ -84,13 +100,7 @@ const OptionsApp = () => {
         data={optionsData}
         error={blockRulesError ?? settingsError}
       >
-        <StatsGrid
-          stats={{
-            'Total rules': blockRules?.length ?? 0,
-            'Active rules': activeRuleCount - pausedRuleCount,
-            'Temporarily allowed': pausedRuleCount,
-          }}
-        />
+        <StatsGrid stats={statsToDisplay} />
         <Tabs
           className={styles.tabs}
           ariaLabel='Options sections'

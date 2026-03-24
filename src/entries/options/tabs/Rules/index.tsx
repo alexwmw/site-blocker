@@ -12,6 +12,7 @@ import Stack from '@/components/primitives/Stack';
 import Switch from '@/components/primitives/Switch';
 import SiteIdentity from '@/components/shared/SiteIdentity';
 import StatusItem from '@/components/shared/StatusItem';
+import { SchedulingService } from '@/services/SchedulingService';
 import { SiteIdentityService } from '@/services/SiteIdentityService';
 import type { BlockRule, Schedule } from '@/types/schema';
 
@@ -54,9 +55,12 @@ const Rules = ({ blockRules, className, onClickEditSchedule, removeRule, schedul
     }
   };
 
+  const isBlockingActiveNow = SchedulingService.isBlockingActiveNow(schedule ?? undefined);
+
   const renderRule = (rule: BlockRule) => {
-    const unblockState =
-      rule.unblockUntil && rule.unblockUntil > Date.now()
+    const unblockState = !isBlockingActiveNow
+      ? 'Outside of schedule window'
+      : rule.unblockUntil && rule.unblockUntil > Date.now()
         ? `Temporarily allowed until ${new Date(rule.unblockUntil).toLocaleTimeString()}`
         : 'Blocked now';
 
@@ -66,23 +70,27 @@ const Rules = ({ blockRules, className, onClickEditSchedule, removeRule, schedul
           <div>
             <SiteIdentity
               identity={SiteIdentityService.fromRule(rule)}
-              size='small'
+              size='large'
             />
-            <p className={styles.ruleMeta}>
-              Match: <strong>{rule.matchType}</strong> · Added {readableDate(rule.createdAt)}
-            </p>
-            <p className={styles.ruleMeta}>{unblockState}</p>
-            <Switch
-              id={rule.id + '-switch'}
-              className={styles.ruleSwitch}
-              label='Block subpages'
-              fieldHint={rule.matchType === 'prefix' ? 'On · Prefix match' : 'Off · Exact match'}
-              checked={rule.matchType === 'prefix'}
-              disabled={pendingMatchTypeRuleId === rule.id}
-              onChange={(event) => {
-                handleMatchTypeToggle(rule, event.target.checked).catch(console.error);
-              }}
-            />
+            <div className={styles.ruleCardContent}>
+              <div>
+                <p className={styles.ruleMeta}>
+                  <strong>{unblockState}</strong>
+                </p>
+                <p className={styles.ruleMeta}>Added {readableDate(rule.createdAt)}</p>
+              </div>
+              <Switch
+                id={rule.id + '-switch'}
+                className={styles.ruleSwitch}
+                label='Block subpages'
+                fieldHint={rule.matchType === 'prefix' ? 'On · Prefix match' : 'Off · Exact match'}
+                checked={rule.matchType === 'prefix'}
+                disabled={pendingMatchTypeRuleId === rule.id}
+                onChange={(event) => {
+                  handleMatchTypeToggle(rule, event.target.checked).catch(console.error);
+                }}
+              />
+            </div>
           </div>
           <div>
             <Button
@@ -113,7 +121,12 @@ const Rules = ({ blockRules, className, onClickEditSchedule, removeRule, schedul
             value='On'
             tone='bad'
           />
-          <Button onClick={onClickEditSchedule}>Edit schedule</Button>
+          <Button
+            variant='secondary'
+            onClick={onClickEditSchedule}
+          >
+            Edit schedule
+          </Button>
         </div>
       ) : null}
       {emptyRuleList ? (

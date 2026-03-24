@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import { useEffect, useMemo, useState } from 'react';
 
 import styles from './PopupApp.module.css';
@@ -6,10 +7,13 @@ import Button from '@/components/primitives/Button';
 import Card from '@/components/primitives/Card';
 import Stack from '@/components/primitives/Stack';
 import Hero from '@/components/shared/Hero';
+import type { IconName } from '@/components/shared/InfoItem';
+import InfoItem from '@/components/shared/InfoItem';
 import RenderBoundary from '@/components/shared/RenderBoundary';
 import SectionHeader from '@/components/shared/SectionHeader';
 import SiteIdentity from '@/components/shared/SiteIdentity';
 import StatusItem from '@/components/shared/StatusItem';
+import useTabUrlInfo from '@/entries/popup/useTabUrlInfo';
 import useBlockRules from '@/hooks/useBlockRules';
 import useCreateRuleFromTab from '@/hooks/useCreateRuleFromTab';
 import useSettings from '@/hooks/useSettings';
@@ -17,7 +21,7 @@ import useThemeEffect from '@/hooks/useThemeEffect';
 import { RulesService } from '@/services/RulesService';
 import { SchedulingService } from '@/services/SchedulingService';
 import { SiteIdentityService } from '@/services/SiteIdentityService';
-import { isExtensionUrl } from '@/utils/extensionUrls';
+import { getOptionsPageUrl } from '@/utils/extensionUrls';
 
 const formatRemainingTime = (milliseconds: number) => {
   const totalSeconds = Math.max(0, Math.floor(milliseconds / 1000));
@@ -45,21 +49,17 @@ const PopupApp = () => {
   const [tickNow, setTickNow] = useState(Date.now());
 
   const popupData = blockRules && settings && isResolved ? { activeTab, blockRules, settings } : null;
-  const url = activeTab?.url ?? null;
-  const isSupported = Boolean(url && RulesService.isSupportedUrl(url));
-  const isExtensionPageUrl = isExtensionUrl(url);
+
+  const { url, isSupported, isExtensionPageUrl, domain, path } = useTabUrlInfo(activeTab);
 
   const matchingRules = useMemo(() => {
     return url && blockRules ? RulesService.findMatchingRules(url, blockRules) : [];
   }, [url, blockRules]);
 
   const matchingTemporarilyUnblockedRules = matchingRules.filter((rule) => (rule.unblockUntil ?? 0) > tickNow);
-  const activeBlockingRules = matchingRules.filter((rule) => (rule.unblockUntil ?? 0) <= tickNow);
 
   const isScheduleEnabled = Boolean(settings?.schedule.enabled);
   const isBlockingTime = SchedulingService.isBlockingActiveNow(settings?.schedule);
-  const isBlockedByRule = isSupported && activeBlockingRules.length > 0;
-  const isBlockedNow = isBlockedByRule && isBlockingTime;
 
   const nextUnblockExpiration = matchingTemporarilyUnblockedRules.reduce<number | null>((soonest, rule) => {
     const value = rule.unblockUntil;
@@ -88,21 +88,21 @@ const PopupApp = () => {
 
   const notBlockedReason = (() => {
     if (!isSupported) {
-      return 'This URL type is not supported by rules.';
-    }
-    if (matchingRules.length === 0) {
-      return 'No matching rules for this page.';
+      return { text: 'This URL type cannot be blocked' };
     }
     if (matchingTemporarilyUnblockedRules.length > 0) {
-      return 'This page matches a rule but is temporarily unblocked.';
+      return { text: 'This page is temporarily unblocked' };
     }
     if (isScheduleEnabled && !isBlockingTime) {
-      return 'This page matches a rule, but blocking is currently outside your scheduled window.';
+      return { text: 'This page matches a rule, but blocking is currently outside your schedule', icon: 'Clock' };
+    }
+    if (matchingRules.length > 0) {
+      return { text: 'This page is temporarily unblocked' };
     }
     return null;
   })();
 
-  const canAddRule = Boolean(activeTab && isSupported);
+  const canAddRule = Boolean(activeTab && isSupported && matchingRules.length === 0);
 
   const handleAddDomainClick = () => {
     const rule = createDomainPrefixRule();
@@ -120,6 +120,9 @@ const PopupApp = () => {
 
   const handleOpenOptions = () => {
     chrome.runtime.openOptionsPage().catch(console.error);
+  };
+  const handleOpenSchedule = () => {
+    window.open(getOptionsPageUrl() + '?tabId=scheduling', 'scheduling');
   };
 
   return (
@@ -145,67 +148,63 @@ const PopupApp = () => {
           </div>
         ) : null}
         <Stack topMargin>
-          <Card
-            padding
-            as='section'
-          >
-            <SectionHeader title='Blocking' />
-            <Stack gap='x-small'>
-              <StatusItem
-                label='Blocked by rule'
-                value={isBlockedNow ? 'Yes' : 'No'}
-                tone={isBlockedNow ? 'bad' : 'good'}
-              />
-              <StatusItem
-                label='Scheduling enabled'
-                value={isScheduleEnabled ? 'Yes' : 'No'}
-                tone={isScheduleEnabled ? 'neutral' : 'good'}
-              />
-              <StatusItem
-                label='URL supported'
-                value={isSupported ? 'Yes' : 'No'}
-                tone={isSupported ? 'good' : 'bad'}
-              />
-              {nextUnblockExpiration ? (
-                <StatusItem
-                  label='Temporary unblock remaining'
-                  value={formatRemainingTime(nextUnblockExpiration - tickNow)}
-                  tone='neutral'
-                />
-              ) : null}
-            </Stack>
-
-            {notBlockedReason ? <p className={styles.reasonBanner}>{notBlockedReason}</p> : null}
-          </Card>
+          {notBlockedReason ? (
+            <InfoItem
+              tone='good'
+              text={notBlockedReason.text}
+              iconName={notBlockedReason.icon as IconName}
+            />
+          ) : null}
+          {nextUnblockExpiration ? (
+            <StatusItem
+              label='Temporary unblock remaining'
+              value={formatRemainingTime(nextUnblockExpiration - tickNow)}
+              tone='neutral'
+            />
+          ) : null}
 
           <Card
             padding
             as='section'
+            className={styles.flexColumn}
           >
             <SectionHeader title='Quick actions' />
-            {!isExtensionPageUrl ? (
-              <div className={styles.actions}>
-                <Button
-                  disabled={!canAddRule}
-                  onClick={handleAddDomainClick}
-                >
-                  Add domain
-                </Button>
-                <Button
-                  variant='secondary'
-                  disabled={!canAddRule}
-                  onClick={handleAddPathClick}
-                >
-                  Add page
-                </Button>
-              </div>
+            <Button
+              disabled={!canAddRule}
+              onClick={handleAddDomainClick}
+              className={clsx(styles.optionsButton, styles.primary)}
+            >
+              Block this site
+            </Button>
+            {domain !== path ? (
+              <Button
+                variant='secondary'
+                disabled={!canAddRule}
+                onClick={handleAddPathClick}
+                className={styles.optionsButton}
+              >
+                <div className={styles.optionsButtonText}>Block {path}</div>
+              </Button>
             ) : null}
+          </Card>
+          <Card
+            padding
+            as='section'
+          >
+            <SectionHeader title='More options' />
             <Button
               variant='ghost'
               className={styles.optionsButton}
               onClick={handleOpenOptions}
             >
-              Manage rules in options
+              Manage blocking rules
+            </Button>
+            <Button
+              variant='ghost'
+              className={styles.optionsButton}
+              onClick={handleOpenSchedule}
+            >
+              {isScheduleEnabled ? 'Edit schedule' : 'Create a blocking schedule'}
             </Button>
           </Card>
         </Stack>

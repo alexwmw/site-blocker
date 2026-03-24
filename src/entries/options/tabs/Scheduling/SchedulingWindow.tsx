@@ -4,7 +4,6 @@ import styles from './Scheduling.module.css';
 
 import Button from '@/components/primitives/Button';
 import Card from '@/components/primitives/Card';
-import Paragraph from '@/components/primitives/Paragraph';
 import Setting from '@/components/primitives/Setting';
 import { SchedulingDays, SchedulingDaysPresetButtons } from '@/entries/options/tabs/Scheduling/SchedulingDays';
 import type { ScheduleWindow } from '@/types/schema';
@@ -26,11 +25,10 @@ const SchedulingWindow = ({ window, windowIndex, disabled, removeWindow, updateW
       <div className={styles.scheduleWindowHeader}>
         <div>
           <strong>Schedule {windowIndex + 1}</strong>
-          <Paragraph subtle>Recurring weekly block</Paragraph>
         </div>
         {window.id !== '_initial' ? (
           <Button
-            variant='ghost'
+            variant='danger'
             disabled={disabled}
             onClick={() => {
               removeWindow().catch(console.error);
@@ -42,7 +40,6 @@ const SchedulingWindow = ({ window, windowIndex, disabled, removeWindow, updateW
       </div>
 
       <div className={styles.scheduleWindowDays}>
-        <span className={styles.settingsLabel}>Repeat on</span>
         <SchedulingDaysPresetButtons
           disabled={disabled}
           updateWindow={updateWindow}
