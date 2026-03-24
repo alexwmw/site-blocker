@@ -11,10 +11,14 @@
   font-weight: 700;
 }
 
+.ruleCardContent {
+  display: flex;
+  flex-direction: column;
+}
+
 .ruleMeta {
   margin: 6px 0 0;
   color: var(--color-text-secondary);
-  font-size: 0.92rem;
 }
 
 .ruleSwitch {

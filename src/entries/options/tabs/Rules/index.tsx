@@ -12,6 +12,8 @@ import Stack from '@/components/primitives/Stack';
 import Switch from '@/components/primitives/Switch';
 import SiteIdentity from '@/components/shared/SiteIdentity';
 import StatusItem from '@/components/shared/StatusItem';
+import useSettings from '@/hooks/useSettings';
+import { SchedulingService } from '@/services/SchedulingService';
 import { SiteIdentityService } from '@/services/SiteIdentityService';
 import type { BlockRule, Schedule } from '@/types/schema';
 
@@ -33,6 +35,7 @@ const Rules = ({ blockRules, className, onClickEditSchedule, removeRule, schedul
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
   const [pendingMatchTypeRuleId, setPendingMatchTypeRuleId] = useState<string | null>(null);
   const emptyRuleList = blockRules !== null && blockRules.length === 0;
+  const { settings } = useSettings();
 
   const handleRemove = async (ruleId: string) => {
     setPendingDeleteId(ruleId);
@@ -56,9 +59,11 @@ const Rules = ({ blockRules, className, onClickEditSchedule, removeRule, schedul
 
   const renderRule = (rule: BlockRule) => {
     const unblockState =
-      rule.unblockUntil && rule.unblockUntil > Date.now()
-        ? `Temporarily allowed until ${new Date(rule.unblockUntil).toLocaleTimeString()}`
-        : 'Blocked now';
+      settings && !SchedulingService.isBlockingActiveNow(settings.schedule)
+        ? 'Outside of schedule window'
+        : rule.unblockUntil && rule.unblockUntil > Date.now()
+          ? `Temporarily allowed until ${new Date(rule.unblockUntil).toLocaleTimeString()}`
+          : 'Blocked now';
 
     return (
       <li key={rule.id}>
@@ -66,23 +71,27 @@ const Rules = ({ blockRules, className, onClickEditSchedule, removeRule, schedul
           <div>
             <SiteIdentity
               identity={SiteIdentityService.fromRule(rule)}
-              size='small'
+              size='large'
             />
-            <p className={styles.ruleMeta}>
-              Match: <strong>{rule.matchType}</strong> · Added {readableDate(rule.createdAt)}
-            </p>
-            <p className={styles.ruleMeta}>{unblockState}</p>
-            <Switch
-              id={rule.id + '-switch'}
-              className={styles.ruleSwitch}
-              label='Block subpages'
-              fieldHint={rule.matchType === 'prefix' ? 'On · Prefix match' : 'Off · Exact match'}
-              checked={rule.matchType === 'prefix'}
-              disabled={pendingMatchTypeRuleId === rule.id}
-              onChange={(event) => {
-                handleMatchTypeToggle(rule, event.target.checked).catch(console.error);
-              }}
-            />
+            <div className={styles.ruleCardContent}>
+              <div>
+                <p className={styles.ruleMeta}>
+                  <strong>{unblockState}</strong>
+                </p>
+                <p className={styles.ruleMeta}>Added {readableDate(rule.createdAt)}</p>
+              </div>
+              <Switch
+                id={rule.id + '-switch'}
+                className={styles.ruleSwitch}
+                label='Block subpages'
+                fieldHint={rule.matchType === 'prefix' ? 'On · Prefix match' : 'Off · Exact match'}
+                checked={rule.matchType === 'prefix'}
+                disabled={pendingMatchTypeRuleId === rule.id}
+                onChange={(event) => {
+                  handleMatchTypeToggle(rule, event.target.checked).catch(console.error);
+                }}
+              />
+            </div>
           </div>
           <div>
             <Button

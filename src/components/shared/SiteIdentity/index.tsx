@@ -9,7 +9,7 @@ import type { SiteIdentityModel } from '@/services/SiteIdentityService';
 type SiteIdentityProps = {
   className?: string;
   identity: SiteIdentityModel;
-  size?: 'small' | 'medium';
+  size?: 'small' | 'medium' | 'large';
 };
 
 const SiteIdentity = ({ className, identity, size = 'medium' }: SiteIdentityProps) => {
