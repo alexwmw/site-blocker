@@ -13,6 +13,7 @@ import RenderBoundary from '@/components/shared/RenderBoundary';
 import SectionHeader from '@/components/shared/SectionHeader';
 import SiteIdentity from '@/components/shared/SiteIdentity';
 import StatusItem from '@/components/shared/StatusItem';
+import useTabUrlInfo from '@/entries/popup/useTabUrlInfo';
 import useBlockRules from '@/hooks/useBlockRules';
 import useCreateRuleFromTab from '@/hooks/useCreateRuleFromTab';
 import useSettings from '@/hooks/useSettings';
@@ -20,7 +21,7 @@ import useThemeEffect from '@/hooks/useThemeEffect';
 import { RulesService } from '@/services/RulesService';
 import { SchedulingService } from '@/services/SchedulingService';
 import { SiteIdentityService } from '@/services/SiteIdentityService';
-import { getOptionsPageUrl, isExtensionUrl } from '@/utils/extensionUrls';
+import { getOptionsPageUrl } from '@/utils/extensionUrls';
 
 const formatRemainingTime = (milliseconds: number) => {
   const totalSeconds = Math.max(0, Math.floor(milliseconds / 1000));
@@ -48,12 +49,8 @@ const PopupApp = () => {
   const [tickNow, setTickNow] = useState(Date.now());
 
   const popupData = blockRules && settings && isResolved ? { activeTab, blockRules, settings } : null;
-  const url = activeTab?.url ?? null;
-  const isSupported = Boolean(url && RulesService.isSupportedUrl(url));
-  const isExtensionPageUrl = isExtensionUrl(url);
-  const domain = RulesService.domainPatternFromUrl(url ?? '');
-  const path = RulesService.pathPatternFromUrl(url ?? '');
-  const domainIsPath = domain === path;
+
+  const { url, isSupported, isExtensionPageUrl, domain, path } = useTabUrlInfo(activeTab);
 
   const matchingRules = useMemo(() => {
     return url && blockRules ? RulesService.findMatchingRules(url, blockRules) : [];
@@ -181,7 +178,7 @@ const PopupApp = () => {
             >
               Block this site
             </Button>
-            {!domainIsPath ? (
+            {domain !== path ? (
               <Button
                 variant='secondary'
                 disabled={!canAddRule}
