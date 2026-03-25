@@ -26,6 +26,8 @@ vi.mock('@/services/RulesService', () => ({
   RulesService: {
     isSupportedUrl: vi.fn(),
     findMatchingRules: vi.fn(),
+    domainPatternFromUrl: vi.fn(),
+    pathPatternFromUrl: vi.fn(),
   },
 }));
 vi.mock('@/services/SchedulingService', () => ({
@@ -72,6 +74,8 @@ describe('PopupApp', () => {
     });
     vi.mocked(RulesService.isSupportedUrl).mockReturnValue(true);
     vi.mocked(RulesService.findMatchingRules).mockReturnValue([]);
+    vi.mocked(RulesService.domainPatternFromUrl).mockReturnValue('example.com');
+    vi.mocked(RulesService.pathPatternFromUrl).mockReturnValue('example.com/path?q=react');
     vi.mocked(SchedulingService.isBlockingActiveNow).mockReturnValue(true);
   });
 
@@ -101,5 +105,12 @@ describe('PopupApp', () => {
 
     expect(screen.getByRole('alert').textContent).toContain('Failed to query tabs.');
     expect(screen.queryByText('Blocking')).toBeNull();
+  });
+
+  it('shows specific-page action label and cleaned rule preview', () => {
+    render(<PopupApp />);
+
+    expect(screen.getByText('Block this specific page')).toBeTruthy();
+    expect(screen.getByText('Will save: example.com/path?q=react')).toBeTruthy();
   });
 });

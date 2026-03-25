@@ -1,6 +1,28 @@
 import type { BlockRule } from '@/types/schema';
 
+type QueryMode = 'ignore' | 'include-all' | 'include-selected';
+
 export class RulesService {
+  private static readonly QUERY_HARD_NOISE_PARAM_PREFIXES_LOWER = ['utm_'] as const;
+
+  private static readonly QUERY_HARD_NOISE_PARAM_KEYS_LOWER = new Set(['fbclid', 'gclid']);
+
+  private static readonly QUERY_SOFT_NOISE_PARAM_KEYS_LOWER = new Set([
+    'ref',
+    'source',
+    'si',
+    'feature',
+    'pp',
+  ]);
+
+  private static readonly QUERY_STRONG_IDENTITY_KEYS_BY_PRIORITY = ['id', 'v'] as const;
+
+  private static readonly QUERY_SHALLOW_IDENTITY_KEYS_BY_PRIORITY = ['q'] as const;
+
+  private static readonly EMPTY_QUERY_SELECTION = Object.freeze([]) as readonly string[];
+
+  private static readonly QUERY_PARAM_SEPARATOR = '\u0000';
+
   /**
    * Return true only for valid http: or https: URLs.
    * Return false for invalid URLs and everything else (chrome://, about:blank, etc).
@@ -39,36 +61,187 @@ export class RulesService {
     return lowerPath.replace(/\/+$/u, '');
   }
 
-  private static normalisePathComparable(host: string, pathname: string): string {
-    return `${this.normaliseHost(host)}${this.normalisePathSegment(pathname)}`;
+  private static normalisePathComparable(
+    host: string,
+    pathname: string,
+    search: string = '',
+    options: { queryMode?: QueryMode; selectedKeys?: readonly string[] } = {},
+  ): string {
+    const normalisedSearch = this.normaliseSearch(search, options);
+    return `${this.normaliseHost(host)}${this.normalisePathSegment(pathname)}${normalisedSearch}`;
   }
 
-  private static parseLooseHostAndPath(rawInput: string): { host: string; pathname: string } {
-    const withoutQueryOrHash = rawInput.trim().toLowerCase().split(/[?#]/u, 1)[0] ?? '';
-    const withoutProtocol = withoutQueryOrHash.replace(/^https?:\/\//u, '');
+  private static filterQueryPairs(
+    pairs: Array<[string, string]>,
+    queryMode: QueryMode,
+    selectedKeys: readonly string[],
+    options: { stripSoftNoise?: boolean } = {},
+  ): Array<[string, string]> {
+    if (queryMode === 'ignore') {
+      return [];
+    }
+
+    const stripSoftNoise = options.stripSoftNoise ?? false;
+    const selectedKeySet = new Set(selectedKeys.map((key) => key.toLowerCase()));
+
+    return pairs.filter(([key]) => {
+      const lowerKey = key.toLowerCase();
+      const isHardNoiseKey = this.QUERY_HARD_NOISE_PARAM_KEYS_LOWER.has(lowerKey);
+      const isSoftNoiseKey = this.QUERY_SOFT_NOISE_PARAM_KEYS_LOWER.has(lowerKey);
+      const hasHardNoisePrefix = this.QUERY_HARD_NOISE_PARAM_PREFIXES_LOWER.some((prefix) => lowerKey.startsWith(prefix));
+
+      if (isHardNoiseKey || hasHardNoisePrefix) {
+        return false;
+      }
+
+      if (stripSoftNoise && isSoftNoiseKey) {
+        return false;
+      }
+
+      if (queryMode === 'include-all') {
+        return true;
+      }
+
+      return selectedKeySet.has(lowerKey);
+    });
+  }
+
+  private static normaliseSearch(
+    search: string,
+    options: { queryMode?: QueryMode; selectedKeys?: readonly string[]; stripSoftNoise?: boolean } = {},
+  ): string {
+    const query = search.replace(/^\?/u, '');
+    if (!query) {
+      return '';
+    }
+
+    const queryMode = options.queryMode ?? 'include-all';
+    const selectedKeys = options.selectedKeys ?? this.EMPTY_QUERY_SELECTION;
+
+    const pairs = [...new URLSearchParams(query).entries()];
+    const filteredPairs = this.filterQueryPairs(pairs, queryMode, selectedKeys, {
+      stripSoftNoise: options.stripSoftNoise,
+    });
+
+    if (filteredPairs.length === 0) {
+      return '';
+    }
+
+    const sortedPairs = filteredPairs.sort(([keyA, valueA], [keyB, valueB]) => {
+      if (keyA !== keyB) {
+        return keyA.localeCompare(keyB);
+      }
+      return valueA.localeCompare(valueB);
+    });
+
+    const sortedSearchParams = new URLSearchParams();
+    sortedPairs.forEach(([key, value]) => sortedSearchParams.append(key, value));
+    const normalised = sortedSearchParams.toString();
+
+    return normalised ? `?${normalised}` : '';
+  }
+
+  private static firstMatchingKeyByPriority(
+    pairs: Array<[string, string]>,
+    priorityKeys: readonly string[],
+  ): string | null {
+    const firstSeenByLower = new Map<string, string>();
+
+    for (const [key] of pairs) {
+      const lowerKey = key.toLowerCase();
+      if (firstSeenByLower.has(lowerKey)) {
+        continue;
+      }
+      firstSeenByLower.set(lowerKey, key);
+    }
+
+    for (const lowerPriorityKey of priorityKeys) {
+      const matched = firstSeenByLower.get(lowerPriorityKey);
+      if (matched) {
+        return matched;
+      }
+    }
+
+    return null;
+  }
+
+  private static parseLooseHostPathAndSearch(rawInput: string): { host: string; pathname: string; search: string } {
+    const withoutHash = rawInput.trim().split('#', 1)[0] ?? '';
+    const [hostAndPath = '', searchPart = ''] = withoutHash.split('?', 2);
+    const withoutProtocol = hostAndPath.replace(/^https?:\/\//u, '');
     const [hostPart = '', ...pathParts] = withoutProtocol.split('/');
     const pathTail = pathParts.join('/');
     const pathname = pathTail ? `/${pathTail}` : '/';
+    const search = searchPart ? `?${searchPart}` : '';
 
     return {
       host: hostPart,
       pathname,
+      search,
     };
   }
 
-  private static normalisePatternParts(patternInput: string): { host: string; path: string } {
-    const { host, pathname } = this.parseLooseHostAndPath(patternInput);
+  private static normalisePatternParts(patternInput: string): { host: string; path: string; query: string } {
+    const { host, pathname, search } = this.parseLooseHostPathAndSearch(patternInput);
     return {
       host: this.normaliseHost(host),
       path: this.normalisePathSegment(pathname),
+      query: this.normaliseSearch(search, { queryMode: 'include-all' }),
     };
   }
 
-  private static normalisedTargetParts(targetUrl: string): { host: string; path: string } {
+  private static normalisedTargetParts(targetUrl: string): { host: string; path: string; query: string } {
     const urlObj: URL = new URL(targetUrl);
     return {
       host: this.normaliseHost(urlObj.hostname),
       path: this.normalisePathSegment(urlObj.pathname),
+      query: this.normaliseSearch(urlObj.search, { queryMode: 'include-all' }),
+    };
+  }
+
+  private static getAutoQuerySelection(parsedUrl: URL): {
+    queryMode: QueryMode;
+    selectedKeys: readonly string[];
+  } {
+    const normalisedPath = this.normalisePathSegment(parsedUrl.pathname);
+    const segmentCount = normalisedPath.split('/').filter(Boolean).length;
+
+    const cleanedPairs = this.filterQueryPairs(
+      [...parsedUrl.searchParams.entries()],
+      'include-all',
+      this.EMPTY_QUERY_SELECTION,
+      { stripSoftNoise: true },
+    );
+
+    const strongIdentityKey = this.firstMatchingKeyByPriority(cleanedPairs, this.QUERY_STRONG_IDENTITY_KEYS_BY_PRIORITY);
+    if (strongIdentityKey) {
+      return {
+        queryMode: 'include-selected',
+        selectedKeys: [strongIdentityKey],
+      };
+    }
+
+    if (segmentCount > 1) {
+      return {
+        queryMode: 'ignore',
+        selectedKeys: this.EMPTY_QUERY_SELECTION,
+      };
+    }
+
+    const shallowIdentityKey = this.firstMatchingKeyByPriority(
+      cleanedPairs,
+      this.QUERY_SHALLOW_IDENTITY_KEYS_BY_PRIORITY,
+    );
+    if (shallowIdentityKey) {
+      return {
+        queryMode: 'include-selected',
+        selectedKeys: [shallowIdentityKey],
+      };
+    }
+
+    return {
+      queryMode: 'ignore',
+      selectedKeys: this.EMPTY_QUERY_SELECTION,
     };
   }
 
@@ -86,11 +259,11 @@ export class RulesService {
     const parsed = this.parseSupportedUrl(trimmedInput);
 
     if (parsed) {
-      return this.normalisePathComparable(parsed.hostname, parsed.pathname);
+      return this.normalisePathComparable(parsed.hostname, parsed.pathname, parsed.search);
     }
 
-    const { host, pathname } = this.parseLooseHostAndPath(trimmedInput);
-    return this.normalisePathComparable(host, pathname);
+    const { host, pathname, search } = this.parseLooseHostPathAndSearch(trimmedInput);
+    return this.normalisePathComparable(host, pathname, search);
   }
 
   /**
@@ -111,7 +284,8 @@ export class RulesService {
       return null;
     }
 
-    return this.normalisePathComparable(parsedUrl.hostname, parsedUrl.pathname);
+    const autoQuerySelection = this.getAutoQuerySelection(parsedUrl);
+    return this.normalisePathComparable(parsedUrl.hostname, parsedUrl.pathname, parsedUrl.search, autoQuerySelection);
   }
 
   /**
@@ -156,23 +330,60 @@ export class RulesService {
     }
 
     if (rule.matchType === 'exact') {
-      return target.path === pattern.path;
+      if (target.path !== pattern.path) {
+        return false;
+      }
+
+      if (!pattern.query) {
+        return true;
+      }
+
+      return target.query === pattern.query;
     }
 
     if (rule.matchType === 'prefix') {
-      if (pattern.path === '') {
+      const isPathMatch =
+        pattern.path === '' ? true : target.path === pattern.path || target.path.startsWith(`${pattern.path}/`);
+
+      if (!isPathMatch) {
+        return false;
+      }
+
+      if (!pattern.query) {
         return true;
       }
-      return target.path === pattern.path || target.path.startsWith(`${pattern.path}/`);
+
+      return this.queryIncludes(target.query, pattern.query);
     }
 
     return false;
   }
 
+  private static queryIncludes(targetQuery: string, patternQuery: string): boolean {
+    const targetSearchParams = new URLSearchParams(targetQuery.replace(/^\?/u, ''));
+    const patternSearchParams = new URLSearchParams(patternQuery.replace(/^\?/u, ''));
+
+    const targetCounts = new Map<string, number>();
+    [...targetSearchParams.entries()].forEach(([key, value]) => {
+      const token = `${key}${this.QUERY_PARAM_SEPARATOR}${value}`;
+      targetCounts.set(token, (targetCounts.get(token) ?? 0) + 1);
+    });
+
+    for (const [key, value] of patternSearchParams.entries()) {
+      const token = `${key}${this.QUERY_PARAM_SEPARATOR}${value}`;
+      const count = targetCounts.get(token) ?? 0;
+      if (count <= 0) {
+        return false;
+      }
+      targetCounts.set(token, count - 1);
+    }
+
+    return true;
+  }
+
   static splitPattern(pattern: string): { host: string; path: string } {
-    const [host = '', ...pathParts] = RulesService.normaliseRulePattern(pattern).split('/');
-    const path = pathParts.length > 0 ? `/${pathParts.join('/')}` : '';
-    return { host, path };
+    const normalised = RulesService.normalisePatternParts(pattern);
+    return { host: normalised.host, path: normalised.path };
   }
 
   static sortRulesBySpecificity(rules: BlockRule[]): BlockRule[] {

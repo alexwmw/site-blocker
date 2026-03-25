@@ -183,9 +183,10 @@ const PopupApp = () => {
                 onClick={handleAddPathClick}
                 className={styles.optionsButton}
               >
-                <div className={styles.optionsButtonText}>Block {path}</div>
+                <div className={styles.optionsButtonText}>Block this specific page</div>
               </Button>
             ) : null}
+            {domain !== path && path ? <div className={styles.cleanedRulePreview}>Will save: {path}</div> : null}
           </Card>
           <Card
             padding

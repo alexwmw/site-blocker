@@ -120,13 +120,13 @@ describe('useCreateRuleFromActiveTab', () => {
     expect(result.current.isResolved).toBe(true);
   });
 
-  it('creates exact and prefix URL rules from active tab', async () => {
-    chromeMock.tabs.query.mockResolvedValue([{ url: 'https://www.reddit.com/r/aita/' }]);
+  it('creates exact and prefix URL rules from active tab with automatic query selection', async () => {
+    chromeMock.tabs.query.mockResolvedValue([{ url: 'https://www.reddit.com/r/aita/?sort=new&view=compact' }]);
 
     const { result } = renderHook(() => useCreateRuleFromTab());
 
     await waitFor(() => {
-      expect(result.current.activeTab?.url).toBe('https://www.reddit.com/r/aita/');
+      expect(result.current.activeTab?.url).toBe('https://www.reddit.com/r/aita/?sort=new&view=compact');
     });
 
     const exactRule = result.current.createExactUrlRule();
@@ -137,6 +137,18 @@ describe('useCreateRuleFromActiveTab', () => {
     expect(exactRule?.pattern).toBe('reddit.com/r/aita');
     expect(prefixRule?.pattern).toBe('reddit.com/r/aita');
     expect(exactRule?.enabled).toBe(true);
+  });
+
+  it('keeps selected meaningful query params for shallow paths', async () => {
+    chromeMock.tabs.query.mockResolvedValue([{ url: 'https://example.com/watch?v=abc&t=30&pp=xyz' }]);
+
+    const { result } = renderHook(() => useCreateRuleFromTab());
+
+    await waitFor(() => {
+      expect(result.current.activeTab?.url).toBe('https://example.com/watch?v=abc&t=30&pp=xyz');
+    });
+
+    expect(result.current.createPrefixUrlRule()?.pattern).toBe('example.com/watch?v=abc');
   });
 
   it('creates a domain prefix rule from active tab', async () => {
