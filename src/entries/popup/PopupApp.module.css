@@ -27,6 +27,10 @@
   min-width: 0;
 }
 
+.flexColumn button {
+  /*height: 56px;*/
+}
+
 .optionsButton {
   display: flex; /* or inline-flex if your Button already does this */
   align-items: center;
@@ -50,4 +54,34 @@
 
 .activePageIdentity {
   margin: 8px 0 0;
+}
+
+.cleanedRulePreview {
+  margin-top: 8px;
+  color: var(--color-text-secondary);
+  font-size: 0.8rem;
+  word-break: break-all;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-bottom: 2.5px;
+}
+
+@keyframes scroll-horizontal {
+  from {
+    transform: translateX(268px);
+    display: inline-block;
+    overflow: auto;
+    margin-bottom: 0;
+  }
+  to {
+    transform: translateX(calc(-100% - 30px));
+    display: inline-block;
+    overflow: auto;
+    margin-bottom: 0;
+  }
+}
+.optionsButton:hover .cleanedRulePreview {
+  animation: scroll-horizontal 8s linear forwards infinite;
+  animation-delay: 2s;
 }

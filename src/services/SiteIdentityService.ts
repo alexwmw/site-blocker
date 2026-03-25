@@ -93,8 +93,8 @@ export class SiteIdentityService {
   }
 
   static fromRule(rule: Pick<BlockRule, 'pattern'>, options?: IdentityOptions): SiteIdentityModel {
-    const { host, path } = RulesService.splitPattern(rule.pattern);
-    return this.fromHostAndPath(host || null, path, options);
+    const { host, path, query } = RulesService.splitPattern(rule.pattern);
+    return this.fromHostAndPath(host || null, `${path}${query}`, options);
   }
 
   static fromUrl(targetUrl: string | null | undefined, options?: IdentityOptions): SiteIdentityModel {

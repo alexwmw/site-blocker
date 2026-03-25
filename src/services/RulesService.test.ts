@@ -63,7 +63,7 @@ describe('BlockService', () => {
     expect(RulesService.ruleMatchesUrl(rule, 'https://www.reddit.com/r/all')).toBe(false);
   });
 
-  it('ruleMatchesUrl ignores query string and hash for exact and prefix rules', () => {
+  it('ruleMatchesUrl keeps legacy non-query patterns query-agnostic, while still ignoring hashes', () => {
     const exactRule = makeRule({ matchType: 'exact', pattern: 'reddit.com/r/programming' });
     const prefixRule = makeRule({ matchType: 'prefix', pattern: 'reddit.com/r/programming' });
 
@@ -72,22 +72,59 @@ describe('BlockService', () => {
     expect(RulesService.ruleMatchesUrl(prefixRule, 'https://reddit.com/r/programming/comments/1#top')).toBe(true);
   });
 
+  it('ruleMatchesUrl with exact query-aware page rules requires query equality', () => {
+    const exactRule = makeRule({ matchType: 'exact', pattern: 'youtube.com/watch?v=aaa' });
+
+    expect(RulesService.ruleMatchesUrl(exactRule, 'https://www.youtube.com/watch?v=aaa')).toBe(true);
+    expect(RulesService.ruleMatchesUrl(exactRule, 'https://www.youtube.com/watch?v=bbb')).toBe(false);
+    expect(RulesService.ruleMatchesUrl(exactRule, 'https://www.youtube.com/watch?v=aaa&t=30')).toBe(false);
+  });
+
+  it('ruleMatchesUrl with prefix query-aware rules requires target query to include pattern params', () => {
+    const prefixRule = makeRule({ matchType: 'prefix', pattern: 'youtube.com/watch?v=aaa&list=xyz' });
+
+    expect(RulesService.ruleMatchesUrl(prefixRule, 'https://www.youtube.com/watch?v=aaa&list=xyz')).toBe(true);
+    expect(RulesService.ruleMatchesUrl(prefixRule, 'https://www.youtube.com/watch?list=xyz&v=aaa&t=30')).toBe(true);
+    expect(RulesService.ruleMatchesUrl(prefixRule, 'https://www.youtube.com/watch?v=aaa')).toBe(false);
+    expect(RulesService.ruleMatchesUrl(prefixRule, 'https://www.youtube.com/watch?v=bbb&list=xyz')).toBe(false);
+  });
+
   it('ruleMatchesUrl returns false for disabled rules', () => {
     const rule = makeRule({ enabled: false });
 
     expect(RulesService.ruleMatchesUrl(rule, 'https://reddit.com')).toBe(false);
   });
 
-  it('normaliseRulePattern normalises case, www, slash, and query/hash', () => {
+  it('normaliseRulePattern normalises case, www, slash, keeps query, and drops hash', () => {
     expect(RulesService.normaliseRulePattern('WWW.Reddit.com/R/Typescript/?Sort=top#today')).toBe(
-      'reddit.com/r/typescript',
+      'reddit.com/r/typescript?Sort=top',
     );
-    expect(RulesService.normaliseRulePattern('https://www.Reddit.com/?Sort=top#today')).toBe('reddit.com');
+    expect(RulesService.normaliseRulePattern('https://www.Reddit.com/?Sort=top#today')).toBe('reddit.com?Sort=top');
+  });
+
+  it('normaliseRulePattern canonicalises query parameter order for duplicate detection', () => {
+    expect(RulesService.normaliseRulePattern('https://example.com/watch?b=2&a=1&b=1')).toBe(
+      'example.com/watch?a=1&b=1&b=2',
+    );
+  });
+
+  it('normaliseRulePattern keeps soft-noise params for explicit/manual patterns', () => {
+    expect(RulesService.normaliseRulePattern('https://example.com/search?q=react&source=hp')).toBe(
+      'example.com/search?q=react&source=hp',
+    );
   });
 
   it('patternFromUrl builds normalised page pattern from current tab URL', () => {
-    expect(RulesService.patternFromUrl('https://www.Reddit.com/R/Typescript/?Sort=top#today')).toBe(
-      'reddit.com/r/typescript',
+    expect(RulesService.patternFromUrl('https://www.Reddit.com/R/Typescript/?Sort=top#today')).toBe('reddit.com/r/typescript');
+    expect(RulesService.patternFromUrl('https://example.com/search?q=react&source=hp')).toBe('example.com/search?q=react');
+    expect(RulesService.patternFromUrl('https://example.com/search?query=react')).toBe('example.com/search');
+    expect(RulesService.patternFromUrl('https://example.com/view?id=123&tab=info')).toBe('example.com/view?id=123');
+    expect(RulesService.patternFromUrl('https://example.com/watch?v=abc&id=123')).toBe('example.com/watch?id=123');
+    expect(RulesService.patternFromUrl('https://example.com/watch?v=abc&t=30&pp=xyz')).toBe('example.com/watch?v=abc');
+    expect(RulesService.patternFromUrl('https://example.com/docs/article/view?id=abc')).toBe('example.com/docs/article/view?id=abc');
+    expect(RulesService.patternFromUrl('https://example.com/docs/article/view?q=react')).toBe('example.com/docs/article/view');
+    expect(RulesService.patternFromUrl('https://example.com/docs/article/123?id=abc')).toBe(
+      'example.com/docs/article/123?id=abc',
     );
     expect(RulesService.patternFromUrl('chrome://extensions')).toBeNull();
   });
@@ -95,6 +132,16 @@ describe('BlockService', () => {
   it('pathPatternFromUrl builds normalised page pattern from current tab URL', () => {
     expect(RulesService.pathPatternFromUrl('https://www.Reddit.com/R/Typescript/?Sort=top#today')).toBe(
       'reddit.com/r/typescript',
+    );
+    expect(RulesService.pathPatternFromUrl('https://example.com/search?q=react&source=hp')).toBe('example.com/search?q=react');
+    expect(RulesService.pathPatternFromUrl('https://example.com/search?query=react')).toBe('example.com/search');
+    expect(RulesService.pathPatternFromUrl('https://example.com/view?id=123&tab=info')).toBe('example.com/view?id=123');
+    expect(RulesService.pathPatternFromUrl('https://example.com/watch?v=abc&id=123')).toBe('example.com/watch?id=123');
+    expect(RulesService.pathPatternFromUrl('https://example.com/watch?v=abc&t=30&pp=xyz')).toBe('example.com/watch?v=abc');
+    expect(RulesService.pathPatternFromUrl('https://example.com/docs/article/view?id=abc')).toBe('example.com/docs/article/view?id=abc');
+    expect(RulesService.pathPatternFromUrl('https://example.com/docs/article/view?q=react')).toBe('example.com/docs/article/view');
+    expect(RulesService.pathPatternFromUrl('https://example.com/docs/article/123?id=abc')).toBe(
+      'example.com/docs/article/123?id=abc',
     );
     expect(RulesService.pathPatternFromUrl('chrome://extensions')).toBeNull();
   });
@@ -140,11 +187,11 @@ describe('BlockService', () => {
   it('findDuplicateRules returns canonical duplicates regardless of matchType', () => {
     const compareRule = makeRule({
       id: 'rule-new',
-      pattern: 'https://www.Reddit.com/r/typescript/?sort=top#today',
+      pattern: 'https://www.Reddit.com/r/typescript/?b=2&a=1#today',
       matchType: 'prefix',
     });
     const rules: BlockRule[] = [
-      makeRule({ id: 'rule-1', pattern: 'reddit.com/r/typescript', matchType: 'exact' }),
+      makeRule({ id: 'rule-1', pattern: 'reddit.com/r/typescript?a=1&b=2', matchType: 'exact' }),
       makeRule({ id: 'rule-2', pattern: 'news.ycombinator.com', matchType: 'prefix' }),
     ];
 

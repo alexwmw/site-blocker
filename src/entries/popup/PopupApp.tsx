@@ -40,7 +40,7 @@ const PopupApp = () => {
   const {
     activeTab,
     createDomainPrefixRule,
-    createPrefixUrlRule,
+    createExactUrlRule,
     error: activeTabError,
     isResolved,
   } = useCreateRuleFromTab();
@@ -112,7 +112,7 @@ const PopupApp = () => {
   };
 
   const handleAddPathClick = () => {
-    const rule = createPrefixUrlRule();
+    const rule = createExactUrlRule();
     if (rule) {
       addRule(rule).catch(console.error);
     }
@@ -183,7 +183,10 @@ const PopupApp = () => {
                 onClick={handleAddPathClick}
                 className={styles.optionsButton}
               >
-                <div className={styles.optionsButtonText}>Block {path}</div>
+                <div className={styles.optionsButtonText}>
+                  <div> Block this specific page</div>
+                  <div className={styles.cleanedRulePreview}>{path}</div>
+                </div>
               </Button>
             ) : null}
           </Card>
