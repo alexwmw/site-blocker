@@ -111,7 +111,7 @@ describe('PopupApp', () => {
     render(<PopupApp />);
 
     expect(screen.getByText('Block this specific page')).toBeTruthy();
-    expect(screen.getByText('Will save: example.com/path?q=react')).toBeTruthy();
+    expect(screen.getByText('example.com/path?q=react')).toBeTruthy();
   });
 
   it('creates an exact page rule from the specific-page action', () => {
