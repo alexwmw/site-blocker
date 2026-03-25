@@ -266,6 +266,25 @@ export class RulesService {
     return this.normalisePathComparable(host, pathname, search);
   }
 
+  private static normalisePatternForDuplicateDetection(patternInput: string): string {
+    const trimmedInput = patternInput.trim();
+    const parsed = this.parseSupportedUrl(trimmedInput);
+
+    if (parsed) {
+      const autoQuerySelection = this.getAutoQuerySelection(parsed);
+      return this.normalisePathComparable(parsed.hostname, parsed.pathname, parsed.search, autoQuerySelection);
+    }
+
+    const { host, pathname, search } = this.parseLooseHostPathAndSearch(trimmedInput);
+    const syntheticParsed = this.parseSupportedUrl(`https://${host}${pathname}${search}`);
+    if (syntheticParsed) {
+      const autoQuerySelection = this.getAutoQuerySelection(syntheticParsed);
+      return this.normalisePathComparable(host, pathname, search, autoQuerySelection);
+    }
+
+    return this.normalisePathComparable(host, pathname, search);
+  }
+
   /**
    * Convert a supported URL to a normalised path pattern for new-rule creation flows.
    * This matches the legacy "Block reddit.com/r/path" action.
@@ -381,9 +400,9 @@ export class RulesService {
     return true;
   }
 
-  static splitPattern(pattern: string): { host: string; path: string } {
+  static splitPattern(pattern: string): { host: string; path: string; query: string } {
     const normalised = RulesService.normalisePatternParts(pattern);
-    return { host: normalised.host, path: normalised.path };
+    return { host: normalised.host, path: normalised.path, query: normalised.query };
   }
 
   static sortRulesBySpecificity(rules: BlockRule[]): BlockRule[] {
@@ -433,8 +452,8 @@ export class RulesService {
   }
 
   static findDuplicateRules(compareRule: BlockRule, rules: BlockRule[]): BlockRule[] {
-    const normalisedPattern = this.normaliseRulePattern(compareRule.pattern);
+    const normalisedPattern = this.normalisePatternForDuplicateDetection(compareRule.pattern);
 
-    return rules.filter((rule) => this.normaliseRulePattern(rule.pattern) === normalisedPattern);
+    return rules.filter((rule) => this.normalisePatternForDuplicateDetection(rule.pattern) === normalisedPattern);
   }
 }

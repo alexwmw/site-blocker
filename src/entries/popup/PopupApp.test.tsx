@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import PopupApp from './PopupApp';
@@ -112,5 +112,38 @@ describe('PopupApp', () => {
 
     expect(screen.getByText('Block this specific page')).toBeTruthy();
     expect(screen.getByText('Will save: example.com/path?q=react')).toBeTruthy();
+  });
+
+  it('creates an exact page rule from the specific-page action', () => {
+    const createExactUrlRule = vi.fn(() => ({
+      id: 'r1',
+      pattern: 'example.com/path?q=react',
+      matchType: 'exact' as const,
+      createdAt: new Date().toISOString(),
+      enabled: true,
+    }));
+    const createPrefixUrlRule = vi.fn(() => null);
+    const addRule = vi.fn(async () => {});
+
+    vi.mocked(useCreateRuleFromTab).mockReturnValue(
+      createRuleHookResult({
+        createExactUrlRule,
+        createPrefixUrlRule,
+      }),
+    );
+    vi.mocked(useBlockRules).mockReturnValue({
+      blockRules: [],
+      addRule,
+      error: null,
+      removeRule: vi.fn(async () => {}),
+      updateRule: vi.fn(async () => {}),
+    });
+
+    render(<PopupApp />);
+    fireEvent.click(screen.getByText('Block this specific page'));
+
+    expect(createExactUrlRule).toHaveBeenCalledTimes(1);
+    expect(createPrefixUrlRule).not.toHaveBeenCalled();
+    expect(addRule).toHaveBeenCalledTimes(1);
   });
 });

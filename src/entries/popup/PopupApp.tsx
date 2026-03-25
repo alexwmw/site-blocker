@@ -40,7 +40,7 @@ const PopupApp = () => {
   const {
     activeTab,
     createDomainPrefixRule,
-    createPrefixUrlRule,
+    createExactUrlRule,
     error: activeTabError,
     isResolved,
   } = useCreateRuleFromTab();
@@ -112,7 +112,7 @@ const PopupApp = () => {
   };
 
   const handleAddPathClick = () => {
-    const rule = createPrefixUrlRule();
+    const rule = createExactUrlRule();
     if (rule) {
       addRule(rule).catch(console.error);
     }
