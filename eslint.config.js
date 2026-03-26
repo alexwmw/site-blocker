@@ -74,17 +74,6 @@ export default defineConfig([
           alphabetize: { order: 'asc', caseInsensitive: true },
         },
       ],
-      'no-restricted-imports': [
-        'error',
-        {
-          patterns: [
-            {
-              group: ['@/services/rules/*', './rules/*', '../rules/*', '**/services/rules/*'],
-              message: 'Import rule functionality through RulesService only.',
-            },
-          ],
-        },
-      ],
 
       /* Performance & Security */
       'security/detect-object-injection': 'off', // Usually too noisy
@@ -102,12 +91,7 @@ export default defineConfig([
       react: { version: 'detect' },
     },
   },
-  {
-    files: ['src/services/RulesService.ts'],
-    rules: {
-      'no-restricted-imports': 'off',
-    },
-  },
+
   // Override for specific paths
   {
     files: ['src/entries/background/**/*.{ts,tsx}', 'src/services/**/*.{ts,tsx}'],
