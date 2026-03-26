@@ -18,6 +18,18 @@ const Hero = ({
 }) => {
   return (
     <header className={clsx(styles.hero, variant && styles[variant])}>
+      <div className={styles.brandRow}>
+        <div
+          aria-hidden='true'
+          className={styles.brandGlyph}
+        >
+          H
+        </div>
+        <div>
+          <p className={styles.brandName}>Hold</p>
+          <p className={styles.brandTone}>Mindful site boundaries</p>
+        </div>
+      </div>
       <EyebrowLabel>{label}</EyebrowLabel>
       <h1 className={styles.heroTitle}>{title}</h1>
       {subheading ? <Paragraph subtle>{subheading}</Paragraph> : null}

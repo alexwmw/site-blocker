@@ -1,7 +1,9 @@
 .page {
   width: 360px;
-  padding: 16px;
-  background: var(--color-bg);
+  padding: 14px 14px 16px;
+  background:
+    radial-gradient(circle at 90% -30%, color-mix(in srgb, var(--color-accent) 14%, transparent), transparent 44%),
+    var(--color-bg);
   color: var(--color-text-primary);
 }
 
@@ -27,12 +29,8 @@
   min-width: 0;
 }
 
-.flexColumn button {
-  /*height: 56px;*/
-}
-
 .optionsButton {
-  display: flex; /* or inline-flex if your Button already does this */
+  display: flex;
   align-items: center;
   width: 100%;
   min-width: 0;
@@ -53,7 +51,11 @@
 }
 
 .activePageIdentity {
-  margin: 8px 0 0;
+  margin: 10px 0 0;
+  padding: 8px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border-muted);
+  background: color-mix(in srgb, var(--color-bg-elevated) 94%, var(--color-accent) 6%);
 }
 
 .cleanedRulePreview {
@@ -81,6 +83,7 @@
     margin-bottom: 0;
   }
 }
+
 .optionsButton:hover .cleanedRulePreview {
   animation: scroll-horizontal 8s linear forwards infinite;
   animation-delay: 2s;

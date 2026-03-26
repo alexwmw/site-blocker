@@ -1,9 +1,56 @@
 .hero {
-  margin-bottom: 4px;
+  margin-bottom: 8px;
+  padding: 14px;
+  border: 1px solid var(--color-border-muted);
+  border-radius: var(--radius-lg);
+  background:
+    radial-gradient(circle at 8% -10%, color-mix(in srgb, var(--color-accent) 12%, transparent), transparent 42%),
+    linear-gradient(180deg, color-mix(in srgb, var(--color-bg-elevated) 94%, var(--color-accent) 6%), var(--color-bg-elevated));
+}
+
+.brandRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.brandGlyph {
+  inline-size: 30px;
+  block-size: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--color-text-inverse);
+  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-strong));
+  box-shadow: var(--shadow-soft);
+}
+
+.brandName {
+  margin: 0;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.brandTone {
+  margin: 2px 0 0;
+  color: var(--color-text-secondary);
+  font-size: 0.76rem;
 }
 
 .heroTitle {
-  margin: 6px 0 0;
+  margin: 8px 0 0;
+}
+
+.compact {
+  padding: 12px;
+}
+
+.compact .brandRow {
+  margin-bottom: 8px;
 }
 
 .compact .heroTitle {
