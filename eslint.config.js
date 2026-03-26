@@ -91,6 +91,7 @@ export default defineConfig([
       react: { version: 'detect' },
     },
   },
+
   // Override for specific paths
   {
     files: ['src/entries/background/**/*.{ts,tsx}', 'src/services/**/*.{ts,tsx}'],
