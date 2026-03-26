@@ -1,5 +1,9 @@
 :root {
   --font-family-base: Inter, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif;
+  --font-family-display: "Inter Tight", Inter, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif;
+
+  --brand-logo-min-width: 28px;
+  --brand-logo-clearspace: 8px;
 
   --block-page-focus-image: url('images/abstract.webp');
   --block-page-mindful-image: url('images/green.webp');
@@ -31,6 +35,22 @@
   --color-accent-strong: #2f6a70;
   --color-accent-soft: #6e9da2;
   --color-danger: #b85c63;
+  --color-success: #2f8a63;
+
+  --color-icon-default: currentcolor;
+  --icon-stroke-width: 1.85;
+
+  --focus-ring-width: 2px;
+  --focus-ring-color: color-mix(in srgb, var(--color-accent) 65%, white);
+
+  --interactive-primary-bg: var(--color-accent);
+  --interactive-primary-bg-hover: var(--color-accent-strong);
+  --interactive-primary-bg-active: color-mix(in srgb, var(--color-accent-strong) 86%, black);
+  --interactive-secondary-bg: var(--color-bg-muted);
+  --interactive-secondary-bg-hover: var(--color-bg-input);
+  --interactive-secondary-border: var(--color-border-strong);
+  --interactive-ghost-border: var(--color-border);
+  --interactive-ghost-border-hover: var(--color-border-strong);
 
   --color-block-page-bg: #f5f2ee;
   --image-block-page-bg: none;

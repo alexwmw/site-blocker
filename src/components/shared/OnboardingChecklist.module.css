@@ -1,0 +1,18 @@
+.title {
+  margin: 0;
+  font-size: 1rem;
+  font-family: var(--font-family-display), sans-serif;
+}
+
+.list {
+  margin: 12px 0 0;
+  padding-left: 18px;
+  color: var(--color-text-secondary);
+  display: grid;
+  gap: 6px;
+}
+
+.item::marker {
+  color: var(--color-accent);
+  font-weight: 700;
+}

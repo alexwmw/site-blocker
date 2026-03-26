@@ -4,7 +4,7 @@ import Lottie from 'lottie-react';
 const BasicLottie = (props: LottieComponentProps) => {
   return (
     <Lottie
-      style={{ display: 'none' }} // todo: remove once styles are added
+      style={{ width: '100%', height: '100%' }}
       loop={false}
       autoplay={false}
       rendererSettings={{

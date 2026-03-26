@@ -7,6 +7,7 @@ import useSettings from '@/hooks/useSettings';
 type RefCurrentProps = {
   play: () => void;
   stop: () => void;
+  setSpeed?: (speed: number) => void;
 } & Partial<LottieRefCurrentProps>;
 
 export const useButtonEvents = (player: RefObject<RefCurrentProps | null>) => {
@@ -36,6 +37,7 @@ export const useButtonEvents = (player: RefObject<RefCurrentProps | null>) => {
 
     setTimeRemaining(settings.holdDurationSeconds);
     setHeld(true);
+    player.current?.setSpeed?.(5 / Math.max(settings.holdDurationSeconds, 1));
     player.current?.play();
     interval.current = setInterval(countdown, 1000);
   };
@@ -57,6 +59,9 @@ export const useButtonEvents = (player: RefObject<RefCurrentProps | null>) => {
   };
 
   const onRelease = useCallback(() => {
+    if (timeRemaining === 0) {
+      return;
+    }
     setTimeRemaining(null);
     setHeld(false);
     player.current?.stop();
@@ -64,7 +69,7 @@ export const useButtonEvents = (player: RefObject<RefCurrentProps | null>) => {
       clearInterval(interval.current);
       interval.current = null;
     }
-  }, [player]);
+  }, [player, timeRemaining]);
 
   useEffect(() => {
     document.addEventListener('mouseup', onRelease);

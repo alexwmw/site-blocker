@@ -24,9 +24,18 @@
     border-color 0.15s ease;
 }
 
+.tabButton:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: 2px;
+}
+
 .tabButton:hover {
   color: var(--color-text-primary);
   background: color-mix(in srgb, var(--color-accent) 10%, transparent);
+}
+
+.tabButton:active {
+  background: color-mix(in srgb, var(--color-accent) 22%, transparent);
 }
 
 .tabButtonActive {

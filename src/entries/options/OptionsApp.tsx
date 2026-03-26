@@ -9,6 +9,7 @@ import Scheduling from './tabs/Scheduling';
 
 import Tabs, { type TabItem } from '@/components/primitives/Tabs';
 import Hero from '@/components/shared/Hero';
+import OnboardingChecklist from '@/components/shared/OnboardingChecklist';
 import RenderBoundary from '@/components/shared/RenderBoundary';
 import useBlockRules from '@/hooks/useBlockRules';
 import useSettings from '@/hooks/useSettings';
@@ -25,6 +26,12 @@ const OPTIONS_TABS: ReadonlyArray<TabItem<OptionsTab>> = [
   { id: 'scheduling', label: 'Schedule' },
   { id: 'preferences', label: 'Preferences' },
 ];
+
+const ONBOARDING_STEPS = [
+  'Add at least one rule in the Rules tab.',
+  'Set a hold duration that creates enough friction.',
+  'Optionally turn on a schedule to block only at focus times.',
+] as const;
 
 const createNewScheduleWindow: () => ScheduleWindow = () => ({
   id: createUniqueId(),
@@ -100,6 +107,11 @@ const OptionsApp = () => {
         data={optionsData}
         error={blockRulesError ?? settingsError}
       >
+        <OnboardingChecklist
+          className={styles.onboarding}
+          title='Quick setup'
+          items={ONBOARDING_STEPS}
+        />
         <StatsGrid stats={statsToDisplay} />
         <Tabs
           className={styles.tabs}
