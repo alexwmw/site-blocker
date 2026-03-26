@@ -21,16 +21,20 @@ const HoldButton = (props: HoldButtonProps) => {
 
   return (
     <div className={styles.holdAction}>
-      <RelevantLottie lottieRef={player} />
-      <button
-        autoFocus={autoFocus}
-        onKeyDown={onKeyDown}
-        onMouseDown={onMouseDown}
-        className={styles.holdButton}
-        aria-live='polite'
-      >
-        {buttonText}
-      </button>
+      <div className={styles.holdButtonStack}>
+        <div className={styles.holdLottieLayer}>
+          <RelevantLottie lottieRef={player} />
+        </div>
+        <button
+          autoFocus={autoFocus}
+          onKeyDown={onKeyDown}
+          onMouseDown={onMouseDown}
+          className={styles.holdButton}
+          aria-live='polite'
+        >
+          {buttonText}
+        </button>
+      </div>
       <p className={styles.holdCaption}>
         {holdIsComplete ? 'Success! Redirecting…' : 'Click and hold or press Space.'}
       </p>

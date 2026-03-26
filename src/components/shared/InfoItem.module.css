@@ -9,6 +9,8 @@
 }
 .infoIcon {
   flex-shrink: 0;
+  color: var(--color-icon-default);
+  stroke-width: var(--icon-stroke-width);
 }
 
 .infoTextContainer {

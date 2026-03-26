@@ -5,16 +5,46 @@
   gap: 12px;
 }
 
+.holdButtonStack {
+  position: relative;
+  display: grid;
+  place-items: center;
+  inline-size: 190px;
+  block-size: 190px;
+}
+
+.holdLottieLayer {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
 .holdButton {
   border: 0;
   border-radius: var(--radius-pill);
   background: linear-gradient(135deg, var(--color-accent-strong), var(--color-accent-soft));
   color: var(--color-text-inverse);
-  font-size: 1rem;
+  font-size: 1.15rem;
   font-weight: 700;
-  padding: 12px 24px;
+  inline-size: 124px;
+  block-size: 124px;
+  display: grid;
+  place-items: center;
   cursor: pointer;
-  min-width: 180px;
+  position: relative;
+  z-index: 1;
+  box-shadow: var(--shadow-soft);
+}
+
+.holdButton:focus-visible {
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: 4px;
+}
+
+.holdButton:active {
+  transform: scale(0.98);
 }
 
 .holdCaption {
