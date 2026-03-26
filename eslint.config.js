@@ -79,7 +79,7 @@ export default defineConfig([
         {
           patterns: [
             {
-              group: ['@/services/rules/*', './rules/*', '../rules/*'],
+              group: ['@/services/rules/*', './rules/*', '../rules/*', '**/services/rules/*'],
               message: 'Import rule functionality through RulesService only.',
             },
           ],
