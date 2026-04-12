@@ -8,13 +8,59 @@
 .holdButton {
   border: 0;
   border-radius: var(--radius-pill);
-  background: linear-gradient(135deg, var(--color-accent-strong), var(--color-accent-soft));
+  background: linear-gradient(135deg, var(--color-brand-strong), var(--color-brand-soft));
   color: var(--color-text-inverse);
-  font-size: 1rem;
+  font-size: 1.2rem;
   font-weight: 700;
   padding: 12px 24px;
   cursor: pointer;
-  min-width: 180px;
+  letter-spacing: 2px;
+  aspect-ratio: 1 / 1;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: filter var(--transition-duration) ease;
+
+  &.holdComplete {
+    opacity: 0;
+  }
+
+  &:hover {
+    filter: brightness(110%) saturate(110%);
+  }
+  &:active {
+    filter: brightness(110%) saturate(110%) contrast(120%);
+    font-size: 1.75rem;
+  }
+}
+
+.buttonStack {
+  display: grid;
+  grid-template-areas: 'stack';
+  padding-block: 12px;
+  justify-items: center;
+  align-items: center;
+  transition: scale var(--transition-duration) ease;
+  scale: 1;
+
+  > * {
+    width: 100px;
+    grid-area: stack;
+    &.holdButton {
+      z-index: 1;
+    }
+    &:not(.holdButton) {
+      position: relative;
+      top: 1px;
+      z-index: 0;
+      scale: 1.22;
+    }
+  }
+
+  &:has(.holdButton:active) {
+    scale: 0.95;
+  }
 }
 
 .holdCaption {

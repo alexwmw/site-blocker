@@ -1,0 +1,44 @@
+@keyframes zoomOuter {
+  from {
+    transform: scale(0.9);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+@keyframes bgColorToSuccess {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.wrapper {
+  svg > g > g:first-child path {
+    stroke: var(--color-success);
+  }
+  svg > g > g:last-child path {
+    stroke: var(--color-success);
+  }
+
+  animation: zoomOuter 1s ease-in;
+  animation-fill-mode: forwards;
+
+  .background {
+    border-radius: 50%;
+    position: absolute;
+    inset: 7px;
+    animation: bgColorToSuccess 1s ease;
+    animation-fill-mode: forwards;
+    filter: brightness(110%) saturate(110%) contrast(120%);
+    background: linear-gradient(135deg, var(--color-brand-strong), var(--color-brand-soft));
+  }
+  .backgroundSuccess {
+    border-radius: 50%;
+    position: absolute;
+    inset: 7px;
+    background-color: var(--color-success-background);
+  }
+}

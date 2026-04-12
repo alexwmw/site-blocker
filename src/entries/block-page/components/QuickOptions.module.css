@@ -1,0 +1,24 @@
+.quickOptions {
+  &:has(details[open]) {
+    summary svg {
+      rotate: 90deg;
+    }
+  }
+}
+
+.quickOptions summary {
+  cursor: pointer;
+  padding-left: 0;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  svg {
+    transition: rotate 0.1s ease-in-out;
+    width: 18px;
+  }
+}
+
+.quickOptions summary::-webkit-details-marker {
+  display: none;
+}

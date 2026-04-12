@@ -208,7 +208,7 @@ describe('MigrationService - Deep Logic Tests', () => {
       const [calls] = chromeMock.storage.local.set.mock.calls[0];
 
       expect(calls.version).toBe(4);
-      expect(calls.settings.theme).toBe('mindful-light');
+      expect(calls.settings.theme).toBe('intention-dark');
       expect(calls.settings.blockPageHeadline).toBe('Stay on track');
       expect(calls.settings.holdDurationSeconds).toBe(3);
       expect(calls.settings.extendedUnblock.durationMinutes).toBe(240);

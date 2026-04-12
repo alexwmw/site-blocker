@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import type { LottieRef } from 'lottie-react';
 import type { KeyboardEventHandler, MouseEventHandler } from 'react';
 
@@ -11,26 +12,29 @@ export type HoldButtonProps = {
   onMouseDown: MouseEventHandler;
   onKeyDown: KeyboardEventHandler;
   autoFocus: boolean;
+  holdIsComplete: boolean;
 };
 
 const HoldButton = (props: HoldButtonProps) => {
-  const { autoFocus, player, remainingTime, onKeyDown, onMouseDown } = props;
-  const holdIsComplete = remainingTime === 0;
+  const { autoFocus, holdIsComplete, player, remainingTime, onKeyDown, onMouseDown } = props;
   const RelevantLottie = holdIsComplete ? LottieSuccess : LottieHold;
-  const buttonText = String(remainingTime === null ? 'Hold' : remainingTime);
+  const buttonText = String(remainingTime === null ? 'HOLD' : remainingTime);
 
   return (
     <div className={styles.holdAction}>
-      <RelevantLottie lottieRef={player} />
-      <button
-        autoFocus={autoFocus}
-        onKeyDown={onKeyDown}
-        onMouseDown={onMouseDown}
-        className={styles.holdButton}
-        aria-live='polite'
-      >
-        {buttonText}
-      </button>
+      <div className={styles.buttonStack}>
+        <RelevantLottie lottieRef={player} />
+        <button
+          autoFocus={autoFocus}
+          onKeyDown={onKeyDown}
+          onMouseDown={onMouseDown}
+          className={clsx(styles.holdButton, holdIsComplete && styles.holdComplete)}
+          aria-live='polite'
+          disabled={holdIsComplete}
+        >
+          {buttonText}
+        </button>
+      </div>
       <p className={styles.holdCaption}>
         {holdIsComplete ? 'Success! Redirecting…' : 'Click and hold or press Space.'}
       </p>

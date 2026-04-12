@@ -16,6 +16,15 @@
     "prettier": "prettier */**/*.css --write"
   },
   "dependencies": {
+    "@fontsource/figtree": "^5.2.10",
+    "@fontsource/funnel-display": "^5.2.8",
+    "@fontsource/inter": "^5.2.8",
+    "@fontsource/manrope": "^5.2.8",
+    "@fontsource/outfit": "^5.2.8",
+    "@fontsource/plus-jakarta-sans": "^5.2.8",
+    "@fontsource/poppins": "^5.2.7",
+    "@fontsource/rubik": "^5.2.8",
+    "@fontsource/source-sans-3": "^5.2.9",
     "lottie-react": "^2.4.1",
     "lucide-react": "^0.400.0",
     "react": "^18.3.1",

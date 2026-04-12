@@ -1,9 +1,18 @@
 .hero {
-  margin-bottom: 4px;
+  margin-bottom: 8px;
+  padding: 14px;
 }
 
 .heroTitle {
-  margin: 6px 0 0;
+  margin: 8px 0 0;
+}
+
+.compact {
+  padding: 12px;
+}
+
+.compact .brandRow {
+  margin-bottom: 8px;
 }
 
 .compact .heroTitle {

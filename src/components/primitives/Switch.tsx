@@ -9,13 +9,22 @@ type SwitchProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> & {
   id: string;
   reverse?: boolean;
   compact?: boolean;
+  switchSize?: 'small' | 'medium';
 };
 
-const Switch = ({ label, fieldHint, className, reverse, id: switchId, ...rest }: SwitchProps) => {
+const Switch = ({
+  label,
+  fieldHint,
+  className,
+  switchSize = 'medium',
+  reverse,
+  id: switchId,
+  ...rest
+}: SwitchProps) => {
   const describedById = switchId + '-field-hint';
 
   return (
-    <div className={clsx(styles.switchGrid, reverse && styles.reverse, className)}>
+    <div className={clsx(styles.switchGrid, reverse && styles.reverse, className, styles[switchSize])}>
       <label
         htmlFor={switchId}
         className={styles.switchLabel}

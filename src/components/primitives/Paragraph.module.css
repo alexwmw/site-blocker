@@ -3,3 +3,7 @@
   color: var(--color-text-secondary);
   font-size: 0.92rem;
 }
+
+.small {
+  font-size: 0.75rem;
+}
