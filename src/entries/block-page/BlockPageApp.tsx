@@ -97,6 +97,7 @@ const BlockPageApp = () => {
           <QuickOptions
             className={styles.optionsCard}
             settings={settings}
+            updateSettings={updateSettings}
           />
         ) : null}
         {!settings?.isRated ? (

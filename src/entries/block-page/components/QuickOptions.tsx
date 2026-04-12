@@ -14,8 +14,19 @@ import useOptionChangeHandlers from '@/entries/options/useOptionChangeHandlers';
 import type { Settings } from '@/types/schema';
 import { SETTINGS_LIMITS } from '@/types/schema';
 
-const QuickOptions = ({ settings, className }: { settings: Settings; className?: string }) => {
-  const { handleExtendedUnblockDurationChange, handleExtendedUnblockEnabledChange } = useOptionChangeHandlers(settings);
+const QuickOptions = ({
+  settings,
+  updateSettings,
+  className,
+}: {
+  settings: Settings;
+  updateSettings: (updates: Partial<Settings>) => Promise<void>;
+  className?: string;
+}) => {
+  const { handleExtendedUnblockDurationChange, handleExtendedUnblockEnabledChange } = useOptionChangeHandlers(
+    settings,
+    updateSettings,
+  );
   const [open, setOpen] = useState<boolean>(false);
 
   const handleOpenOptions = () => {

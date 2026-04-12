@@ -20,7 +20,7 @@ type PreferencesProps = {
   updateSettings: (updates: Partial<Settings>) => Promise<void>;
 };
 
-const Preferences = ({ className, settings }: PreferencesProps) => {
+const Preferences = ({ className, settings, updateSettings }: PreferencesProps) => {
   const [[theme, mode], setModeAndTheme] = useState<string[]>([]);
   const {
     handleExtendedUnblockDurationChange,
@@ -29,7 +29,7 @@ const Preferences = ({ className, settings }: PreferencesProps) => {
     handleHoldDurationChange,
     handleResetPreferences,
     handleThemeChange,
-  } = useOptionChangeHandlers(settings);
+  } = useOptionChangeHandlers(settings, updateSettings);
 
   useEffect(() => {
     if (settings?.theme) {

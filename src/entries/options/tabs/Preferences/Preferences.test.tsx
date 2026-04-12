@@ -1,11 +1,30 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import Preferences from './index';
 
 import { defaultPreferenceSettings, defaultSettings } from '@/services/defaultSettings';
 
+// Mock the Chrome API
+const chromeMock = {
+  storage: {
+    sync: { get: vi.fn(), set: vi.fn(), clear: vi.fn() },
+    local: { get: vi.fn(), set: vi.fn(), clear: vi.fn() },
+  },
+};
+vi.stubGlobal('chrome', chromeMock);
+
 describe('Preferences', () => {
+  beforeEach(() => {
+    vi.restoreAllMocks();
+
+    chromeMock.storage.local.get.mockImplementation(async (key: string) => {
+      return {
+        [key]: defaultSettings,
+      };
+    });
+  });
+
   it('does not render editable persisted-looking controls while settings are unresolved', () => {
     render(
       <Preferences

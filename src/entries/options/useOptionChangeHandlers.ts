@@ -1,4 +1,3 @@
-import useSettings from '@/hooks/useSettings';
 import { defaultPreferenceSettings } from '@/services/defaultSettings';
 import type { Settings, Theme } from '@/types/schema';
 import { SETTINGS_LIMITS } from '@/types/schema';
@@ -15,9 +14,10 @@ const parseIntegerInput = (value: string): number | null => {
 
 const clamp = (value: number, min: number, max: number): number => Math.max(min, Math.min(max, value));
 
-const useOptionChangeHandlers = (settings: Settings | null) => {
-  const { updateSettings } = useSettings();
-
+const useOptionChangeHandlers = (
+  settings: Settings | null,
+  updateSettings: (updates: Partial<Settings>) => Promise<void>,
+) => {
   const handleThemeChange = (theme: Theme) => {
     updateSettings({ theme }).catch(console.error);
   };
