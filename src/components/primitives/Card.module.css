@@ -7,3 +7,13 @@
 .padding {
   padding: 16px;
 }
+
+.card.subtle {
+  background: var(--color-bg-translucent);
+  border-color: var(--color-border);
+  box-shadow: unset;
+  transition: background 0.2s ease-in-out;
+  &:hover {
+    background: var(--color-bg-elevated);
+  }
+}

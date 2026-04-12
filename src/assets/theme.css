@@ -1,5 +1,43 @@
+/* Core UI fonts */
+@import '@fontsource/inter/400.css';
+@import '@fontsource/inter/500.css';
+@import '@fontsource/inter/600.css';
+@import '@fontsource/inter/700.css';
+
+@import '@fontsource/figtree/400.css';
+@import '@fontsource/figtree/600.css';
+@import '@fontsource/figtree/700.css';
+
+@import '@fontsource/manrope/400.css';
+@import '@fontsource/manrope/600.css';
+
+/* Brand / expressive */
+@import '@fontsource/outfit/400.css';
+@import '@fontsource/outfit/600.css';
+
+@import '@fontsource/poppins/400.css';
+@import '@fontsource/poppins/500.css';
+
+@import '@fontsource/plus-jakarta-sans/400.css';
+@import '@fontsource/plus-jakarta-sans/600.css';
+@import '@fontsource/plus-jakarta-sans/700.css';
+
+@import '@fontsource/rubik/400.css';
+@import '@fontsource/rubik/600.css';
+
+@import '@fontsource/funnel-display/400.css';
+@import '@fontsource/funnel-display/600.css';
+@import '@fontsource/funnel-display/700.css';
+
+/* Backup classic */
+@import '@fontsource/source-sans-3/400.css';
+@import '@fontsource/source-sans-3/600.css';
+
 :root {
-  --font-family-base: Inter, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif;
+  --font-family-base: figtree, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif;
+  --font-family-headings: outfit, var(--font-family-base), sans-serif;
+  --font-family-brand: figtree, var(--font-family-headings), sans-serif;
+  --font-family-buttons: figtree, var(--font-family-headings), sans-serif;
 
   --block-page-focus-image: url('images/abstract.webp');
   --block-page-mindful-image: url('images/green.webp');
@@ -14,6 +52,7 @@
   --shadow-soft: 0 2px 8px rgb(28 34 38 / 6%);
 
   --color-bg: #f3f2f1;
+  --color-bg-translucent: #f3f2f177;
   --color-bg-elevated: #fcfbf8;
   --color-bg-muted: #f7f4f0;
   --color-bg-input: #faf7f3;
@@ -45,6 +84,7 @@
   --shadow-soft: 0 2px 8px rgb(28 34 38 / 6%);
 
   --color-bg: #f3f2f1;
+  --color-bg-translucent: #f3f2f177;
   --color-bg-elevated: #fcfbf8;
   --color-bg-muted: #f7f4f0;
   --color-bg-input: #faf7f3;
@@ -58,7 +98,10 @@
   --color-border-strong: #c3bbb0;
   --color-border-muted: #e4ded6;
 
-  --color-eyebrow: #863d3d;
+  --color-brand: #863d3d;
+  --color-brand-strong: #753131;
+  --color-brand-soft: #8c4d4d;
+
   --color-accent: #3d7f86;
   --color-accent-strong: #2f6a70;
   --color-accent-soft: #6e9da2;
@@ -76,6 +119,7 @@
   --shadow-soft: 0 2px 8px rgb(6 8 10 / 22%);
 
   --color-bg: #171b1e;
+  --color-bg-translucent: #171b1e77;
   --color-bg-elevated: #20262b;
   --color-bg-muted: #262d33;
   --color-bg-input: #2a3238;
@@ -89,7 +133,10 @@
   --color-border-strong: #46525a;
   --color-border-muted: #2b3338;
 
-  --color-eyebrow: #b37676;
+  --color-brand: #b37676;
+  --color-brand-strong: #8c4d4d;
+  --color-brand-soft: #ba7e7e;
+
   --color-accent: #76aeb3;
   --color-accent-strong: #5f989d;
   --color-accent-soft: #98c5c9;
@@ -107,6 +154,7 @@
   --shadow-soft: 0 2px 8px rgb(20 42 34 / 6%);
 
   --color-bg: #f0f4f2;
+  --color-bg-translucent: #f0f4f277;
   --color-bg-elevated: #fbfdfb;
   --color-bg-muted: #f2f8f4;
   --color-bg-input: #f4faf6;
@@ -120,7 +168,10 @@
   --color-border-strong: #a9cab7;
   --color-border-muted: #d6e7dc;
 
-  --color-eyebrow: #8a2f6a;
+  --color-brand: #8a2f6a;
+  --color-brand-strong: #852362;
+  --color-brand-soft: #98467b;
+
   --color-accent: #2f8a63;
   --color-accent-strong: #267352;
   --color-accent-soft: #56a07d;
@@ -128,12 +179,12 @@
 
   --color-block-page-bg: #edf7f1;
   --image-block-page-bg: var(--block-page-mindful-image);
-  --image-block-page-overlay: linear-gradient(180deg, rgb(245 251 247 / 84%), rgb(232 244 237 / 74%));
+  --image-block-page-overlay: linear-gradient(180deg, rgb(245 251 247 / 64%), rgb(232 244 237 / 54%));
 
   color-scheme: light;
 
   body:has(#block-page) {
-    backdrop-filter: saturate(75%);
+    backdrop-filter: brightness(75%);
   }
 }
 
@@ -142,6 +193,7 @@
   --shadow-soft: 0 2px 8px rgb(2 6 4 / 22%);
 
   --color-bg: #141916;
+  --color-bg-translucent: #14191677;
   --color-bg-elevated: #1b231f;
   --color-bg-muted: #212b26;
   --color-bg-input: #25302a;
@@ -154,6 +206,10 @@
   --color-border: #324039;
   --color-border-strong: #42534a;
   --color-border-muted: #2b3530;
+
+  --color-brand: #58a77e;
+  --color-brand-strong: #3f8663;
+  --color-brand-soft: #79bc98;
 
   --color-accent: #58a77e;
   --color-accent-strong: #3f8663;
@@ -176,6 +232,7 @@
   --shadow-soft: 0 2px 8px rgb(18 31 58 / 6%);
 
   --color-bg: #f2f5fb;
+  --color-bg-translucent: rgba(242, 245, 251, 0.62);
   --color-bg-elevated: #ffffff;
   --color-bg-muted: #f6f8ff;
   --color-bg-input: #f8faff;
@@ -189,6 +246,10 @@
   --color-border-strong: #b7c5e4;
   --color-border-muted: #dde5f4;
 
+  --color-brand: #4d63e3;
+  --color-brand-strong: #3d52d0;
+  --color-brand-soft: #7889f0;
+
   --color-accent: #4d63e3;
   --color-accent-strong: #3d52d0;
   --color-accent-soft: #7889f0;
@@ -196,10 +257,10 @@
 
   --color-block-page-bg: #f4f7ff;
   --image-block-page-bg: var(--block-page-focus-image);
-  --image-block-page-overlay: linear-gradient(180deg, rgb(250 251 255 / 84%), rgb(237 243 255 / 74%));
+  --image-block-page-overlay: linear-gradient(180deg, rgb(250 251 255 / 24%), rgb(237 243 255 / 34%));
 
   body:has(#block-page) {
-    backdrop-filter: brightness(50%) saturate(180%) contrast(200%) hue-rotate(40deg);
+    backdrop-filter: brightness(50%) saturate(180%) hue-rotate(-20deg);
   }
 
   color-scheme: light;
@@ -210,6 +271,7 @@
   --shadow-soft: 0 2px 8px rgb(7 9 20 / 24%);
 
   --color-bg: #111426;
+  --color-bg-translucent: #11142677;
   --color-bg-elevated: #191d38;
   --color-bg-muted: #20254a;
   --color-bg-input: #252b53;
@@ -223,6 +285,10 @@
   --color-border-strong: #4a5391;
   --color-border-muted: #2f3761;
 
+  --color-brand: #938bf2;
+  --color-brand-strong: #7c74e4;
+  --color-brand-soft: #b2abfb;
+
   --color-accent: #938bf2;
   --color-accent-strong: #7c74e4;
   --color-accent-soft: #b2abfb;
@@ -233,12 +299,23 @@
   --image-block-page-overlay: linear-gradient(180deg, rgb(18 22 46 / 76%), rgb(9 11 26 / 84%));
 
   body:has(#block-page) {
-    backdrop-filter: brightness(80%) contrast(110%) hue-rotate(-10deg);
+    backdrop-filter: contrast(115%) hue-rotate(-20deg);
   }
 
   color-scheme: dark;
 }
 
 body {
+  font-weight: 400;
   font-family: var(--font-family-base), sans-serif;
+}
+
+body h1,
+body h2,
+body h3 {
+  font-family: var(--font-family-headings), sans-serif;
+}
+
+body button {
+  font-family: var(--font-family-buttons), sans-serif;
 }

@@ -8,13 +8,25 @@
 .holdButton {
   border: 0;
   border-radius: var(--radius-pill);
-  background: linear-gradient(135deg, var(--color-accent-strong), var(--color-accent-soft));
+  background: linear-gradient(135deg, var(--color-brand-strong), var(--color-brand-soft));
   color: var(--color-text-inverse);
   font-size: 1rem;
   font-weight: 700;
   padding: 12px 24px;
+  margin-block: 24px;
   cursor: pointer;
-  min-width: 180px;
+  min-width: 120px;
+  letter-spacing: 2px;
+  aspect-ratio: 1 / 1;
+  transition:
+    filter 0.2s ease,
+    font-size 0.2s ease;
+
+  &:hover,
+  &:active {
+    filter: brightness(110%) saturate(150%);
+    font-size: 1.2rem;
+  }
 }
 
 .holdCaption {

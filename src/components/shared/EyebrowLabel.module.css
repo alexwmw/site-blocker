@@ -1,8 +1,9 @@
 .eyebrow {
   margin: 0;
-  color: var(--color-eyebrow, var(--color-accent));
+  color: var(--color-brand, var(--color-accent));
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   font-size: 0.75rem;
+  font-family: var(--font-family-brand), sans-serif;
 }

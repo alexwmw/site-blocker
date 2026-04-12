@@ -1,20 +1,28 @@
 .switchGrid {
   display: grid;
-  grid-template-areas: 'label switch' 'hint switch';
+  grid-template-areas: 'label switch' 'label switch';
   grid-template-columns: 1fr auto;
   gap: 8px 12px;
   align-items: center;
+}
+
+.switchGrid:has(.fieldHint) {
+  grid-template-areas: 'label switch' 'hint switch';
+}
+
+.switchGrid.reverse {
+  grid-template-areas: 'switch label' 'switch label';
+  grid-template-columns: auto 1fr;
+}
+
+.switchGrid.reverse:has(.fieldHint) {
+  grid-template-areas: 'switch label' 'switch hint';
 }
 
 .switchLabel {
   display: contents;
   font-weight: 600;
   cursor: pointer;
-}
-
-.switchGrid.reverse {
-  grid-template-areas: 'switch label' 'switch hint';
-  grid-template-columns: auto 1fr;
 }
 
 /*.switchLabel.compact {*/
@@ -87,4 +95,20 @@
 .input:disabled {
   cursor: not-allowed;
   opacity: 0.6;
+}
+
+.switchGrid.small {
+  .controlWrap {
+    width: 30px;
+    height: 16px;
+  }
+
+  .slider::after {
+    width: 10px;
+    height: 10px;
+  }
+
+  .input:checked + .slider::after {
+    transform: translateX(14px);
+  }
 }
