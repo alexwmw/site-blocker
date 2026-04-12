@@ -1,4 +1,5 @@
 import clsx from 'clsx';
+import { Settings } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 
 import styles from './PopupApp.module.css';
@@ -127,11 +128,21 @@ const PopupApp = () => {
 
   return (
     <main className={styles.page}>
-      <Hero
-        title='Active page status'
-        label='Hold'
-        variant='compact'
-      />
+      <div className={styles.headerBar}>
+        <Hero
+          title='Active page status'
+          label='Hold'
+          variant='compact'
+        />
+        <div>
+          <Button
+            onClick={handleOpenOptions}
+            variant='invisible'
+          >
+            <Settings />
+          </Button>
+        </div>
+      </div>
 
       <RenderBoundary
         data={popupData}
@@ -189,19 +200,15 @@ const PopupApp = () => {
                 </div>
               </Button>
             ) : null}
-          </Card>
-          <Card
-            padding
-            as='section'
-          >
-            <SectionHeader title='More options' />
-            <Button
-              variant='ghost'
-              className={styles.optionsButton}
-              onClick={handleOpenOptions}
-            >
-              Manage blocking rules
-            </Button>
+            {blockRules && blockRules.length > 0 ? (
+              <Button
+                variant='ghost'
+                className={styles.optionsButton}
+                onClick={handleOpenOptions}
+              >
+                Manage blocking rules
+              </Button>
+            ) : null}
             <Button
               variant='ghost'
               className={styles.optionsButton}

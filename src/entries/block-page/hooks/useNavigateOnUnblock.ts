@@ -21,7 +21,9 @@ const useNavigateOnUnblock = (ruleIds: string[] | null, targetUrl: string | null
 
   useEffect(() => {
     if (isUnblocked && !didNavigate) {
-      replaceLocation().catch(console.error);
+      setTimeout(() => {
+        replaceLocation().catch(console.error);
+      }, 1000);
     }
   }, [replaceLocation, isUnblocked, didNavigate]);
 

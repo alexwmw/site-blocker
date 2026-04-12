@@ -43,6 +43,8 @@
   --block-page-mindful-image: url('images/green.webp');
   --block-page-intention-image: url('images/mountains.webp');
 
+  --transition-duration: 0.25s;
+
   --radius-sm: 10px;
   --radius-md: 14px;
   --radius-lg: 18px;
@@ -69,7 +71,10 @@
   --color-accent: #863d4e;
   --color-accent-strong: #2f6a70;
   --color-accent-soft: #6e9da2;
+  --color-brand-contrast: #24313a;
   --color-danger: #b85c63;
+  --color-success: #9ed168;
+  --color-success-background: white;
 
   --color-block-page-bg: #f5f2ee;
   --image-block-page-bg: none;
@@ -101,11 +106,14 @@
   --color-brand: #863d3d;
   --color-brand-strong: #753131;
   --color-brand-soft: #8c4d4d;
+  --color-brand-contrast: #76888c;
 
   --color-accent: #3d7f86;
   --color-accent-strong: #2f6a70;
   --color-accent-soft: #6e9da2;
   --color-danger: #b85c63;
+  --color-success: #77b63c;
+  --color-success-background: transparent;
 
   --color-block-page-bg: #f5f2ee;
   --image-block-page-bg: var(--block-page-intention-image);
@@ -136,12 +144,14 @@
   --color-brand: #b37676;
   --color-brand-strong: #8c4d4d;
   --color-brand-soft: #ba7e7e;
+  --color-brand-contrast: #edf0f2;
 
   --color-accent: #76aeb3;
   --color-accent-strong: #5f989d;
   --color-accent-soft: #98c5c9;
   --color-danger: #d4888d;
-
+  --color-success-background: #77b338;
+  --color-success: white;
   --color-block-page-bg: #13171a;
   --image-block-page-bg: var(--block-page-intention-image);
   --image-block-page-overlay: linear-gradient(180deg, rgb(18 21 24 / 78%), rgb(10 12 14 / 84%));
@@ -171,11 +181,14 @@
   --color-brand: #8a2f6a;
   --color-brand-strong: #852362;
   --color-brand-soft: #98467b;
+  --color-brand-contrast: #8d9f97;
 
   --color-accent: #2f8a63;
   --color-accent-strong: #267352;
   --color-accent-soft: #56a07d;
   --color-danger: #bc4b5d;
+  --color-success: #56a07d;
+  --color-success-background: transparent;
 
   --color-block-page-bg: #edf7f1;
   --image-block-page-bg: var(--block-page-mindful-image);
@@ -210,11 +223,14 @@
   --color-brand: #58a77e;
   --color-brand-strong: #3f8663;
   --color-brand-soft: #79bc98;
+  --color-brand-contrast: #e4ece7;
 
   --color-accent: #58a77e;
   --color-accent-strong: #3f8663;
   --color-accent-soft: #79bc98;
   --color-danger: #de8593;
+  --color-success-background: #3f8663;
+  --color-success: white;
 
   --color-block-page-bg: #111613;
   --image-block-page-bg: var(--block-page-mindful-image);
@@ -249,18 +265,21 @@
   --color-brand: #4d63e3;
   --color-brand-strong: #3d52d0;
   --color-brand-soft: #7889f0;
+  --color-brand-contrast: #4b5f91;
 
   --color-accent: #4d63e3;
   --color-accent-strong: #3d52d0;
   --color-accent-soft: #7889f0;
   --color-danger: #cd3e54;
+  --color-success: #68d196;
+  --color-success-background: transparent;
 
   --color-block-page-bg: #f4f7ff;
   --image-block-page-bg: var(--block-page-focus-image);
-  --image-block-page-overlay: linear-gradient(180deg, rgb(250 251 255 / 24%), rgb(237 243 255 / 34%));
+  --image-block-page-overlay: linear-gradient(180deg, rgb(250 251 255 / 4%), rgb(237 243 255 / 14%));
 
   body:has(#block-page) {
-    backdrop-filter: brightness(50%) saturate(180%) hue-rotate(-20deg);
+    backdrop-filter: brightness(110%) saturate(110%) hue-rotate(-90deg);
   }
 
   color-scheme: light;
@@ -288,11 +307,14 @@
   --color-brand: #938bf2;
   --color-brand-strong: #7c74e4;
   --color-brand-soft: #b2abfb;
+  --color-brand-contrast: #eeedff;
 
   --color-accent: #938bf2;
   --color-accent-strong: #7c74e4;
   --color-accent-soft: #b2abfb;
   --color-danger: #f081a0;
+  --color-success-background: #38b392;
+  --color-success: white;
 
   --color-block-page-bg: #10142b;
   --image-block-page-bg: var(--block-page-focus-image);
