@@ -31,6 +31,13 @@ export class MessagesService {
           })().catch((err) => sendResponse({ ok: false, reason: String(err) }));
           return true;
         }
+        case 'TEST_URL_REQUEST': {
+          (async () => {
+            const isBlocked = await blockingEngine.testUrlIsBlocked(message.payload.targetUrl);
+            sendResponse({ ok: true, isBlocked });
+          })().catch((err) => sendResponse({ ok: false, reason: String(err) }));
+          return true;
+        }
         default:
           return false;
       }
