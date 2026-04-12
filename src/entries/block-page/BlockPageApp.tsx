@@ -8,19 +8,23 @@ import useButtonEvents from './hooks/useButtonEvents';
 import useNavigateOnUnblock from './hooks/useNavigateOnUnblock';
 
 import Card from '@/components/primitives/Card';
+import Stack from '@/components/primitives/Stack';
 import EyebrowLabel from '@/components/shared/EyebrowLabel';
 import SiteIdentity from '@/components/shared/SiteIdentity';
 import BackgroundCredit from '@/entries/block-page/components/BackgroundCredit';
+import QuickOptions from '@/entries/block-page/components/QuickOptions';
+import ReviewCard from '@/entries/block-page/components/ReviewCard';
 import useSettings from '@/hooks/useSettings';
 import useThemeEffect from '@/hooks/useThemeEffect';
 import { SiteIdentityService } from '@/services/SiteIdentityService';
+import { getChromeWebStoreUrl } from '@/utils/extensionUrls';
 
 const BlockPageApp = () => {
   const theme = useThemeEffect();
   const player = useRef<LottieRefCurrentProps>(null);
   const { onMouseDown, onKeyDown, timeRemaining, timeTotal } = useButtonEvents(player);
-  const { ruleIds, targetUrl, patternHost, patternPath, matchType } = useBlockPageParams();
-  const { settings } = useSettings();
+  const { ruleIds, targetUrl } = useBlockPageParams();
+  const { settings, updateSettings } = useSettings();
 
   const holdIsComplete = timeRemaining === 0;
 
@@ -28,10 +32,18 @@ const BlockPageApp = () => {
   useNavigateOnUnblock(ruleIds, targetUrl, holdIsComplete);
 
   const targetIdentity = useMemo(() => SiteIdentityService.fromUrl(targetUrl), [targetUrl]);
-  const ruleIdentity = useMemo(
-    () => SiteIdentityService.fromHostAndPath(patternHost, patternPath),
-    [patternHost, patternPath],
-  );
+
+  const handleSelectReview = () => {
+    const targetUrl = getChromeWebStoreUrl('reviews');
+    if (targetUrl) {
+      window.open(targetUrl, '_blank');
+    }
+    updateSettings({ isRated: true }).catch(console.error);
+  };
+
+  const handleDontShowReviewCard = () => {
+    updateSettings({ isRated: true }).catch(console.error);
+  };
 
   return (
     <main
@@ -42,30 +54,18 @@ const BlockPageApp = () => {
         as='section'
         className={styles.blockedCard}
       >
-        <EyebrowLabel>Hold to Unblock</EyebrowLabel>
+        <EyebrowLabel>Hold</EyebrowLabel>
         <h1 className={styles.title}>{settings?.blockPageHeadline ?? 'Stay on track'}</h1>
         <div className={styles.subtitle}>
-          <SiteIdentity identity={targetIdentity} />
-          <p>This page is blocked by your focus rules.</p>
+          <p>This page is blocked by your focus rules:</p>
+          <SiteIdentity
+            size='large'
+            identity={targetIdentity}
+          />
         </div>
         <p>
           <strong>If you wish to proceed, hold the button.</strong>
         </p>
-        <dl className={styles.details}>
-          <div className={styles.detailsItem}>
-            <dt className={styles.detailTerm}>Match type</dt>
-            <dd className={styles.detailValue}>{matchType ?? 'Not provided'}</dd>
-          </div>
-          <div className={styles.detailsItem}>
-            <dt className={styles.detailTerm}>Matched rule</dt>
-            <dd className={styles.detailValue}>
-              <SiteIdentity
-                identity={ruleIdentity}
-                size='small'
-              />
-            </dd>
-          </div>
-        </dl>
 
         <p className={styles.holdHelp}>
           Hold for {timeTotal ?? '...'} seconds to continue. Releasing early will reset the timer.
@@ -79,6 +79,20 @@ const BlockPageApp = () => {
           onKeyDown={onKeyDown}
         />
       </Card>
+      <Stack className={styles.absStack}>
+        {settings ? (
+          <QuickOptions
+            className={styles.optionsCard}
+            settings={settings}
+          />
+        ) : null}
+        {!settings?.isRated ? (
+          <ReviewCard
+            onSelectDontShow={handleDontShowReviewCard}
+            onSelectReview={handleSelectReview}
+          />
+        ) : null}
+      </Stack>
       <BackgroundCredit theme={theme} />
     </main>
   );

@@ -17,7 +17,7 @@ const HoldButton = (props: HoldButtonProps) => {
   const { autoFocus, player, remainingTime, onKeyDown, onMouseDown } = props;
   const holdIsComplete = remainingTime === 0;
   const RelevantLottie = holdIsComplete ? LottieSuccess : LottieHold;
-  const buttonText = String(remainingTime === null ? 'Hold' : remainingTime);
+  const buttonText = String(remainingTime === null ? 'HOLD' : remainingTime);
 
   return (
     <div className={styles.holdAction}>
