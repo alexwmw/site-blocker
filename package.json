@@ -13,6 +13,7 @@
     "preview": "vite preview",
     "format": "prettier --write .",
     "test": "vitest --run",
+    "typecheck": "tsc --noEmit",
     "prettier": "prettier */**/*.css --write"
   },
   "dependencies": {
