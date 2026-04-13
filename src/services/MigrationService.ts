@@ -73,11 +73,7 @@ export class MigrationService {
     }
 
     if (normalizedTheme === 'dark') {
-      return 'focus-dark';
-    }
-
-    if (normalizedTheme === 'mindful') {
-      return 'mindful-light';
+      return 'intention-dark';
     }
 
     return this.isTheme(normalizedTheme) ? normalizedTheme : fallback;

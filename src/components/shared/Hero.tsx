@@ -1,9 +1,10 @@
 import clsx from 'clsx';
 
-import EyebrowLabel from './EyebrowLabel';
 import styles from './Hero.module.css';
 
+import Icon from '@/assets/icons/icon512.svg?react';
 import Paragraph from '@/components/primitives/Paragraph';
+import EyebrowLabel from '@/components/shared/EyebrowLabel';
 
 const Hero = ({
   label = 'Hold',
@@ -18,9 +19,17 @@ const Hero = ({
 }) => {
   return (
     <header className={clsx(styles.hero, variant && styles[variant])}>
-      <EyebrowLabel>{label}</EyebrowLabel>
-      <h1 className={styles.heroTitle}>{title}</h1>
-      {subheading ? <Paragraph subtle>{subheading}</Paragraph> : null}
+      <div className={styles.row}>
+        <Icon
+          height={54}
+          className={styles.holdIcon}
+        />
+        <div>
+          <EyebrowLabel>{label}</EyebrowLabel>
+          <h1 className={styles.heroTitle}>{title}</h1>
+          {subheading ? <Paragraph subtle>{subheading}</Paragraph> : null}
+        </div>
+      </div>
     </header>
   );
 };
