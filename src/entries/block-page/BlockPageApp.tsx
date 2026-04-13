@@ -33,7 +33,7 @@ const BlockPageApp = () => {
   const holdSpeed = useMemo(() => (timeTotal ? HOLD_ANIM_DEFAULT_DURATION / timeTotal : 1), [timeTotal]);
 
   /** Executes window.location.replace on hold completion */
-  useNavigateOnUnblock(ruleIds, null, holdIsComplete);
+  useNavigateOnUnblock(ruleIds, targetUrl, holdIsComplete);
 
   const targetIdentity = useMemo(() => SiteIdentityService.fromUrl(targetUrl), [targetUrl]);
 

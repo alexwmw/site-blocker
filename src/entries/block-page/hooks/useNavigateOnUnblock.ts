@@ -20,12 +20,25 @@ const useNavigateOnUnblock = (ruleIds: string[] | null, targetUrl: string | null
   }, [ruleIds, targetUrl]);
 
   useEffect(() => {
+    if (targetUrl) {
+      MessagesService.sendMessage({
+        type: 'TEST_URL_REQUEST',
+        payload: { targetUrl },
+      })
+        .then(({ ok, status }) => {
+          if (ok && status !== 'blocked') {
+            window.location.replace(targetUrl);
+            setDidNavigate(true);
+          }
+        })
+        .catch(console.error);
+    }
     if (isUnblocked && !didNavigate) {
       setTimeout(() => {
         replaceLocation().catch(console.error);
       }, 1000);
     }
-  }, [replaceLocation, isUnblocked, didNavigate]);
+  }, [replaceLocation, isUnblocked, didNavigate, targetUrl]);
 
   return didNavigate;
 };

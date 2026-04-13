@@ -168,6 +168,11 @@ export default class TabRedirectStrategy implements BlockingStrategy {
     }
   }
 
+  async testUrlIsBlocked(url: string) {
+    const evaluated = await this.evaluate(NaN, url);
+    return Boolean(evaluated.url && typeof evaluated.url === 'string');
+  }
+
   /**
    * Since this strategy blocks by redirecting tabs, unblock means:
    * - Don’t block that rule for a short period (engine/rules state handles this via unblockUntil).
