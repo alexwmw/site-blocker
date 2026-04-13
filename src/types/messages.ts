@@ -21,7 +21,7 @@ export type UnblockResponse = {
 export type TestUrlResponse = {
   ok: boolean;
   reason?: string;
-  isBlocked: boolean;
+  status: 'blocked' | 'unblocked';
 };
 
 // map request "type" to response shape

@@ -33,8 +33,8 @@ export class MessagesService {
         }
         case 'TEST_URL_REQUEST': {
           (async () => {
-            const isBlocked = await blockingEngine.testUrlIsBlocked(message.payload.targetUrl);
-            sendResponse({ ok: true, isBlocked });
+            const urlIsBlocked = await blockingEngine.testUrlIsBlocked(message.payload.targetUrl);
+            sendResponse({ ok: true, status: urlIsBlocked ? 'blocked' : 'unblocked' });
           })().catch((err) => sendResponse({ ok: false, reason: String(err) }));
           return true;
         }

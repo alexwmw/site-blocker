@@ -25,8 +25,8 @@ const useNavigateOnUnblock = (ruleIds: string[] | null, targetUrl: string | null
         type: 'TEST_URL_REQUEST',
         payload: { targetUrl },
       })
-        .then((result) => {
-          if (!result.isBlocked) {
+        .then(({ ok, status }) => {
+          if (ok && status !== 'blocked') {
             window.location.replace(targetUrl);
             setDidNavigate(true);
           }
