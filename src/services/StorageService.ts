@@ -1,15 +1,12 @@
-import { ZodError, type SafeParseReturnType, type ZodIssue, type ZodType } from 'zod';
+import { type SafeParseReturnType, ZodError, type ZodIssue, type ZodType } from 'zod';
 
 import defaultSettings from './defaultSettings';
 import { RulesService } from './RulesService';
 
+import type BlockingEngine from '@/services/blocking/BlockingEngine';
+import type { SyncItems } from '@/services/blocking/strategies/BlockingStrategy';
 import type { BlockRule, ScheduleWindow, Settings, StorageSchema } from '@/types/schema';
-import {
-  blockRuleSchema,
-  blockRulesSchema,
-  scheduleWindowSchema,
-  settingsSchema,
-} from '@/types/schema';
+import { blockRuleSchema, blockRulesSchema, scheduleWindowSchema, settingsSchema } from '@/types/schema';
 import { deepMerge } from '@/utils/deepMerge';
 
 const SETTINGS_KEY: keyof StorageSchema = 'settings';
@@ -31,11 +28,7 @@ export type AddScheduleWindowResult = {
 };
 
 export class StorageService {
-  private static parseStoredValue<T>(
-    key: keyof StorageSchema,
-    schema: ZodType<T>,
-    value: unknown,
-  ): T {
+  private static parseStoredValue<T>(key: keyof StorageSchema, schema: ZodType<T>, value: unknown): T {
     const validated = schema.safeParse(value);
 
     if (validated.success) {
@@ -204,5 +197,35 @@ export class StorageService {
 
   static removeListener(listener: StorageListener): void {
     chrome.storage.onChanged.removeListener(listener);
+  }
+
+  private static started = false;
+
+  static startListening(blockingEngine: BlockingEngine) {
+    if (this.started) {
+      return;
+    }
+    const listener: StorageListener = (changes) => {
+      const items: SyncItems = {};
+
+      if ('settings' in changes) {
+        items.settings = settingsSchema.parse(changes.settings.newValue);
+      }
+
+      if ('rules' in changes) {
+        items.rules = blockRulesSchema.parse(changes.rules.newValue);
+      }
+
+      blockingEngine.sync(items).catch(console.error);
+    };
+    this.addListener(listener);
+
+    return () => {
+      if (!this.started) {
+        return;
+      }
+      this.removeListener(listener);
+      this.started = false;
+    };
   }
 }
