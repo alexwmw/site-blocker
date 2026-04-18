@@ -203,8 +203,9 @@ export class StorageService {
 
   static startListening(blockingEngine: BlockingEngine) {
     if (this.started) {
-      return;
+      return () => {};
     }
+    this.started = true;
     const listener: StorageListener = (changes) => {
       const items: SyncItems = {};
 
