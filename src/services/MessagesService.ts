@@ -45,6 +45,9 @@ export class MessagesService {
     chrome.runtime.onMessage.addListener(listener);
 
     return () => {
+      if (!this.started) {
+        return;
+      }
       chrome.runtime.onMessage.removeListener(listener);
       this.started = false;
     };

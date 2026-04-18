@@ -1,8 +1,14 @@
 import { findDuplicateRules, findMatchingRules, ruleMatchesUrl, sortRulesBySpecificity } from './rules/ruleMatching';
-import { domainPatternFromUrl, normalisePatternParts, normaliseRulePattern, pathPatternFromUrl } from './rules/rulePattern';
+import {
+  domainPatternFromUrl,
+  normalisePatternParts,
+  normaliseRulePattern,
+  pathPatternFromUrl,
+} from './rules/rulePattern';
 import { isSupportedUrl } from './rules/ruleUrl';
 
-import type { BlockRule } from '@/types/schema';
+import type { BlockRule, MatchType } from '@/types/schema';
+import { createUniqueId } from '@/utils/createUniqueId';
 
 /**
  * Thin facade around small rule-focused modules.
@@ -50,5 +56,29 @@ export class RulesService {
 
   static findDuplicateRules(compareRule: BlockRule, rules: BlockRule[]): BlockRule[] {
     return findDuplicateRules(compareRule, rules);
+  }
+
+  static createUrlRule(
+    url: string | undefined,
+    matchType: MatchType,
+    patternType: 'domain' | 'path',
+  ): BlockRule | null {
+    if (!url || !this.isSupportedUrl(url)) {
+      return null;
+    }
+
+    const pattern = patternType === 'domain' ? this.domainPatternFromUrl(url) : this.pathPatternFromUrl(url);
+
+    if (!pattern) {
+      return null;
+    }
+
+    return {
+      id: createUniqueId(),
+      matchType,
+      pattern,
+      createdAt: new Date().toISOString(),
+      enabled: true,
+    };
   }
 }
