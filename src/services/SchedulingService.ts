@@ -49,4 +49,57 @@ export class SchedulingService {
     }
     return true;
   }
+
+  private static pickEarlier(current: number | null, candidate: number): number {
+    if (current === null) {
+      return candidate;
+    }
+    return candidate < current ? candidate : current;
+  }
+
+  static getNextChangeTime(schedule: Schedule, now: Date = new Date()): Date | null {
+    const nowTs = now.getTime();
+    const { day,  } = this.getCurrentDayAndMinutes(now);
+
+    let next: number | null = null;
+
+    for (const window of schedule.windows) {
+      if (window.days.every((d) => !d)) {
+        continue;
+      }
+
+      const startMin = this.timeToMinutes(window.start);
+      const endMin = this.timeToMinutes(window.end);
+
+      // Check next 7 days (covers wrap-around)
+      for (let i = 0; i < 7; i++) {
+        const checkDay = (day + i) % 7;
+
+        if (!window.days[checkDay]) {
+          continue;
+        }
+
+        const baseDate = new Date(now);
+        baseDate.setDate(now.getDate() + i);
+
+        // --- START time candidate ---
+        const startDate = new Date(baseDate);
+        startDate.setHours(Math.floor(startMin / 60), startMin % 60, 0, 0);
+
+        if (startDate.getTime() > nowTs) {
+          next = this.pickEarlier(next, startDate.getTime());
+        }
+
+        // --- END time candidate ---
+        const endDate = new Date(baseDate);
+        endDate.setHours(Math.floor(endMin / 60), endMin % 60, 0, 0);
+
+        if (endDate.getTime() > nowTs) {
+          next = this.pickEarlier(next, endDate.getTime());
+        }
+      }
+    }
+
+    return next ? new Date(next) : null;
+  }
 }

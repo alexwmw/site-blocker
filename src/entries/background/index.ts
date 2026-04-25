@@ -1,10 +1,34 @@
 import BlockingEngine from '@/services/blocking/BlockingEngine';
 import { ContextMenuService } from '@/services/ContextMenuService';
+import { IconsService } from '@/services/IconsService';
 import { MessagesService } from '@/services/MessagesService';
 import { MigrationService } from '@/services/MigrationService';
 import { StorageService } from '@/services/StorageService';
+import { settingsSchema } from '@/types/schema';
 
 const blockingEngine = new BlockingEngine();
+
+/* ---------------------------------------------
+ * ICONS
+ * -------------------------------------------- */
+
+chrome.alarms.onAlarm.addListener((alarm) => {
+  if (alarm.name !== 'updateIcon') {
+    return;
+  }
+  IconsService.initIcons();
+});
+
+StorageService.addListener((changes) => {
+  if ('settings' in changes) {
+    const { schedule: newSchedule } = settingsSchema.parse(changes.settings.newValue);
+    IconsService.updateIcon(newSchedule);
+    IconsService.scheduleNextIconUpdate(newSchedule).catch(console.error);
+  }
+});
+
+chrome.runtime.onStartup.addListener(IconsService.initIcons);
+chrome.runtime.onInstalled.addListener(IconsService.initIcons);
 
 /* ---------------------------------------------
  * MIGRATION (INSTALL ONLY)
