@@ -59,7 +59,7 @@ export class SchedulingService {
 
   static getNextChangeTime(schedule: Schedule, now: Date = new Date()): Date | null {
     const nowTs = now.getTime();
-    const { day,  } = this.getCurrentDayAndMinutes(now);
+    const { day } = this.getCurrentDayAndMinutes(now);
 
     let next: number | null = null;
 
