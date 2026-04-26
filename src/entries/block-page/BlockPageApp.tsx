@@ -1,5 +1,4 @@
-import type { LottieRefCurrentProps } from 'lottie-react';
-import { useEffect, useMemo, useRef } from 'react';
+import { useMemo } from 'react';
 
 import styles from './BlockPageApp.module.css';
 import BlockPageButton from './components/BlockPageButton';
@@ -19,18 +18,13 @@ import useThemeEffect from '@/hooks/useThemeEffect';
 import { SiteIdentityService } from '@/services/SiteIdentityService';
 import { getChromeWebStoreUrl } from '@/utils/extensionUrls';
 
-const HOLD_ANIM_DEFAULT_DURATION = 5;
-
 const BlockPageApp = () => {
   const theme = useThemeEffect();
-  const player = useRef<LottieRefCurrentProps>(null);
-  const { onMouseDown, onKeyDown, timeRemaining, timeTotal } = useButtonEvents(player);
+  const { onMouseDown, onKeyDown, timeRemaining, timeTotal, held } = useButtonEvents();
   const { ruleIds, targetUrl } = useBlockPageParams();
   const { settings, updateSettings } = useSettings();
 
   const holdIsComplete = useMemo(() => timeRemaining === 0, [timeRemaining]);
-
-  const holdSpeed = useMemo(() => (timeTotal ? HOLD_ANIM_DEFAULT_DURATION / timeTotal : 1), [timeTotal]);
 
   /** Executes window.location.replace on hold completion */
   useNavigateOnUnblock(ruleIds, targetUrl, holdIsComplete);
@@ -48,14 +42,6 @@ const BlockPageApp = () => {
   const handleDontShowReviewCard = () => {
     updateSettings({ isRated: true }).catch(console.error);
   };
-
-  useEffect(() => {
-    if (holdIsComplete) {
-      player.current?.setSpeed(1);
-    } else {
-      player.current?.setSpeed(holdSpeed);
-    }
-  }, [player, holdSpeed, holdIsComplete]);
 
   return (
     <main
@@ -85,11 +71,12 @@ const BlockPageApp = () => {
 
         <BlockPageButton
           autoFocus
-          player={player}
           holdIsComplete={holdIsComplete}
           remainingTime={timeRemaining}
           onMouseDown={onMouseDown}
           onKeyDown={onKeyDown}
+          animationDuration={timeTotal ?? 0}
+          held={held}
         />
       </Card>
       <Stack className={styles.absStack}>

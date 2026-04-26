@@ -26,8 +26,8 @@ export const SETTINGS_LIMITS = {
   blockPageHeadlineMaxLength: 80,
   extendedUnblockDurationMaxMinutes: 240,
   extendedUnblockDurationMinMinutes: 1,
-  holdDurationMaxSeconds: 99,
-  holdDurationMinSeconds: 3,
+  holdDurationMaxSeconds: 100,
+  holdDurationMinSeconds: 1,
 } as const;
 
 /**

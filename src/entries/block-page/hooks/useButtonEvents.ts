@@ -1,15 +1,9 @@
-import type { LottieRefCurrentProps } from 'lottie-react';
-import type { KeyboardEventHandler, MouseEventHandler, RefObject } from 'react';
+import type { KeyboardEventHandler, MouseEventHandler } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import useSettings from '@/hooks/useSettings';
 
-type RefCurrentProps = {
-  play: () => void;
-  stop: () => void;
-} & Partial<LottieRefCurrentProps>;
-
-export const useButtonEvents = (player: RefObject<RefCurrentProps | null>) => {
+export const useButtonEvents = () => {
   const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
   const [held, setHeld] = useState<boolean>(false);
   const interval = useRef<NodeJS.Timeout | null>(null);
@@ -36,7 +30,6 @@ export const useButtonEvents = (player: RefObject<RefCurrentProps | null>) => {
 
     setTimeRemaining(settings.holdDurationSeconds);
     setHeld(true);
-    player.current?.play();
     interval.current = setInterval(countdown, 1000);
   };
 
@@ -59,12 +52,11 @@ export const useButtonEvents = (player: RefObject<RefCurrentProps | null>) => {
   const onRelease = useCallback(() => {
     setTimeRemaining(null);
     setHeld(false);
-    player.current?.stop();
     if (interval.current) {
       clearInterval(interval.current);
       interval.current = null;
     }
-  }, [player]);
+  }, []);
 
   useEffect(() => {
     document.addEventListener('mouseup', onRelease);
@@ -75,7 +67,7 @@ export const useButtonEvents = (player: RefObject<RefCurrentProps | null>) => {
     };
   }, [onRelease]);
 
-  return { onMouseDown, onKeyDown, timeRemaining, timeTotal: settings?.holdDurationSeconds };
+  return { onMouseDown, onKeyDown, timeRemaining, timeTotal: settings?.holdDurationSeconds, held };
 };
 
 export default useButtonEvents;

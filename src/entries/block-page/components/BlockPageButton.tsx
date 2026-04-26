@@ -1,38 +1,42 @@
 import clsx from 'clsx';
-import type { LottieRef } from 'lottie-react';
 import type { KeyboardEventHandler, MouseEventHandler } from 'react';
 
 import styles from './BlockPageButton.module.css';
-import LottieHold from './LottieHold';
-import LottieSuccess from './LottieSuccess';
+import ButtonOutline from './buttonOutline.svg?react';
 
 import Title from '@/assets/icons/icon512.svg?react';
 
 export type HoldButtonProps = {
-  player: LottieRef;
   remainingTime: number | null;
   onMouseDown: MouseEventHandler;
   onKeyDown: KeyboardEventHandler;
   autoFocus: boolean;
   holdIsComplete: boolean;
+  animationDuration: number;
+  held: boolean;
 };
 
 const HoldButton = (props: HoldButtonProps) => {
-  const { autoFocus, holdIsComplete, player, remainingTime, onKeyDown, onMouseDown } = props;
-  const RelevantLottie = holdIsComplete ? LottieSuccess : LottieHold;
-  const buttonText = remainingTime === null ? <Title title='Hold' /> : remainingTime;
+  const { autoFocus, holdIsComplete, remainingTime, onKeyDown, onMouseDown } = props;
+
+  const buttonText =
+    remainingTime === null ? <Title title='Hold' /> : <span>{remainingTime === 0 ? 'OK' : remainingTime}</span>;
 
   return (
     <div className={styles.holdAction}>
       <div className={styles.buttonStack}>
-        <RelevantLottie lottieRef={player} />
+        <ButtonOutline
+          className={clsx(styles.buttonEdge, props.held && styles.held)}
+          style={{ animationDuration: props.animationDuration + 's' }}
+        />
         <button
           autoFocus={autoFocus}
           onKeyDown={onKeyDown}
           onMouseDown={onMouseDown}
-          className={clsx(styles.holdButton, holdIsComplete && styles.holdComplete)}
+          className={clsx(styles.holdButton, props.held && styles.held, holdIsComplete && styles.holdComplete)}
           aria-live='polite'
           disabled={holdIsComplete}
+          style={{ animationDuration: props.animationDuration + 's' }}
         >
           {buttonText}
         </button>

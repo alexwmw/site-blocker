@@ -50,7 +50,7 @@
   --color-danger: #c35f6d;
   --color-success: #5f8f74;
   --color-warning: #a07852;
-  --color-success-background: transparent;
+  --color-success-background: #3f6d57;
 
   /* =========================
      NEUTRALS (LIGHT)
@@ -120,8 +120,6 @@
   --color-accent-strong: #a06d4d;
   --color-accent-soft: #d8b29a;
 
-  --color-success-background: #3f6d57;
-
   --color-block-page-bg: #131112;
   --image-block-page-bg: var(--block-page-mountains-image);
   --image-block-page-overlay: linear-gradient(180deg, rgb(18 16 16 / 82%), rgb(8 7 7 / 88%));
@@ -167,8 +165,6 @@
   --color-accent: #7bb89c;
   --color-accent-strong: #5f9d81;
   --color-accent-soft: #9fd3bb;
-
-  --color-success-background: #3f6d57;
 
   --color-block-page-bg: #111613;
   --image-block-page-bg: var(--block-page-rainforest-image);
@@ -231,8 +227,6 @@
   --color-accent: #6fbec2;
   --color-accent-strong: #4fa6aa;
   --color-accent-soft: #9fd6d9;
-
-  --color-success-background: #2f5f5c;
 
   --color-block-page-bg: #0f1111;
   --image-block-page-bg: var(--block-page-focus-image);
