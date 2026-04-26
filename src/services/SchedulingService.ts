@@ -71,8 +71,9 @@ export class SchedulingService {
       const startMin = this.timeToMinutes(window.start);
       const endMin = this.timeToMinutes(window.end);
 
-      // Check next 7 days (covers wrap-around)
-      for (let i = 0; i < 7; i++) {
+      // Check today through the same weekday next week.
+      // Including i=7 prevents missing weekly windows when today's window already ended.
+      for (let i = 0; i <= 7; i++) {
         const checkDay = (day + i) % 7;
 
         if (!window.days[checkDay]) {

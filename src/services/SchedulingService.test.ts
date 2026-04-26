@@ -76,4 +76,21 @@ describe('SchedulingService', () => {
 
     expect(SchedulingService.isScheduleActiveNow(schedule, new Date('2026-01-05T10:00:00.000Z'))).toBe(false);
   });
+
+  it('finds the next change on the same weekday in the next week when today has already ended', () => {
+    const schedule = buildSchedule({
+      windows: [
+        {
+          id: '_initial',
+          days: [true, false, false, false, false, false, false],
+          start: '09:00',
+          end: '10:00',
+        },
+      ],
+    });
+
+    const now = new Date('2026-01-05T11:00:00.000Z'); // Monday, after the window
+
+    expect(SchedulingService.getNextChangeTime(schedule, now)).toStrictEqual(new Date('2026-01-12T09:00:00.000Z'));
+  });
 });
