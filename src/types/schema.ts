@@ -8,10 +8,10 @@ export const CURRENT_STORAGE_VERSION = 4;
 
 /** Supported UI themes. */
 export const THEMES = [
-  'intention-light',
-  'intention-dark',
-  'mindful-light',
-  'mindful-dark',
+  'mountains-light',
+  'mountains-dark',
+  'rainforest-light',
+  'rainforest-dark',
   'focus-light',
   'focus-dark',
 ] as const;

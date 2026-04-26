@@ -84,7 +84,7 @@ describe('Schema Validation', () => {
 
   it('should reject blank block page headlines', () => {
     const result = settingsSchema.safeParse({
-      theme: 'mindful-light',
+      theme: 'rainforest-light',
       holdDurationSeconds: 15,
       isRated: false,
       schedule: {
@@ -103,7 +103,7 @@ describe('Schema Validation', () => {
 
   it('should reject extended unblock durations outside the supported range', () => {
     const result = settingsSchema.safeParse({
-      theme: 'mindful-light',
+      theme: 'rainforest-light',
       holdDurationSeconds: 15,
       isRated: false,
       schedule: {

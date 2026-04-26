@@ -63,7 +63,7 @@ describe('useSettings Hook', () => {
   });
 
   it('should load initial settings from StorageService', async () => {
-    const mockSettings: Settings = { ...defaultSettings, theme: 'mindful-light' };
+    const mockSettings: Settings = { ...defaultSettings, theme: 'rainforest-light' };
     vi.spyOn(StorageService, 'getSettings').mockResolvedValue(mockSettings);
 
     const { result } = renderHook(() => useSettings());
@@ -99,13 +99,13 @@ describe('useSettings Hook', () => {
       expect(listeners).toHaveLength(1);
       listeners[0]({
         settings: {
-          newValue: { ...defaultSettings, theme: 'mindful-dark' },
+          newValue: { ...defaultSettings, theme: 'rainforest-dark' },
           oldValue: defaultSettings,
         },
       });
     });
 
-    expect(result.current.settings?.theme).toBe('mindful-dark');
+    expect(result.current.settings?.theme).toBe('rainforest-dark');
     expect(result.current.error).toBeNull();
   });
 
@@ -135,9 +135,9 @@ describe('useSettings Hook', () => {
     const { result } = renderHook(() => useSettings());
 
     await act(async () => {
-      await result.current.updateSettings({ theme: 'mindful-dark' });
+      await result.current.updateSettings({ theme: 'rainforest-dark' });
     });
 
-    expect(spy).toHaveBeenCalledWith({ theme: 'mindful-dark' });
+    expect(spy).toHaveBeenCalledWith({ theme: 'rainforest-dark' });
   });
 });
