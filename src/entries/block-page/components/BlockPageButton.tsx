@@ -6,6 +6,8 @@ import styles from './BlockPageButton.module.css';
 import LottieHold from './LottieHold';
 import LottieSuccess from './LottieSuccess';
 
+import Title from '@/assets/icons/icon512.svg?react';
+
 export type HoldButtonProps = {
   player: LottieRef;
   remainingTime: number | null;
@@ -18,7 +20,7 @@ export type HoldButtonProps = {
 const HoldButton = (props: HoldButtonProps) => {
   const { autoFocus, holdIsComplete, player, remainingTime, onKeyDown, onMouseDown } = props;
   const RelevantLottie = holdIsComplete ? LottieSuccess : LottieHold;
-  const buttonText = String(remainingTime === null ? 'HOLD' : remainingTime);
+  const buttonText = remainingTime === null ? <Title title='Hold' /> : remainingTime;
 
   return (
     <div className={styles.holdAction}>

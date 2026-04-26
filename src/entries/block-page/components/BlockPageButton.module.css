@@ -6,6 +6,7 @@
 }
 
 .holdButton {
+  --color-brand-icon-bg: transparent;
   border: 0;
   border-radius: 45%;
   background: linear-gradient(135deg, var(--color-brand-strong), var(--color-brand-soft));

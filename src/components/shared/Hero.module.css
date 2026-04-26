@@ -9,7 +9,7 @@
 
 .row {
   display: flex;
-  gap: 16px;
+  gap: 20px;
   /*align-items: center;*/
 }
 
