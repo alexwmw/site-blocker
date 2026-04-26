@@ -7,11 +7,12 @@
 
 .holdButton {
   border: 0;
-  border-radius: var(--radius-pill);
+  border-radius: 45%;
   background: linear-gradient(135deg, var(--color-brand-strong), var(--color-brand-soft));
   color: var(--color-text-inverse);
   font-size: 1.2rem;
-  font-weight: 700;
+  font-weight: 500;
+  font-family: var(--font-family-brand), sans-serif;
   padding: 12px 24px;
   cursor: pointer;
   letter-spacing: 2px;

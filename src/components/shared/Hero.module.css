@@ -15,7 +15,7 @@
 
 .holdIcon {
   height: 54px;
-  filter: saturate(0.8);
+  /*filter: saturate(0.8);*/
 }
 
 .compact {
