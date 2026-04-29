@@ -24,8 +24,8 @@ type OptionsTab = 'rules' | 'scheduling' | 'preferences' | 'starter-sites';
 const OPTIONS_TABS: ReadonlyArray<TabItem<OptionsTab>> = [
   { id: 'rules', label: 'Rules' },
   { id: 'scheduling', label: 'Schedule' },
-  { id: 'starter-sites', label: 'Starter sites' },
   { id: 'preferences', label: 'Preferences' },
+  { id: 'starter-sites', label: 'Get started' },
 ];
 
 const createNewScheduleWindow: () => ScheduleWindow = () => ({

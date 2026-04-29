@@ -48,7 +48,10 @@ const PopularWebsitesSelector = ({ addRule, blockRules }: PopularWebsitesSelecto
           <h3>Popular websites</h3>
           <Paragraph subtle>Choose common distractions to block in one click.</Paragraph>
         </div>
-        <Stack gap='small'>
+        <Stack
+          gap='small'
+          variant={'two-columns'}
+        >
           {POPULAR_WEBSITES.map((site) => {
             const isBlocked = alreadyBlockedSites.has(site);
             const isPending = pendingSite === site;
@@ -62,7 +65,7 @@ const PopularWebsitesSelector = ({ addRule, blockRules }: PopularWebsitesSelecto
                   handleAddSite(site).catch(console.error);
                 }}
               >
-                <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <SiteIdentity
                     identity={SiteIdentityService.fromUrl(`https://${site}`)}
                     size='small'

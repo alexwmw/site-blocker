@@ -10,7 +10,6 @@ import Stack from '@/components/primitives/Stack';
 import Hero from '@/components/shared/Hero';
 import type { IconName } from '@/components/shared/InfoItem';
 import InfoItem from '@/components/shared/InfoItem';
-import PopularWebsitesSelector from '@/components/shared/PopularWebsitesSelector';
 import RenderBoundary from '@/components/shared/RenderBoundary';
 import SectionHeader from '@/components/shared/SectionHeader';
 import SiteIdentity from '@/components/shared/SiteIdentity';
@@ -160,12 +159,6 @@ const PopupApp = () => {
           </div>
         ) : null}
         <Stack topMargin>
-          {blockRules && blockRules.length === 0 ? (
-            <PopularWebsitesSelector
-              blockRules={blockRules}
-              addRule={addRule}
-            />
-          ) : null}
           {notBlockedReason ? (
             <InfoItem
               tone='good'
