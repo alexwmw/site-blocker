@@ -1,11 +1,13 @@
-import type { LottieRefCurrentProps } from 'lottie-react';
-import { useEffect, useMemo, useRef } from 'react';
+import clsx from 'clsx';
+import { useMemo } from 'react';
 
 import styles from './BlockPageApp.module.css';
 import BlockPageButton from './components/BlockPageButton';
 import useBlockPageParams from './hooks/useBlockPageParams';
 import useButtonEvents from './hooks/useButtonEvents';
 
+import TitleDark from '@/assets/icons/title-dark.svg?react';
+import TitleLight from '@/assets/icons/title-light.svg?react';
 import Card from '@/components/primitives/Card';
 import Stack from '@/components/primitives/Stack';
 import EyebrowLabel from '@/components/shared/EyebrowLabel';
@@ -19,18 +21,15 @@ import useThemeEffect from '@/hooks/useThemeEffect';
 import { SiteIdentityService } from '@/services/SiteIdentityService';
 import { getChromeWebStoreUrl } from '@/utils/extensionUrls';
 
-const HOLD_ANIM_DEFAULT_DURATION = 5;
-
 const BlockPageApp = () => {
   const theme = useThemeEffect();
-  const player = useRef<LottieRefCurrentProps>(null);
-  const { onMouseDown, onKeyDown, timeRemaining, timeTotal } = useButtonEvents(player);
+  const { onMouseDown, onKeyDown, timeRemaining, timeTotal, held } = useButtonEvents();
   const { ruleIds, targetUrl } = useBlockPageParams();
   const { settings, updateSettings } = useSettings();
 
-  const holdIsComplete = useMemo(() => timeRemaining === 0, [timeRemaining]);
+  const TitleImage = theme?.endsWith('dark') ? TitleLight : TitleDark;
 
-  const holdSpeed = useMemo(() => (timeTotal ? HOLD_ANIM_DEFAULT_DURATION / timeTotal : 1), [timeTotal]);
+  const holdIsComplete = useMemo(() => timeRemaining === 0, [timeRemaining]);
 
   /** Executes window.location.replace on hold completion */
   useNavigateOnUnblock(ruleIds, targetUrl, holdIsComplete);
@@ -49,18 +48,11 @@ const BlockPageApp = () => {
     updateSettings({ isRated: true }).catch(console.error);
   };
 
-  useEffect(() => {
-    if (holdIsComplete) {
-      player.current?.setSpeed(1);
-    } else {
-      player.current?.setSpeed(holdSpeed);
-    }
-  }, [player, holdSpeed, holdIsComplete]);
-
   return (
-    <main
+    <Stack
       id='block-page'
       className={styles.page}
+      as='main'
     >
       <Card
         as='section'
@@ -75,7 +67,12 @@ const BlockPageApp = () => {
             identity={targetIdentity}
           />
         </div>
-        <p>
+      </Card>
+      <Card
+        as='section'
+        className={styles.blockedCard}
+      >
+        <p className={styles.holdInstruction}>
           <strong>If you wish to proceed, hold the button.</strong>
         </p>
 
@@ -85,14 +82,15 @@ const BlockPageApp = () => {
 
         <BlockPageButton
           autoFocus
-          player={player}
           holdIsComplete={holdIsComplete}
           remainingTime={timeRemaining}
           onMouseDown={onMouseDown}
           onKeyDown={onKeyDown}
+          animationDuration={timeTotal ?? 0}
+          held={held}
         />
       </Card>
-      <Stack className={styles.absStack}>
+      <Stack className={clsx(styles.absStack, styles.absStackLeft)}>
         {settings ? (
           <QuickOptions
             className={styles.optionsCard}
@@ -107,8 +105,11 @@ const BlockPageApp = () => {
           />
         ) : null}
       </Stack>
+      <Stack className={clsx(styles.absStack, styles.absStackRight)}>
+        <TitleImage className={styles.titleImage} />
+      </Stack>
       <BackgroundCredit theme={theme} />
-    </main>
+    </Stack>
   );
 };
 

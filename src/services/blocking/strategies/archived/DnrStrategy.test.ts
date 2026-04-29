@@ -6,7 +6,7 @@ import { StorageService } from '@/services/StorageService';
 import type { BlockRule, Settings } from '@/types/schema';
 
 const defaultSettings: Settings = {
-  theme: 'mindful-light',
+  theme: 'rainforest-light',
   blockPageHeadline: 'Stay on track',
   holdDurationSeconds: 20,
   isRated: false,

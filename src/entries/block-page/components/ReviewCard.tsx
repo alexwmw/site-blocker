@@ -25,7 +25,7 @@ const ReviewCard = ({ onSelectDontShow, onSelectReview }: ReviewCardProps) => {
             alt=''
           />
           <div>
-            <strong>Enjoying HOLD?</strong>
+            <strong>Enjoying Hold?</strong>
           </div>
         </header>
         <div>Please consider leaving a review.</div>

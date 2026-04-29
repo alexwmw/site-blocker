@@ -35,12 +35,9 @@ export class IconsService {
       });
     }
   }
-  static initIcons() {
-    StorageService.getSettings()
-      .then(async ({ schedule }) => {
-        this.updateIcon(schedule);
-        await this.scheduleNextIconUpdate(schedule);
-      })
-      .catch(console.error);
+  static async initIcons() {
+    const settings = await StorageService.getSettings();
+    this.updateIcon(settings.schedule);
+    await this.scheduleNextIconUpdate(settings.schedule);
   }
 }

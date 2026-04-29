@@ -9,13 +9,13 @@
 
 .row {
   display: flex;
-  gap: 16px;
+  gap: 20px;
   /*align-items: center;*/
 }
 
 .holdIcon {
   height: 54px;
-  filter: saturate(0.8);
+  /*filter: saturate(0.8);*/
 }
 
 .compact {

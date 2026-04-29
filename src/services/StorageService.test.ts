@@ -21,7 +21,7 @@ describe('StorageService', () => {
 
   it('should correctly merge nested schedule updates', async () => {
     storageMock.local.get.mockResolvedValue({
-      settings: { ...defaultSettings, theme: 'mindful-light' },
+      settings: { ...defaultSettings, theme: 'rainforest-light' },
     });
 
     await StorageService.updateSettings({
@@ -29,7 +29,7 @@ describe('StorageService', () => {
     });
 
     const [[setCall]] = storageMock.local.set.mock.calls;
-    expect(setCall.settings.theme).toBe('mindful-light');
+    expect(setCall.settings.theme).toBe('rainforest-light');
     expect(setCall.settings.schedule.enabled).toBe(false);
     expect(setCall.settings.schedule.windows[0].days).toEqual(defaultSettings.schedule.windows[0].days);
   });

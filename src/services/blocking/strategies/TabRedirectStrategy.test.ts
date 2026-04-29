@@ -11,7 +11,7 @@ import { getBlockPageUrl } from '@/utils/extensionUrls';
 
 const defaultSettings: Settings = {
   blockPageHeadline: 'Stay on track',
-  theme: 'mindful-light',
+  theme: 'rainforest-light',
   holdDurationSeconds: 20,
   isRated: false,
   schedule: {

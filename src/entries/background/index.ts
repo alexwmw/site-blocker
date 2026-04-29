@@ -12,11 +12,15 @@ const blockingEngine = new BlockingEngine();
  * ICONS
  * -------------------------------------------- */
 
+const initIcons = () => {
+  IconsService.initIcons().catch(console.error);
+};
+
 chrome.alarms.onAlarm.addListener((alarm) => {
   if (alarm.name !== 'updateIcon') {
     return;
   }
-  IconsService.initIcons();
+  initIcons();
 });
 
 StorageService.addListener((changes) => {
@@ -27,8 +31,8 @@ StorageService.addListener((changes) => {
   }
 });
 
-chrome.runtime.onStartup.addListener(IconsService.initIcons);
-chrome.runtime.onInstalled.addListener(IconsService.initIcons);
+chrome.runtime.onStartup.addListener(initIcons);
+chrome.runtime.onInstalled.addListener(initIcons);
 
 /* ---------------------------------------------
  * MIGRATION (INSTALL ONLY)

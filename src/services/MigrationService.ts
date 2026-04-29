@@ -69,11 +69,11 @@ export class MigrationService {
     const normalizedTheme = value.toLowerCase().trim(); // Legacy values are capitalised
 
     if (normalizedTheme === 'light') {
-      return 'mindful-light';
+      return 'focus-light';
     }
 
     if (normalizedTheme === 'dark') {
-      return 'intention-dark';
+      return 'focus-dark';
     }
 
     return this.isTheme(normalizedTheme) ? normalizedTheme : fallback;
