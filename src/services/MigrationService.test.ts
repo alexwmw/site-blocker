@@ -210,7 +210,7 @@ describe('MigrationService - Deep Logic Tests', () => {
       expect(calls.version).toBe(4);
       expect(calls.settings.theme).toBe('focus-dark');
       expect(calls.settings.blockPageHeadline).toBe('Stay on track');
-      expect(calls.settings.holdDurationSeconds).toBe(3);
+      expect(calls.settings.holdDurationSeconds).toBe(1);
       expect(calls.settings.extendedUnblock.durationMinutes).toBe(240);
       expect(calls.rules).toEqual([existingRule]);
       expect(chromeMock.storage.sync.get).not.toHaveBeenCalled();

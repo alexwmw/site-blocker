@@ -1,3 +1,4 @@
+import clsx from 'clsx';
 import { useMemo } from 'react';
 
 import styles from './BlockPageApp.module.css';
@@ -5,6 +6,8 @@ import BlockPageButton from './components/BlockPageButton';
 import useBlockPageParams from './hooks/useBlockPageParams';
 import useButtonEvents from './hooks/useButtonEvents';
 
+import TitleDark from '@/assets/icons/title-dark.svg?react';
+import TitleLight from '@/assets/icons/title-light.svg?react';
 import Card from '@/components/primitives/Card';
 import Stack from '@/components/primitives/Stack';
 import EyebrowLabel from '@/components/shared/EyebrowLabel';
@@ -23,6 +26,8 @@ const BlockPageApp = () => {
   const { onMouseDown, onKeyDown, timeRemaining, timeTotal, held } = useButtonEvents();
   const { ruleIds, targetUrl } = useBlockPageParams();
   const { settings, updateSettings } = useSettings();
+
+  const TitleImage = theme?.endsWith('dark') ? TitleLight : TitleDark;
 
   const holdIsComplete = useMemo(() => timeRemaining === 0, [timeRemaining]);
 
@@ -44,9 +49,10 @@ const BlockPageApp = () => {
   };
 
   return (
-    <main
+    <Stack
       id='block-page'
       className={styles.page}
+      as='main'
     >
       <Card
         as='section'
@@ -61,7 +67,12 @@ const BlockPageApp = () => {
             identity={targetIdentity}
           />
         </div>
-        <p>
+      </Card>
+      <Card
+        as='section'
+        className={styles.blockedCard}
+      >
+        <p className={styles.holdInstruction}>
           <strong>If you wish to proceed, hold the button.</strong>
         </p>
 
@@ -79,7 +90,7 @@ const BlockPageApp = () => {
           held={held}
         />
       </Card>
-      <Stack className={styles.absStack}>
+      <Stack className={clsx(styles.absStack, styles.absStackLeft)}>
         {settings ? (
           <QuickOptions
             className={styles.optionsCard}
@@ -94,8 +105,11 @@ const BlockPageApp = () => {
           />
         ) : null}
       </Stack>
+      <Stack className={clsx(styles.absStack, styles.absStackRight)}>
+        <TitleImage className={styles.titleImage} />
+      </Stack>
       <BackgroundCredit theme={theme} />
-    </main>
+    </Stack>
   );
 };
 

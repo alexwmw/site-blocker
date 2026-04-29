@@ -43,7 +43,7 @@
   align-items: center;
   justify-content: center;
   transition: all var(--transition-duration) ease;
-  filter: hue-rotate(0);
+  filter: brightness(100%) saturate(100%) hue-rotate(0);
   &.held {
     /*opacity: 0;*/
     animation: hue linear;

@@ -118,7 +118,7 @@ describe('Preferences', () => {
     fireEvent.change(unblockDurationInput, { target: { value: '999' } });
     fireEvent.click(screen.getByRole('button', { name: 'Reset preferences to defaults' }));
 
-    expect(updateSettings).toHaveBeenNthCalledWith(1, { holdDurationSeconds: 3 });
+    expect(updateSettings).toHaveBeenNthCalledWith(1, { holdDurationSeconds: 1 });
     expect(updateSettings).toHaveBeenNthCalledWith(2, { blockPageHeadline: defaultSettings.blockPageHeadline });
     expect(updateSettings).toHaveBeenNthCalledWith(3, {
       extendedUnblock: { enabled: true, durationMinutes: 240 },

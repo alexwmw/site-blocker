@@ -2,7 +2,7 @@ import clsx from 'clsx';
 
 import styles from './Hero.module.css';
 
-import IconCompact from '@/assets/icons/icon512.svg?react';
+import IconCompact from '@/assets/icons/icon-no-bg.svg?react';
 import IconTitle from '@/assets/icons/title-brand-colors.svg?react';
 import Paragraph from '@/components/primitives/Paragraph';
 import EyebrowLabel from '@/components/shared/EyebrowLabel';

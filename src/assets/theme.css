@@ -133,7 +133,7 @@
   --color-accent-soft: #8fb9a3;
 
   --image-block-page-bg: var(--block-page-rainforest-image);
-  --image-block-page-overlay: linear-gradient(180deg, rgb(245 251 247 / 44%), rgb(232 244 237 / 33%));
+  --image-block-page-overlay: linear-gradient(180deg, rgb(245 251 247 / 64%), rgb(232 244 237 / 33%));
 
   color-scheme: light;
 
