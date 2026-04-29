@@ -333,12 +333,11 @@ export class MigrationService {
       rules: legacy.providers ? this.mapRules(legacy.providers) : [],
     };
 
+    rawMigratedData.settings.showMigrationBrief = true;
     const result = storageSchema.safeParse(rawMigratedData);
 
     if (result.success) {
       await chrome.storage.local.set(result.data);
-      // -- do not clear, because data will be lost if using the extension on more than once device
-      // await chrome.storage.sync.clear();
       console.log('Migration complete:', result.data);
     } else {
       console.error('Migration failed validation:', result.error.flatten());

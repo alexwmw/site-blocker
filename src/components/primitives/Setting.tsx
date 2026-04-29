@@ -10,6 +10,7 @@ type BaseProps = {
   label: string;
   fieldHint?: string;
   settingId: string;
+  variant?: string;
 };
 
 type SelectProps = BaseProps & {
@@ -48,13 +49,13 @@ const Select = ({
 };
 
 const Setting = (props: SettingProps) => {
-  const { settingId, className, label, fieldHint, options, as, ...inputProps } = props;
+  const { settingId, className, label, fieldHint, options, variant, as, ...inputProps } = props;
   const describedById = settingId + '-field-hint';
   return (
     <div>
       <label
         htmlFor={settingId}
-        className={clsx(styles.settingsLabel, className)}
+        className={clsx(styles.settingsLabel, className, styles[variant])}
       >
         {label}
 

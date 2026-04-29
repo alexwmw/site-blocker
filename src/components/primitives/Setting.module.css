@@ -3,6 +3,11 @@
   gap: 8px;
   font-weight: 600;
   grid-template-rows: auto auto 1fr;
+  &.row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
 }
 
 .settingsInput {
