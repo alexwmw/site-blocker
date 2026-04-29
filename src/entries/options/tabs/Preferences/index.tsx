@@ -123,9 +123,9 @@ const Preferences = ({ className, settings, updateSettings }: PreferencesProps) 
                 handleThemeChange((event.target.value + '-' + mode) as Theme);
               }}
               options={[
-                { value: 'intention', label: 'Intentional' },
-                { value: 'mindful', label: 'Mindful' },
-                { value: 'focus', label: 'Focused' },
+                { value: 'focus', label: 'Abstract focus' },
+                { value: 'mountains', label: 'Mountain calm' },
+                { value: 'rainforest', label: 'Deep forest' },
               ]}
             />
             <Setting

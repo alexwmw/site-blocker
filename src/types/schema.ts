@@ -8,10 +8,10 @@ export const CURRENT_STORAGE_VERSION = 4;
 
 /** Supported UI themes. */
 export const THEMES = [
-  'intention-light',
-  'intention-dark',
-  'mindful-light',
-  'mindful-dark',
+  'mountains-light',
+  'mountains-dark',
+  'rainforest-light',
+  'rainforest-dark',
   'focus-light',
   'focus-dark',
 ] as const;
@@ -26,8 +26,8 @@ export const SETTINGS_LIMITS = {
   blockPageHeadlineMaxLength: 80,
   extendedUnblockDurationMaxMinutes: 240,
   extendedUnblockDurationMinMinutes: 1,
-  holdDurationMaxSeconds: 99,
-  holdDurationMinSeconds: 3,
+  holdDurationMaxSeconds: 100,
+  holdDurationMinSeconds: 1,
 } as const;
 
 /**

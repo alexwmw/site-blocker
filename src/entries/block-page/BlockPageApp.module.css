@@ -61,20 +61,40 @@
   font-weight: 600;
 }
 
+.holdInstruction {
+  font-size: 1rem;
+  text-align: center;
+}
+
 .holdHelp {
   margin: 0 0 12px;
   color: var(--color-text-secondary);
+  text-align: center;
 }
 
 .absStack {
   position: absolute;
   top: 40px;
-  left: 40px;
+
+  &.absStackLeft {
+    left: 40px;
+  }
+  &.absStackRight {
+    right: 40px;
+  }
+}
+
+.titleImage {
+  width: 120px;
+  opacity: 0.55;
 }
 
 @media (width < 1100px) {
   .absStack {
     position: initial;
     margin-top: 40px;
+    &.absStackRight {
+      display: none;
+    }
   }
 }
