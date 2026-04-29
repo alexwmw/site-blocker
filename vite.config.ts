@@ -30,6 +30,7 @@ export default defineConfig({
       input: {
         // popup and options are not required as they are explicitly referenced in the manifest
         blockPage: path.resolve(__dirname, 'block-page.html'),
+        onboarding: path.resolve(__dirname, 'onboarding.html'),
       },
       output: {
         entryFileNames: 'public/[name].js',

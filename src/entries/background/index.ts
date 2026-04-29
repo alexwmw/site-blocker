@@ -37,6 +37,10 @@ chrome.runtime.onInstalled.addListener((details) => {
   console.log('Installed/updated:', details.reason);
 
   MigrationService.migrate().catch(console.error);
+
+  if (details.reason === 'install') {
+    chrome.tabs.create({ url: chrome.runtime.getURL('onboarding.html') }).catch(console.error);
+  }
 });
 
 /* ---------------------------------------------

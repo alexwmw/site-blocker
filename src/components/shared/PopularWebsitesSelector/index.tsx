@@ -4,8 +4,10 @@ import Button from '@/components/primitives/Button';
 import Card from '@/components/primitives/Card';
 import Paragraph from '@/components/primitives/Paragraph';
 import Stack from '@/components/primitives/Stack';
+import SiteIdentity from '@/components/shared/SiteIdentity';
 import { POPULAR_WEBSITES } from '@/services/popularWebsites';
 import { RulesService } from '@/services/RulesService';
+import { SiteIdentityService } from '@/services/SiteIdentityService';
 import type { BlockRule } from '@/types/schema';
 
 type PopularWebsitesSelectorProps = {
@@ -60,7 +62,13 @@ const PopularWebsitesSelector = ({ addRule, blockRules }: PopularWebsitesSelecto
                   handleAddSite(site).catch(console.error);
                 }}
               >
-                {isBlocked ? `Blocked · ${site}` : isPending ? `Adding… ${site}` : `Block ${site}`}
+                <div>
+                  <SiteIdentity
+                    identity={SiteIdentityService.fromUrl(`https://${site}`)}
+                    size='small'
+                  />
+                  <div>{isBlocked ? 'Already blocked' : isPending ? 'Adding…' : 'Block site'}</div>
+                </div>
               </Button>
             );
           })}
