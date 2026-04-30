@@ -45,7 +45,7 @@ const PopularWebsitesSelector = ({ addRule, blockRules }: PopularWebsitesSelecto
     <Card padding>
       <Stack gap='small'>
         <div>
-          <h3>Popular websites</h3>
+          <h2>Popular websites</h2>
           <Paragraph subtle>Choose common distractions to block in one click.</Paragraph>
         </div>
         <Stack

@@ -106,7 +106,12 @@ const BlockPageApp = () => {
         ) : null}
       </Stack>
       <Stack className={clsx(styles.absStack, styles.absStackRight)}>
-        <TitleImage className={styles.titleImage} />
+        <a
+          target='_blank'
+          href={getChromeWebStoreUrl()}
+        >
+          <TitleImage className={styles.titleImage} />
+        </a>
       </Stack>
       <BackgroundCredit theme={theme} />
     </Stack>

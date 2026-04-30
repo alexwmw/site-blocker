@@ -7,7 +7,6 @@ import Card from '@/components/primitives/Card';
 import Paragraph from '@/components/primitives/Paragraph';
 import Stack from '@/components/primitives/Stack';
 import Switch from '@/components/primitives/Switch';
-import InfoItem from '@/components/shared/InfoItem';
 import SettingsGrid from '@/components/shared/SettingsGrid';
 import SchedulingWindow from '@/entries/options/tabs/Scheduling/SchedulingWindow';
 import type { Schedule, ScheduleWindow } from '@/types/schema';
@@ -51,6 +50,7 @@ const Scheduling = ({
             onChange={(event) => {
               setSchedulingEnabled(event.target.checked).catch(console.error);
             }}
+            reverse
             checked={schedule.enabled}
             fieldHint='When this is off, blocking stays active all day. Turn it on to block only during the recurring windows below.'
           />
@@ -75,12 +75,6 @@ const Scheduling = ({
         topMargin
         asList
       >
-        {!schedule.enabled && (
-          <InfoItem
-            tone='good'
-            text='Scheduled blocking is disabled. Enable scheduled blocking to set a schedule.'
-          />
-        )}
         {schedule.windows.map((win, index) => (
           <li key={win.id}>
             <SchedulingWindow
