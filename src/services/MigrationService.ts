@@ -109,7 +109,7 @@ export class MigrationService {
 
       // Filter out dates greater than DD 31 / MM 12
       if (day > 31 || month > 12) {
-        throw new Error('Invalid date');
+        return new Date().toISOString();
       }
 
       const date = new Date(year, month - 1, day, h, m, s);
@@ -333,7 +333,9 @@ export class MigrationService {
       rules: legacy.providers ? this.mapRules(legacy.providers) : [],
     };
 
-    rawMigratedData.settings.showMigrationBrief = true;
+    if (legacy) {
+      rawMigratedData.settings.showMigrationBrief = true;
+    }
     const result = storageSchema.safeParse(rawMigratedData);
 
     if (result.success) {
