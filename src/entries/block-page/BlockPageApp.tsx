@@ -37,11 +37,12 @@ const BlockPageApp = () => {
 
   const targetIdentity = useMemo(() => SiteIdentityService.fromUrl(targetUrl), [targetUrl]);
 
-  const handleSelectWebStoreButton = (page?: 'reviews' | 'support') => {
-    const targetUrl = getChromeWebStoreUrl(page);
-    if (targetUrl) {
-      window.open(targetUrl, '_blank');
-    }
+  const handleSelectWebStoreButton = () => {
+    window.open(getChromeWebStoreUrl(), '_blank');
+  };
+
+  const handleSelectReviewButton = () => {
+    window.open(getChromeWebStoreUrl('reviews'), '_blank');
     updateSettings({ isRated: true }).catch(console.error);
   };
 
@@ -106,7 +107,7 @@ const BlockPageApp = () => {
         {!settings?.isRated ? (
           <ReviewCard
             onSelectDontShow={handleDontShowReviewCard}
-            onSelectReview={() => handleSelectWebStoreButton('reviews')}
+            onSelectReview={handleSelectReviewButton}
           />
         ) : null}
       </Stack>
