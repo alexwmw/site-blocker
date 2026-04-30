@@ -15,6 +15,7 @@ import SiteIdentity from '@/components/shared/SiteIdentity';
 import BackgroundCredit from '@/entries/block-page/components/BackgroundCredit';
 import QuickOptions from '@/entries/block-page/components/QuickOptions';
 import ReviewCard from '@/entries/block-page/components/ReviewCard';
+import UpdatedBanner from '@/entries/block-page/components/UpdatedBanner';
 import useNavigateOnUnblock from '@/entries/block-page/hooks/useNavigateOnUnblock';
 import useSettings from '@/hooks/useSettings';
 import useThemeEffect from '@/hooks/useThemeEffect';
@@ -36,16 +37,21 @@ const BlockPageApp = () => {
 
   const targetIdentity = useMemo(() => SiteIdentityService.fromUrl(targetUrl), [targetUrl]);
 
-  const handleSelectReview = () => {
-    const targetUrl = getChromeWebStoreUrl('reviews');
-    if (targetUrl) {
-      window.open(targetUrl, '_blank');
-    }
+  const handleSelectWebStoreButton = () => {
+    window.open(getChromeWebStoreUrl(), '_blank');
+  };
+
+  const handleSelectReviewButton = () => {
+    window.open(getChromeWebStoreUrl('reviews'), '_blank');
     updateSettings({ isRated: true }).catch(console.error);
   };
 
   const handleDontShowReviewCard = () => {
     updateSettings({ isRated: true }).catch(console.error);
+  };
+
+  const handleHideBanner = () => {
+    updateSettings({ showMigrationBrief: false }).catch(console.error);
   };
 
   return (
@@ -101,12 +107,19 @@ const BlockPageApp = () => {
         {!settings?.isRated ? (
           <ReviewCard
             onSelectDontShow={handleDontShowReviewCard}
-            onSelectReview={handleSelectReview}
+            onSelectReview={handleSelectReviewButton}
           />
         ) : null}
       </Stack>
       <Stack className={clsx(styles.absStack, styles.absStackRight)}>
-        <TitleImage className={styles.titleImage} />
+        {settings?.showMigrationBrief ? (
+          <UpdatedBanner
+            onSelectWebStoreLink={handleSelectWebStoreButton}
+            onSelectDontShow={handleHideBanner}
+          />
+        ) : (
+          <TitleImage className={styles.titleImage} />
+        )}
       </Stack>
       <BackgroundCredit theme={theme} />
     </Stack>

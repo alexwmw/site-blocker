@@ -123,6 +123,8 @@ export const settingsSchema = z.object({
   /** Whether the user has rated or reviewed the extension. */
   isRated: z.boolean(),
 
+  showMigrationBrief: z.boolean().optional(),
+
   /** Scheduled blocking configuration. */
   schedule: scheduleSchema,
 

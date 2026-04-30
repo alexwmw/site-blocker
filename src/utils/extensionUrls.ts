@@ -10,7 +10,9 @@ export function isExtensionUrl(url: string | null): boolean {
   return Boolean(url && url.startsWith(`chrome-extension://${chrome.runtime.id}`));
 }
 
-export function getChromeWebStoreUrl(page?: 'reviews' | 'support') {
+export type WebStorePage = 'reviews' | 'support';
+
+export function getChromeWebStoreUrl(page?: WebStorePage) {
   const baseUrl = `https://chromewebstore.google.com/detail/${chrome.runtime.id}`;
 
   if (page) {
