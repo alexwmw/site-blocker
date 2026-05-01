@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { MessagesService } from '@/services/MessagesService';
 
-type Phase = 'idle' | 'cooldown' | 'ready' | 'navigated';
+type Phase = 'idle' | 'delay' | 'waiting-release' | 'ready' | 'navigated';
 
 const useNavigateOnUnblock = (
   ruleIds: string[] | null,
@@ -89,19 +89,28 @@ const useNavigateOnUnblock = (
     };
   }, [targetUrl, testIfAllowed, navigate, phase]);
 
-  // ⏱️ Timer finished → start 1s cooldown
+  // ⏱️ Timer finished → start 1s delay for success animation
   useEffect(() => {
     if (!isUnblocked || phase !== 'idle') {
       return;
     }
 
-    setPhase('cooldown');
+    setPhase('delay');
 
     timeoutRef.current = window.setTimeout(() => {
-      setPhase('ready');
+      setPhase(held ? 'waiting-release' : 'ready');
       timeoutRef.current = null;
     }, 1000);
-  }, [isUnblocked, phase]);
+  }, [isUnblocked, phase, held]);
+
+  // ✅ Once delay has completed while still held, wait for release.
+  useEffect(() => {
+    if (phase !== 'waiting-release' || held) {
+      return;
+    }
+
+    setPhase('ready');
+  }, [phase, held]);
 
   // 🚀 After cooldown + release → unblock → navigate
   useEffect(() => {
