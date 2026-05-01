@@ -56,9 +56,11 @@ export const useButtonEvents = () => {
   }, [stop]);
 
   useEffect(() => {
+    document.addEventListener('pointerup', onRelease);
     document.addEventListener('mouseup', onRelease);
     document.addEventListener('keyup', onRelease);
     return () => {
+      document.removeEventListener('pointerup', onRelease);
       document.removeEventListener('mouseup', onRelease);
       document.removeEventListener('keyup', onRelease);
     };
