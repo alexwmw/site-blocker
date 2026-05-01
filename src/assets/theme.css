@@ -91,7 +91,7 @@
   --color-warning: #9c6a45;
 
   --image-block-page-bg: var(--block-page-mountains-image);
-  --image-block-page-overlay: linear-gradient(180deg, rgb(251 248 245 / 82%), rgb(245 239 233 / 72%));
+  --image-block-page-overlay: linear-gradient(180deg, rgb(251 248 245 /42%), rgb(245 239 233 / 22%));
 
   color-scheme: light;
 }

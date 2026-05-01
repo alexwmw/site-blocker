@@ -6,7 +6,6 @@ import styles from './QuickOptions.module.css';
 
 import Button from '@/components/primitives/Button';
 import Card from '@/components/primitives/Card';
-import Paragraph from '@/components/primitives/Paragraph';
 import Setting from '@/components/primitives/Setting';
 import Stack from '@/components/primitives/Stack';
 import Switch from '@/components/primitives/Switch';
@@ -45,12 +44,12 @@ const QuickOptions = ({
           <ChevronRight />
           Quick options
         </summary>
-        <Paragraph
-          size='small'
-          subtle
-        >
-          Changes here will update your main preferences.
-        </Paragraph>
+        {/*<Paragraph*/}
+        {/*  size='small'*/}
+        {/*  subtle*/}
+        {/*>*/}
+        {/*  Changes here will update your main preferences.*/}
+        {/*</Paragraph>*/}
         <Stack
           topMargin
           gap='small'
@@ -68,6 +67,7 @@ const QuickOptions = ({
             settingId='extendedUnblock'
             label='Unblock duration (minutes)'
             type='number'
+            variant='row'
             min={SETTINGS_LIMITS.extendedUnblockDurationMinMinutes}
             max={SETTINGS_LIMITS.extendedUnblockDurationMaxMinutes}
             value={settings?.extendedUnblock.durationMinutes}

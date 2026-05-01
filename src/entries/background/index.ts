@@ -39,7 +39,6 @@ chrome.runtime.onInstalled.addListener(initIcons);
  * -------------------------------------------- */
 chrome.runtime.onInstalled.addListener((details) => {
   console.log('Installed/updated:', details.reason);
-
   MigrationService.migrate().catch(console.error);
 
   if (details.reason === 'install') {
