@@ -3,60 +3,57 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 
 import useSettings from '@/hooks/useSettings';
 
-export const useButtonEvents = () => {
+export const useHoldTimer = (duration: number | null) => {
   const [timeRemaining, setTimeRemaining] = useState<number | null>(null);
-  const [held, setHeld] = useState<boolean>(false);
   const interval = useRef<NodeJS.Timeout | null>(null);
 
-  const { settings } = useSettings();
-
-  const countdown = () => {
-    setTimeRemaining((t: number | null) => {
-      if (t === null) {
-        return null;
-      }
-      return t > 0 ? t - 1 : 0;
-    });
-  };
-
-  const onButtonPress = () => {
-    if (!settings) {
+  const start = useCallback(() => {
+    if (!duration || interval.current) {
       return;
     }
 
-    if (interval.current) {
-      return;
-    }
+    setTimeRemaining(duration);
+    interval.current = setInterval(() => {
+      setTimeRemaining((t) => (t && t > 0 ? t - 1 : 0));
+    }, 1000);
+  }, [duration]);
 
-    setTimeRemaining(settings.holdDurationSeconds);
-    setHeld(true);
-    interval.current = setInterval(countdown, 1000);
-  };
-
-  const onMouseDown: MouseEventHandler = (e) => {
-    // left click only
-    if (e.button !== 0) {
-      return;
-    }
-    onButtonPress();
-  };
-
-  const onKeyDown: KeyboardEventHandler = (e) => {
-    const spacerBarPress = e.key === ' ' || e.code === 'Space';
-    if (!spacerBarPress || held) {
-      return;
-    }
-    onButtonPress();
-  };
-
-  const onRelease = useCallback(() => {
+  const stop = useCallback(() => {
     setTimeRemaining(null);
-    setHeld(false);
     if (interval.current) {
       clearInterval(interval.current);
       interval.current = null;
     }
   }, []);
+
+  return { timeRemaining, start, stop };
+};
+
+export const useButtonEvents = () => {
+  const { settings } = useSettings();
+  const { timeRemaining, start, stop } = useHoldTimer(settings?.holdDurationSeconds ?? null);
+
+  const [held, setHeld] = useState(false);
+
+  const onMouseDown: MouseEventHandler = (e) => {
+    if (e.button !== 0) {
+      return;
+    }
+    setHeld(true);
+    start();
+  };
+
+  const onKeyDown: KeyboardEventHandler = (e) => {
+    if ((e.key === ' ' || e.code === 'Space') && !held) {
+      setHeld(true);
+      start();
+    }
+  };
+
+  const onRelease = useCallback(() => {
+    setHeld(false);
+    stop();
+  }, [stop]);
 
   useEffect(() => {
     document.addEventListener('mouseup', onRelease);

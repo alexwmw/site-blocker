@@ -33,7 +33,7 @@ const BlockPageApp = () => {
   const holdIsComplete = useMemo(() => timeRemaining === 0, [timeRemaining]);
 
   /** Executes window.location.replace on hold completion */
-  useNavigateOnUnblock(ruleIds, targetUrl, holdIsComplete);
+  useNavigateOnUnblock(ruleIds, targetUrl, holdIsComplete, held);
 
   const targetIdentity = useMemo(() => SiteIdentityService.fromUrl(targetUrl), [targetUrl]);
 
