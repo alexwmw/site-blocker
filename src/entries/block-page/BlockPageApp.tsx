@@ -4,7 +4,7 @@ import { useMemo } from 'react';
 import styles from './BlockPageApp.module.css';
 import BlockPageButton from './components/BlockPageButton';
 import useBlockPageParams from './hooks/useBlockPageParams';
-import useButtonEvents from './hooks/useButtonEvents';
+import useButtonEventHandlers from './hooks/useButtonEventHandlers';
 
 import TitleDark from '@/assets/icons/title-dark.svg?react';
 import TitleLight from '@/assets/icons/title-light.svg?react';
@@ -16,6 +16,7 @@ import BackgroundCredit from '@/entries/block-page/components/BackgroundCredit';
 import QuickOptions from '@/entries/block-page/components/QuickOptions';
 import ReviewCard from '@/entries/block-page/components/ReviewCard';
 import UpdatedBanner from '@/entries/block-page/components/UpdatedBanner';
+import useHoldTimer from '@/entries/block-page/hooks/useHoldTimer';
 import useNavigateOnUnblock from '@/entries/block-page/hooks/useNavigateOnUnblock';
 import useSettings from '@/hooks/useSettings';
 import useThemeEffect from '@/hooks/useThemeEffect';
@@ -24,9 +25,11 @@ import { getChromeWebStoreUrl } from '@/utils/extensionUrls';
 
 const BlockPageApp = () => {
   const theme = useThemeEffect();
-  const { onMouseDown, onKeyDown, timeRemaining, timeTotal, held } = useButtonEvents();
-  const { ruleIds, targetUrl } = useBlockPageParams();
   const { settings, updateSettings } = useSettings();
+  const timeTotal = useMemo(() => settings?.holdDurationSeconds ?? null, [settings]);
+  const { timeRemaining, start, stop } = useHoldTimer(timeTotal);
+  const { onMouseDown, onKeyDown, held } = useButtonEventHandlers(start, stop);
+  const { ruleIds, targetUrl } = useBlockPageParams();
 
   const TitleImage = theme?.endsWith('dark') ? TitleLight : TitleDark;
 
