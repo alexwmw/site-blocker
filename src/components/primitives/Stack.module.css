@@ -3,6 +3,10 @@
   gap: 16px;
 }
 
+.two-columns {
+  grid-template-columns: 1fr 1fr;
+}
+
 .x-small-gap {
   gap: 8px;
 }
