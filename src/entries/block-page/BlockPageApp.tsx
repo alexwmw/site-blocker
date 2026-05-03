@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import styles from './BlockPageApp.module.css';
 import BlockPageButton from './components/BlockPageButton';
@@ -16,7 +16,6 @@ import BackgroundCredit from '@/entries/block-page/components/BackgroundCredit';
 import QuickOptions from '@/entries/block-page/components/QuickOptions';
 import ReviewCard from '@/entries/block-page/components/ReviewCard';
 import UpdatedBanner from '@/entries/block-page/components/UpdatedBanner';
-import useHoldTimer from '@/entries/block-page/hooks/useHoldTimer';
 import useNavigateOnUnblock from '@/entries/block-page/hooks/useNavigateOnUnblock';
 import useSettings from '@/hooks/useSettings';
 import useThemeEffect from '@/hooks/useThemeEffect';
@@ -27,16 +26,14 @@ const BlockPageApp = () => {
   const theme = useThemeEffect();
   const { settings, updateSettings } = useSettings();
   const timeTotal = useMemo(() => settings?.holdDurationSeconds ?? null, [settings]);
-  const { timeRemaining, start, stop } = useHoldTimer(timeTotal);
-  const { onMouseDown, onKeyDown, held } = useButtonEventHandlers(start, stop);
+  const { onMouseDown, onKeyDown, held, timeRemaining } = useButtonEventHandlers(timeTotal);
+  const holdIsComplete = useMemo(() => timeRemaining === 0, [timeRemaining]);
   const { ruleIds, targetUrl } = useBlockPageParams();
+  const [readyToProceed, setReadyToProceed] = useState<boolean>(false);
 
   const TitleImage = theme?.endsWith('dark') ? TitleLight : TitleDark;
 
-  const holdIsComplete = useMemo(() => timeRemaining === 0, [timeRemaining]);
-
-  /** Executes window.location.replace on hold completion */
-  useNavigateOnUnblock(ruleIds, targetUrl, holdIsComplete);
+  const { proceedToTargetUrl, testTargetUrl } = useNavigateOnUnblock(ruleIds, targetUrl);
 
   const targetIdentity = useMemo(() => SiteIdentityService.fromUrl(targetUrl), [targetUrl]);
 
@@ -56,6 +53,41 @@ const BlockPageApp = () => {
   const handleHideBanner = () => {
     updateSettings({ showMigrationBrief: false }).catch(console.error);
   };
+
+  useEffect(() => {
+    let t: NodeJS.Timeout;
+    if (holdIsComplete && !readyToProceed) {
+      // UX delay
+      t = setTimeout(() => {
+        setReadyToProceed(true);
+      }, 1000);
+    }
+    if (holdIsComplete && !held && readyToProceed) {
+      proceedToTargetUrl().catch(console.error);
+    }
+    return () => {
+      clearTimeout(t);
+    };
+  }, [holdIsComplete, proceedToTargetUrl, held, readyToProceed]);
+
+  useEffect(() => {
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') {
+        testTargetUrl()
+          .then((response) => {
+            if (response === 'unblocked') {
+              proceedToTargetUrl().catch(console.error);
+            }
+          })
+          .catch(console.error);
+      }
+    };
+
+    document.addEventListener('visibilitychange', onVisible);
+    return () => {
+      document.removeEventListener('visibilitychange', onVisible);
+    };
+  }, [proceedToTargetUrl, testTargetUrl]);
 
   return (
     <Stack
@@ -82,7 +114,13 @@ const BlockPageApp = () => {
         className={styles.blockedCard}
       >
         <p className={styles.holdInstruction}>
-          <strong>If you wish to proceed, hold the button.</strong>
+          {holdIsComplete && held && readyToProceed ? (
+            <strong>You can let go now...</strong>
+          ) : holdIsComplete ? (
+            <strong>Navigating...</strong>
+          ) : (
+            <strong>If you wish to proceed, hold the button.</strong>
+          )}
         </p>
 
         <p className={styles.holdHelp}>

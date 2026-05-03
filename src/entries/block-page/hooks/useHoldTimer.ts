@@ -16,14 +16,17 @@ export const useHoldTimer = (duration: number | null) => {
   }, [duration]);
 
   const stop = useCallback(() => {
-    setTimeRemaining(null);
     if (interval.current) {
       clearInterval(interval.current);
       interval.current = null;
     }
   }, []);
 
-  return { timeRemaining, start, stop };
+  const reset = useCallback(() => {
+    setTimeRemaining(null);
+  }, []);
+
+  return { timeRemaining, start, stop, reset };
 };
 
 export default useHoldTimer;

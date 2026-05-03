@@ -1,39 +1,44 @@
 import type { KeyboardEventHandler, MouseEventHandler } from 'react';
 import { useCallback, useEffect, useState } from 'react';
 
-const useButtonEventHandlers = (startTimer: () => void, stopTimer: () => void) => {
-  const [held, setHeld] = useState(false);
+import useHoldTimer from '@/entries/block-page/hooks/useHoldTimer';
 
+const useButtonEventHandlers = (timeTotal: number | null) => {
+  const [held, setHeld] = useState(false);
+  const { timeRemaining, start, stop, reset } = useHoldTimer(timeTotal);
   const onMouseDown: MouseEventHandler = (e) => {
     if (e.button !== 0) {
       return;
     }
     setHeld(true);
-    startTimer();
+    start();
   };
 
   const onKeyDown: KeyboardEventHandler = (e) => {
     if ((e.key === ' ' || e.code === 'Space') && !held) {
       setHeld(true);
-      startTimer();
+      start();
     }
   };
 
   const onRelease = useCallback(() => {
     setHeld(false);
-    stopTimer();
-  }, [stopTimer]);
+    stop();
+    if (timeRemaining && timeRemaining > 0) {
+      reset();
+    }
+  }, [timeRemaining, stop, reset]);
 
   useEffect(() => {
-    document.addEventListener('mouseup', onRelease);
+    document.addEventListener('pointerup', onRelease);
     document.addEventListener('keyup', onRelease);
     return () => {
-      document.removeEventListener('mouseup', onRelease);
+      document.removeEventListener('pointerup', onRelease);
       document.removeEventListener('keyup', onRelease);
     };
   }, [onRelease]);
 
-  return { onMouseDown, onKeyDown, held };
+  return { onMouseDown, onKeyDown, held, timeRemaining };
 };
 
 export default useButtonEventHandlers;

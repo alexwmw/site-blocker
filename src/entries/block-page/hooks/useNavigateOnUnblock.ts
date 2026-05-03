@@ -1,46 +1,37 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 
 import { MessagesService } from '@/services/MessagesService';
 
-const useNavigateOnUnblock = (ruleIds: string[] | null, targetUrl: string | null, isUnblocked: boolean) => {
-  const [didNavigate, setDidNavigate] = useState<boolean>(false);
+const useNavigateOnUnblock = (ruleIds: string[] | null, targetUrl: string | null) => {
+  const [isNavigating, setIsNavigating] = useState(false);
 
-  const replaceLocation = useCallback(async () => {
-    if (!ruleIds || !targetUrl) {
+  const testTargetUrl = useCallback(async () => {
+    if (targetUrl) {
+      const response = await MessagesService.sendMessage({
+        type: 'TEST_URL_REQUEST',
+        payload: { targetUrl },
+      });
+
+      return response.status;
+    }
+  }, [targetUrl]);
+
+  const proceedToTargetUrl = useCallback(async () => {
+    if (!ruleIds || !targetUrl || isNavigating) {
       return;
     }
+    setIsNavigating(true);
     const response = await MessagesService.sendMessage({
       type: 'UNBLOCK_REQUEST',
       payload: { ruleIds, targetUrl },
     });
     if (response.ok) {
       window.location.replace(targetUrl);
-      setDidNavigate(true);
+    } else {
+      setIsNavigating(false);
     }
-  }, [ruleIds, targetUrl]);
+  }, [ruleIds, targetUrl, isNavigating]);
 
-  useEffect(() => {
-    if (targetUrl) {
-      MessagesService.sendMessage({
-        type: 'TEST_URL_REQUEST',
-        payload: { targetUrl },
-      })
-        .then(({ ok, status }) => {
-          if (ok && status !== 'blocked') {
-            window.location.replace(targetUrl);
-            setDidNavigate(true);
-          }
-        })
-        .catch(console.error);
-    }
-    if (isUnblocked && !didNavigate) {
-      setTimeout(() => {
-        replaceLocation().catch(console.error);
-      }, 1000);
-    }
-  }, [replaceLocation, isUnblocked, didNavigate, targetUrl]);
-
-  return didNavigate;
+  return { proceedToTargetUrl, testTargetUrl, isNavigating };
 };
-
 export default useNavigateOnUnblock;
