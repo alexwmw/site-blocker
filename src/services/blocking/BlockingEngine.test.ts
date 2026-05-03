@@ -5,7 +5,6 @@ import defaultSettings from '../defaultSettings';
 import { StorageService } from '../StorageService';
 
 import BlockingEngine from './BlockingEngine';
-import DnrStrategy from './strategies/archived/DnrStrategy';
 import type { SyncItems } from './strategies/BlockingStrategy';
 import TabRedirectStrategy from './strategies/TabRedirectStrategy';
 import type { Listener } from './test-utils';
@@ -60,12 +59,6 @@ describe('BlockingEngine', () => {
   const tabHandleUnblockFactory = () =>
     vi.spyOn(TabRedirectStrategy.prototype, 'handleUnblock').mockResolvedValue({ ok: true, reason: 'tab' });
 
-  const dnrStartFactory = () => vi.spyOn(DnrStrategy.prototype, 'start').mockResolvedValue();
-  const dnrStopFactory = () => vi.spyOn(DnrStrategy.prototype, 'stop').mockResolvedValue();
-  const dnrSyncFactory = () => vi.spyOn(DnrStrategy.prototype, 'sync').mockResolvedValue();
-  const dnrHandleUnblockFactory = () =>
-    vi.spyOn(DnrStrategy.prototype, 'handleUnblock').mockResolvedValue({ ok: true, reason: 'dnr' });
-
   beforeEach(() => {
     vi.clearAllMocks();
     vi.spyOn(StorageService, 'getRules').mockResolvedValue(rules);
@@ -78,10 +71,6 @@ describe('BlockingEngine', () => {
     tabStop = tabStopFactory();
     tabSync = tabSyncFactory();
     tabHandleUnblock = tabHandleUnblockFactory();
-    dnrStart = dnrStartFactory();
-    dnrStop = dnrStopFactory();
-    dnrSync = dnrSyncFactory();
-    dnrHandleUnblock = dnrHandleUnblockFactory();
 
     vi.stubGlobal('chrome', {
       permissions: {
@@ -100,7 +89,6 @@ describe('BlockingEngine', () => {
 
     expect(tabStart).toHaveBeenCalledTimes(1);
     expect(tabSync).toHaveBeenCalledWith({ rules, settings: defaultSettings });
-    expect(dnrStart).not.toHaveBeenCalled();
     expect(onAdded.addListener).toHaveBeenCalledTimes(1);
     expect(onRemoved.addListener).toHaveBeenCalledTimes(1);
   });
@@ -112,8 +100,6 @@ describe('BlockingEngine', () => {
 
     await engine.start();
 
-    expect(dnrStart).toHaveBeenCalledTimes(1);
-    expect(dnrSync).toHaveBeenCalledWith({ rules, settings: defaultSettings });
     expect(tabStart).not.toHaveBeenCalled();
   });
 
@@ -129,8 +115,6 @@ describe('BlockingEngine', () => {
     await new Promise((resolve) => setTimeout(resolve, 0));
 
     expect(tabStop).toHaveBeenCalledTimes(1);
-    expect(dnrStart).toHaveBeenCalledTimes(1);
-    expect(dnrSync).toHaveBeenCalledWith({ rules, settings: defaultSettings });
   });
 
   // archived strategy - no strategy to switch to
@@ -143,7 +127,6 @@ describe('BlockingEngine', () => {
 
     expect(onAdded.removeListener).toHaveBeenCalledTimes(1);
     expect(onRemoved.removeListener).toHaveBeenCalledTimes(1);
-    expect(dnrStop).toHaveBeenCalledTimes(1);
   });
 
   it('sync and handleUnblock delegate to active strategy', async () => {
@@ -157,7 +140,6 @@ describe('BlockingEngine', () => {
 
     expect(tabSync).toHaveBeenCalledWith({ rules, settings: defaultSettings });
     expect(tabHandleUnblock).toHaveBeenCalledWith(['rule-1'], 'https://reddit.com', 10);
-    expect(dnrSync).not.toHaveBeenCalled();
     expect(result).toEqual({ ok: true, reason: 'tab' });
   });
 });
