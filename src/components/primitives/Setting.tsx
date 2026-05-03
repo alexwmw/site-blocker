@@ -55,7 +55,7 @@ const Setting = (props: SettingProps) => {
     <div>
       <label
         htmlFor={settingId}
-        className={clsx(styles.settingsLabel, className, styles[variant])}
+        className={clsx(styles.settingsLabel, className, variant && styles[variant])}
       >
         {label}
 
