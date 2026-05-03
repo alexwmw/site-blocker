@@ -1,11 +1,13 @@
-import type { LottieRefCurrentProps } from 'lottie-react';
-import { useEffect, useMemo, useRef } from 'react';
+import clsx from 'clsx';
+import { useEffect, useMemo, useState } from 'react';
 
 import styles from './BlockPageApp.module.css';
 import BlockPageButton from './components/BlockPageButton';
 import useBlockPageParams from './hooks/useBlockPageParams';
-import useButtonEvents from './hooks/useButtonEvents';
+import useButtonEventHandlers from './hooks/useButtonEventHandlers';
 
+import TitleDark from '@/assets/icons/title-dark.svg?react';
+import TitleLight from '@/assets/icons/title-light.svg?react';
 import Card from '@/components/primitives/Card';
 import Stack from '@/components/primitives/Stack';
 import EyebrowLabel from '@/components/shared/EyebrowLabel';
@@ -13,54 +15,82 @@ import SiteIdentity from '@/components/shared/SiteIdentity';
 import BackgroundCredit from '@/entries/block-page/components/BackgroundCredit';
 import QuickOptions from '@/entries/block-page/components/QuickOptions';
 import ReviewCard from '@/entries/block-page/components/ReviewCard';
+import UpdatedBanner from '@/entries/block-page/components/UpdatedBanner';
 import useNavigateOnUnblock from '@/entries/block-page/hooks/useNavigateOnUnblock';
 import useSettings from '@/hooks/useSettings';
 import useThemeEffect from '@/hooks/useThemeEffect';
 import { SiteIdentityService } from '@/services/SiteIdentityService';
 import { getChromeWebStoreUrl } from '@/utils/extensionUrls';
 
-const HOLD_ANIM_DEFAULT_DURATION = 5;
-
 const BlockPageApp = () => {
   const theme = useThemeEffect();
-  const player = useRef<LottieRefCurrentProps>(null);
-  const { onMouseDown, onKeyDown, timeRemaining, timeTotal } = useButtonEvents(player);
-  const { ruleIds, targetUrl } = useBlockPageParams();
   const { settings, updateSettings } = useSettings();
-
+  const timeTotal = useMemo(() => settings?.holdDurationSeconds ?? null, [settings]);
+  const { onMouseDown, onKeyDown, held, timeRemaining } = useButtonEventHandlers(timeTotal);
   const holdIsComplete = useMemo(() => timeRemaining === 0, [timeRemaining]);
+  const { ruleIds, targetUrl } = useBlockPageParams();
+  const [readyToProceed, setReadyToProceed] = useState<boolean>(false);
 
-  const holdSpeed = useMemo(() => (timeTotal ? HOLD_ANIM_DEFAULT_DURATION / timeTotal : 1), [timeTotal]);
+  const TitleImage = theme?.endsWith('dark') ? TitleLight : TitleDark;
 
-  /** Executes window.location.replace on hold completion */
-  useNavigateOnUnblock(ruleIds, null, holdIsComplete);
+  const {
+    proceedToTargetUrl,
+    testAndProceedToTargetUrl,
+    error: navigationError,
+  } = useNavigateOnUnblock(ruleIds, targetUrl);
 
   const targetIdentity = useMemo(() => SiteIdentityService.fromUrl(targetUrl), [targetUrl]);
 
-  const handleSelectReview = () => {
-    const targetUrl = getChromeWebStoreUrl('reviews');
-    if (targetUrl) {
-      window.open(targetUrl, '_blank');
-    }
-    updateSettings({ isRated: true }).catch(console.error);
+  const handleSelectWebStoreButton = () => {
+    window.open(getChromeWebStoreUrl(), '_blank');
+  };
+
+  const handleSelectReviewButton = () => {
+    window.open(getChromeWebStoreUrl('reviews'), '_blank');
   };
 
   const handleDontShowReviewCard = () => {
     updateSettings({ isRated: true }).catch(console.error);
   };
 
+  const handleHideBanner = () => {
+    updateSettings({ showMigrationBrief: false }).catch(console.error);
+  };
+
   useEffect(() => {
-    if (holdIsComplete) {
-      player.current?.setSpeed(1);
-    } else {
-      player.current?.setSpeed(holdSpeed);
+    let t: NodeJS.Timeout;
+    if (holdIsComplete && !readyToProceed) {
+      // UX delay
+      t = setTimeout(() => {
+        setReadyToProceed(true);
+      }, 1000);
     }
-  }, [player, holdSpeed, holdIsComplete]);
+    if (holdIsComplete && !held && readyToProceed) {
+      proceedToTargetUrl().catch(console.error);
+    }
+    return () => {
+      clearTimeout(t);
+    };
+  }, [holdIsComplete, proceedToTargetUrl, held, readyToProceed]);
+
+  useEffect(() => {
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') {
+        testAndProceedToTargetUrl().catch(console.error);
+      }
+    };
+
+    document.addEventListener('visibilitychange', onVisible);
+    return () => {
+      document.removeEventListener('visibilitychange', onVisible);
+    };
+  }, [testAndProceedToTargetUrl]);
 
   return (
-    <main
+    <Stack
       id='block-page'
       className={styles.page}
+      as='main'
     >
       <Card
         as='section'
@@ -75,8 +105,21 @@ const BlockPageApp = () => {
             identity={targetIdentity}
           />
         </div>
-        <p>
-          <strong>If you wish to proceed, hold the button.</strong>
+      </Card>
+      <Card
+        as='section'
+        className={styles.blockedCard}
+      >
+        <p className={styles.holdInstruction}>
+          {navigationError ? (
+            navigationError
+          ) : holdIsComplete && held && readyToProceed ? (
+            <strong>You can let go now...</strong>
+          ) : holdIsComplete ? (
+            <strong>Navigating...</strong>
+          ) : (
+            <strong>If you wish to proceed, hold the button.</strong>
+          )}
         </p>
 
         <p className={styles.holdHelp}>
@@ -85,14 +128,15 @@ const BlockPageApp = () => {
 
         <BlockPageButton
           autoFocus
-          player={player}
           holdIsComplete={holdIsComplete}
           remainingTime={timeRemaining}
           onMouseDown={onMouseDown}
           onKeyDown={onKeyDown}
+          animationDuration={timeTotal ?? 0}
+          held={held}
         />
       </Card>
-      <Stack className={styles.absStack}>
+      <Stack className={clsx(styles.absStack, styles.absStackLeft)}>
         {settings ? (
           <QuickOptions
             className={styles.optionsCard}
@@ -103,12 +147,22 @@ const BlockPageApp = () => {
         {!settings?.isRated ? (
           <ReviewCard
             onSelectDontShow={handleDontShowReviewCard}
-            onSelectReview={handleSelectReview}
+            onSelectReview={handleSelectReviewButton}
           />
         ) : null}
       </Stack>
+      <Stack className={clsx(styles.absStack, styles.absStackRight)}>
+        {settings?.showMigrationBrief ? (
+          <UpdatedBanner
+            onSelectWebStoreLink={handleSelectWebStoreButton}
+            onSelectDontShow={handleHideBanner}
+          />
+        ) : (
+          <TitleImage className={styles.titleImage} />
+        )}
+      </Stack>
       <BackgroundCredit theme={theme} />
-    </main>
+    </Stack>
   );
 };
 

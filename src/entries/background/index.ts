@@ -1,50 +1,67 @@
 import BlockingEngine from '@/services/blocking/BlockingEngine';
-import type { SyncItems } from '@/services/blocking/strategies/BlockingStrategy';
+import { ContextMenuService } from '@/services/ContextMenuService';
+import { IconsService } from '@/services/IconsService';
 import { MessagesService } from '@/services/MessagesService';
 import { MigrationService } from '@/services/MigrationService';
 import { StorageService } from '@/services/StorageService';
-import { blockRulesSchema, settingsSchema } from '@/types/schema';
+import { settingsSchema } from '@/types/schema';
 
 const blockingEngine = new BlockingEngine();
 
-/** Migration and storage setup **/
-chrome.runtime.onInstalled.addListener((details) => {
-  (async (details) => {
-    console.log('Extension installed/updated. Reason:', details.reason);
+/* ---------------------------------------------
+ * ICONS
+ * -------------------------------------------- */
 
-    // Migrate legacy sync storage and upgrade existing local settings to the latest schema version.
-    // Defaults and safe setting clamps are applied here.
-    await MigrationService.migrate();
-    console.log('Migration finished.');
-    const settings = await StorageService.getSettings();
-    const blockRules = await StorageService.getRules();
+const initIcons = () => {
+  IconsService.initIcons().catch(console.error);
+};
 
-    console.log('Settings are:', settings);
-    console.log('Block rules are:', blockRules);
-  })(details).catch(console.error);
+chrome.alarms.onAlarm.addListener((alarm) => {
+  if (alarm.name !== 'updateIcon') {
+    return;
+  }
+  initIcons();
 });
 
-/** Start blocking */
-async function startTheEngine() {
-  StorageService.addListener((changes) => {
-    const items: SyncItems = {};
-    if ('settings' in changes) {
-      items.settings = settingsSchema.parse(changes.settings.newValue);
-    }
-    if ('rules' in changes) {
-      items.rules = blockRulesSchema.parse(changes.rules.newValue);
-    }
-    blockingEngine.sync(items).catch(console.error);
-  });
+StorageService.addListener((changes) => {
+  if ('settings' in changes) {
+    const { schedule: newSchedule } = settingsSchema.parse(changes.settings.newValue);
+    IconsService.updateIcon(newSchedule);
+    IconsService.scheduleNextIconUpdate(newSchedule).catch(console.error);
+  }
+});
 
-  await blockingEngine.start();
+chrome.runtime.onStartup.addListener(initIcons);
+chrome.runtime.onInstalled.addListener(initIcons);
 
-  return blockingEngine;
+/* ---------------------------------------------
+ * MIGRATION (INSTALL ONLY)
+ * -------------------------------------------- */
+chrome.runtime.onInstalled.addListener((details) => {
+  console.log('Installed/updated:', details.reason);
+  MigrationService.migrate().catch(console.error);
+
+  if (details.reason === 'install') {
+    chrome.tabs.create({ url: chrome.runtime.getURL('onboarding.html') }).catch(console.error);
+  }
+});
+
+/* ---------------------------------------------
+ * CONTEXT MENUS (SAFE RE-CREATE)
+ * -------------------------------------------- */
+function initContextMenus() {
+  ContextMenuService.createContextMenu(blockingEngine).catch(console.error);
 }
+chrome.runtime.onStartup.addListener(initContextMenus);
+initContextMenus();
 
-/** Main runtime listener - handle requests as per messages.ts  */
-function startMessaging(engine: BlockingEngine) {
-  MessagesService.startListening(engine);
-}
+/* ---------------------------------------------
+ * LISTENERS
+ * -------------------------------------------- */
+StorageService.startListening(blockingEngine);
+MessagesService.startListening(blockingEngine);
 
-startTheEngine().then(startMessaging).catch(console.error);
+/* ---------------------------------------------
+ * ENGINE START
+ * -------------------------------------------- */
+blockingEngine.start().catch(console.error);

@@ -1,9 +1,11 @@
 import clsx from 'clsx';
 
-import EyebrowLabel from './EyebrowLabel';
 import styles from './Hero.module.css';
 
+import IconCompact from '@/assets/icons/icon-no-bg.svg?react';
+import IconTitle from '@/assets/icons/title-brand-colors.svg?react';
 import Paragraph from '@/components/primitives/Paragraph';
+import EyebrowLabel from '@/components/shared/EyebrowLabel';
 
 const Hero = ({
   label = 'Hold',
@@ -14,13 +16,23 @@ const Hero = ({
   label?: string;
   title: string;
   subheading?: string;
-  variant?: string;
+  variant?: 'compact';
 }) => {
+  const Icon = variant === 'compact' ? IconCompact : IconTitle;
   return (
     <header className={clsx(styles.hero, variant && styles[variant])}>
-      <EyebrowLabel>{label}</EyebrowLabel>
-      <h1 className={styles.heroTitle}>{title}</h1>
-      {subheading ? <Paragraph subtle>{subheading}</Paragraph> : null}
+      <div className={styles.row}>
+        <Icon
+          height={54}
+          className={styles.holdIcon}
+          title='Hold icon'
+        />
+        <div>
+          {variant === 'compact' ? <EyebrowLabel>{label}</EyebrowLabel> : null}
+          <h1 className={styles.heroTitle}>{title}</h1>
+          {subheading ? <Paragraph subtle>{subheading}</Paragraph> : null}
+        </div>
+      </div>
     </header>
   );
 };

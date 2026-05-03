@@ -8,4 +8,5 @@ export interface BlockingStrategy {
   stop(): Promise<void>;
   sync(items: SyncItems): Promise<void>;
   handleUnblock(ruleIds: string[], targetUrl: string, senderTabId?: number): Promise<UnblockResponse>;
+  testUrlIsBlocked(url: string): Promise<boolean>;
 }

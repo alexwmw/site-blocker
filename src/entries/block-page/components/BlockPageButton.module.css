@@ -5,13 +5,35 @@
   gap: 12px;
 }
 
+@keyframes hue {
+  from {
+    filter: hue-rotate(180deg);
+  }
+  to {
+    filter: hue-rotate(0);
+  }
+}
+
+@keyframes appear {
+  from {
+    opacity: 0;
+    scale: 0.1;
+  }
+  to {
+    opacity: 1;
+    scale: 1.2;
+  }
+}
+
 .holdButton {
+  --color-brand-icon-bg: transparent;
   border: 0;
-  border-radius: var(--radius-pill);
+  border-radius: 45%;
   background: linear-gradient(135deg, var(--color-brand-strong), var(--color-brand-soft));
   color: var(--color-text-inverse);
   font-size: 1.2rem;
-  font-weight: 700;
+  font-weight: 500;
+  font-family: var(--font-family-brand), sans-serif;
   padding: 12px 24px;
   cursor: pointer;
   letter-spacing: 2px;
@@ -20,18 +42,66 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: filter var(--transition-duration) ease;
-
+  transition: all var(--transition-duration) ease;
+  filter: brightness(100%) saturate(100%) hue-rotate(0);
+  &.held {
+    /*opacity: 0;*/
+    animation: hue linear;
+  }
   &.holdComplete {
-    opacity: 0;
+    filter: hue-rotate(0);
+    background: var(--color-success-background);
+  }
+
+  &.holdComplete > span {
+    animation: appear ease forwards 0.3s;
+    font-weight: 600;
   }
 
   &:hover {
     filter: brightness(110%) saturate(110%);
   }
+  &.holdComplete,
   &:active {
     filter: brightness(110%) saturate(110%) contrast(120%);
     font-size: 1.75rem;
+    outline: none;
+  }
+}
+
+@keyframes draw {
+  from {
+    opacity: 0.5;
+    stroke-dashoffset: 1;
+  }
+  to {
+    opacity: 1;
+    stroke-dashoffset: 0;
+  }
+}
+
+.completionAnimation {
+  height: 100%;
+  width: 100%;
+  overflow: unset;
+  z-index: 2;
+}
+
+.buttonEdge {
+  opacity: 0;
+  height: 100%;
+  width: 100%;
+  overflow: unset;
+  transform: scale(0.86);
+
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+
+  transition: opacity var(--transition-duration) ease;
+
+  &.held,
+  .complete {
+    animation: draw linear forwards;
   }
 }
 
@@ -50,9 +120,9 @@
     &.holdButton {
       z-index: 1;
     }
-    &:not(.holdButton) {
+    &.buttonEdge {
       position: relative;
-      top: 1px;
+      /*top: 1px;*/
       z-index: 0;
       scale: 1.22;
     }

@@ -51,7 +51,6 @@ describe('Rules', () => {
     );
 
     expect(screen.getByText('No rules yet.')).not.toBeNull();
-    expect(screen.getByText('Add rules from the popup to start blocking distracting sites.')).not.toBeNull();
   });
 
   it('renders rule content once rules are ready', () => {

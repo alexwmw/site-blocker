@@ -1,33 +1,54 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 
 import { MessagesService } from '@/services/MessagesService';
 
-const useNavigateOnUnblock = (ruleIds: string[] | null, targetUrl: string | null, isUnblocked: boolean) => {
-  const [didNavigate, setDidNavigate] = useState<boolean>(false);
+const MAX_RETRY_COUNT = 5;
 
-  const replaceLocation = useCallback(async () => {
-    if (!ruleIds || !targetUrl) {
+const useNavigateOnUnblock = (ruleIds: string[] | null, targetUrl: string | null) => {
+  const [isNavigating, setIsNavigating] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
+  const [errorMessage, setErrorMessage] = useState<string | undefined>();
+
+  const testAndProceedToTargetUrl = useCallback(async () => {
+    if (targetUrl) {
+      const response = await MessagesService.sendMessage({
+        type: 'TEST_URL_REQUEST',
+        payload: { targetUrl },
+      });
+
+      if (response.status === 'unblocked') {
+        window.location.replace(targetUrl);
+      }
+      return response.status;
+    }
+  }, [targetUrl]);
+
+  const proceedToTargetUrl = useCallback(async () => {
+    if (!ruleIds || !targetUrl || isNavigating || retryCount === MAX_RETRY_COUNT) {
       return;
     }
+    setIsNavigating(true);
     const response = await MessagesService.sendMessage({
       type: 'UNBLOCK_REQUEST',
       payload: { ruleIds, targetUrl },
     });
     if (response.ok) {
       window.location.replace(targetUrl);
-      setDidNavigate(true);
-    }
-  }, [ruleIds, targetUrl]);
-
-  useEffect(() => {
-    if (isUnblocked && !didNavigate) {
+      setRetryCount(0);
+    } else {
+      setRetryCount((count) => count + 1);
+      setErrorMessage(response.reason);
       setTimeout(() => {
-        replaceLocation().catch(console.error);
+        setIsNavigating(false);
       }, 1000);
     }
-  }, [replaceLocation, isUnblocked, didNavigate]);
+  }, [ruleIds, targetUrl, isNavigating, retryCount]);
 
-  return didNavigate;
+  return {
+    proceedToTargetUrl,
+    testAndProceedToTargetUrl,
+    isNavigating,
+    error: retryCount === MAX_RETRY_COUNT && errorMessage,
+  };
 };
-
 export default useNavigateOnUnblock;

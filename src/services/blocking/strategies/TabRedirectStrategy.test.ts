@@ -11,7 +11,7 @@ import { getBlockPageUrl } from '@/utils/extensionUrls';
 
 const defaultSettings: Settings = {
   blockPageHeadline: 'Stay on track',
-  theme: 'mindful-light',
+  theme: 'rainforest-light',
   holdDurationSeconds: 20,
   isRated: false,
   schedule: {
@@ -257,8 +257,45 @@ describe('TabRedirectStrategy', () => {
     const updateRuleSpy = vi.spyOn(StorageService, 'updateRule').mockResolvedValue(makeRule());
 
     const result = await strategy.handleUnblock(['rule-1'], 'https://reddit.com/r/aita', 24);
-    expect(updateRuleSpy).toHaveBeenCalledTimes(0);
+    expect(updateRuleSpy).toHaveBeenCalledTimes(1);
     expect(result).toEqual({ ok: true });
+  });
+
+  it('does not re-block after exemption clears when extendedUnblock is disabled', async () => {
+    const strategy = new TabRedirectStrategy();
+    await strategy.sync({
+      rules: [makeRule()],
+      settings: makeSettings({
+        extendedUnblock: {
+          enabled: false,
+          durationMinutes: 0,
+        },
+      }),
+    });
+    await strategy.start();
+    startedStrategies.push(strategy);
+
+    tabsGet.mockResolvedValue({ id: 123, url: 'https://reddit.com/r/aita/comments/123' });
+    vi.spyOn(StorageService, 'updateRule').mockResolvedValue(makeRule());
+
+    await strategy.handleUnblock(['rule-1'], 'https://reddit.com/r/aita/comments/123', 123);
+
+    // First update event should be ignored due to tab exemption.
+    onUpdated.emit(123, { status: 'loading' }, {} as chrome.tabs.Tab);
+    await Promise.resolve();
+    await Promise.resolve();
+
+    // Completion clears tab exemption.
+    onUpdated.emit(123, { status: 'complete' }, {} as chrome.tabs.Tab);
+    await Promise.resolve();
+    await Promise.resolve();
+
+    // Further update events for same target URL should still not block during grace.
+    onUpdated.emit(123, { status: 'loading' }, {} as chrome.tabs.Tab);
+    await Promise.resolve();
+    await Promise.resolve();
+
+    expect(tabsUpdate).not.toHaveBeenCalled();
   });
 
   it('does not re-block the sender tab while it is temporarily exempt', async () => {

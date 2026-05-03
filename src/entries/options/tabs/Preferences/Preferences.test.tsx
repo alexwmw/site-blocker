@@ -46,7 +46,7 @@ describe('Preferences', () => {
         className='preferences'
         settings={{
           ...defaultSettings,
-          theme: 'mindful-dark',
+          theme: 'rainforest-dark',
           holdDurationSeconds: 15,
           blockPageHeadline: 'Keep going',
           extendedUnblock: { enabled: true, durationMinutes: 10 },
@@ -67,7 +67,7 @@ describe('Preferences', () => {
     const headlineInput = screen.getByRole('textbox', { name: /block page headline/i }) as HTMLInputElement;
     const [unblockEnabledSwitch] = screen.getAllByRole('checkbox') as HTMLInputElement[];
 
-    expect((themeSelect as HTMLSelectElement).value).toBe('mindful');
+    expect((themeSelect as HTMLSelectElement).value).toBe('rainforest');
     expect((modeSelect as HTMLSelectElement).value).toBe('dark');
     expect(holdDurationInput.value).toBe('15');
     expect(headlineInput.value).toBe('Keep going');
@@ -82,7 +82,7 @@ describe('Preferences', () => {
     fireEvent.change(unblockDurationInput, { target: { value: '45' } });
 
     expect(updateSettings).toHaveBeenNthCalledWith(1, { theme: 'focus-dark' });
-    expect(updateSettings).toHaveBeenNthCalledWith(2, { theme: 'mindful-light' });
+    expect(updateSettings).toHaveBeenNthCalledWith(2, { theme: 'rainforest-light' });
     expect(updateSettings).toHaveBeenNthCalledWith(3, { holdDurationSeconds: 25 });
     expect(updateSettings).toHaveBeenNthCalledWith(4, { blockPageHeadline: 'Deep work only' });
     expect(updateSettings).toHaveBeenNthCalledWith(5, {
@@ -118,7 +118,7 @@ describe('Preferences', () => {
     fireEvent.change(unblockDurationInput, { target: { value: '999' } });
     fireEvent.click(screen.getByRole('button', { name: 'Reset preferences to defaults' }));
 
-    expect(updateSettings).toHaveBeenNthCalledWith(1, { holdDurationSeconds: 3 });
+    expect(updateSettings).toHaveBeenNthCalledWith(1, { holdDurationSeconds: 1 });
     expect(updateSettings).toHaveBeenNthCalledWith(2, { blockPageHeadline: defaultSettings.blockPageHeadline });
     expect(updateSettings).toHaveBeenNthCalledWith(3, {
       extendedUnblock: { enabled: true, durationMinutes: 240 },

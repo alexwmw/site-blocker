@@ -2,7 +2,6 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { RulesService } from '@/services/RulesService';
 import type { BlockRule, MatchType } from '@/types/schema';
-import { createUniqueId } from '@/utils/createUniqueId';
 
 const toError = (value: unknown): Error => (value instanceof Error ? value : new Error(String(value)));
 
@@ -39,25 +38,7 @@ const useCreateRuleFromTab = (tab?: chrome.tabs.Tab | null) => {
 
   const createUrlRule = useCallback(
     (matchType: MatchType, patternType: 'domain' | 'path'): BlockRule | null => {
-      const url = activeTab?.url;
-      if (!url || !RulesService.isSupportedUrl(url)) {
-        return null;
-      }
-
-      const pattern =
-        patternType === 'domain' ? RulesService.domainPatternFromUrl(url) : RulesService.pathPatternFromUrl(url);
-
-      if (!pattern) {
-        return null;
-      }
-
-      return {
-        id: createUniqueId(),
-        matchType,
-        pattern,
-        createdAt: new Date().toISOString(),
-        enabled: true,
-      };
+      return RulesService.createUrlRule(activeTab?.url, matchType, patternType);
     },
     [activeTab],
   );

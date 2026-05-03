@@ -6,6 +6,7 @@ import styles from './OptionsApp.module.css';
 import Preferences from './tabs/Preferences';
 import Rules from './tabs/Rules';
 import Scheduling from './tabs/Scheduling';
+import StarterSites from './tabs/StarterSites';
 
 import Tabs, { type TabItem } from '@/components/primitives/Tabs';
 import Hero from '@/components/shared/Hero';
@@ -18,12 +19,13 @@ import { StorageService } from '@/services/StorageService';
 import type { ScheduleWindow, Settings } from '@/types/schema';
 import { createUniqueId } from '@/utils/createUniqueId';
 
-type OptionsTab = 'rules' | 'scheduling' | 'preferences';
+type OptionsTab = 'rules' | 'scheduling' | 'preferences' | 'starter-sites';
 
 const OPTIONS_TABS: ReadonlyArray<TabItem<OptionsTab>> = [
   { id: 'rules', label: 'Rules' },
   { id: 'scheduling', label: 'Schedule' },
   { id: 'preferences', label: 'Preferences' },
+  { id: 'starter-sites', label: 'Get started' },
 ];
 
 const createNewScheduleWindow: () => ScheduleWindow = () => ({
@@ -42,7 +44,7 @@ const getTabIdFromUrlParams = (): OptionsTab => {
 
 const OptionsApp = () => {
   useThemeEffect();
-  const { blockRules, error: blockRulesError, removeRule, updateRule } = useBlockRules();
+  const { blockRules, error: blockRulesError, removeRule, updateRule, addRule } = useBlockRules();
   const { settings, error: settingsError, updateSettings } = useSettings();
   const [activeTab, setActiveTab] = useState<OptionsTab>(getTabIdFromUrlParams());
 
@@ -134,6 +136,13 @@ const OptionsApp = () => {
             schedule={settings?.schedule ?? null}
             updateRule={updateRule}
             onClickEditSchedule={() => setActiveTab('scheduling')}
+          />
+        ) : null}
+        {activeTab === 'starter-sites' ? (
+          <StarterSites
+            className={styles.section}
+            blockRules={blockRules ?? []}
+            addRule={addRule}
           />
         ) : null}
       </RenderBoundary>

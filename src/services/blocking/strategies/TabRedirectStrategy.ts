@@ -13,7 +13,10 @@ type EnforceArgs = {
   rules?: BlockRule[];
 };
 
-const TAB_EXEMPTION_TIMEOUT = 10000;
+// In-memory tab exemption protects the current navigation while events are noisy.
+const TAB_EXEMPTION_TIMEOUT_MS = 10000;
+// Persisted grace protects the immediate post-load re-evaluation window after exemption clears.
+const NON_EXTENDED_UNBLOCK_GRACE_MS = TAB_EXEMPTION_TIMEOUT_MS + 5000;
 
 export default class TabRedirectStrategy implements BlockingStrategy {
   private rules: BlockRule[] = [];
@@ -30,7 +33,7 @@ export default class TabRedirectStrategy implements BlockingStrategy {
     // fallback -- remove exemption after a set amount of time
     setTimeout(() => {
       this.temporarilyExemptTabs.delete(tabId);
-    }, TAB_EXEMPTION_TIMEOUT);
+    }, TAB_EXEMPTION_TIMEOUT_MS);
   }
 
   private readonly handleTabCompletion = (tabId: number, changeInfo: chrome.tabs.OnUpdatedInfo) => {
@@ -96,10 +99,15 @@ export default class TabRedirectStrategy implements BlockingStrategy {
 
   private getUnblockUntilTime() {
     const { enabled, durationMinutes = 0 } = this.settings?.extendedUnblock ?? {};
-    if (!enabled || !durationMinutes) {
-      return null;
+    if (enabled && durationMinutes) {
+      return Date.now() + durationMinutes * 60 * 1000;
     }
-    return Date.now() + durationMinutes * 60 * 1000;
+    return Date.now() + NON_EXTENDED_UNBLOCK_GRACE_MS;
+  }
+
+  private applyUnblockToLoadedRules(ruleIds: string[], unblockUntil: number) {
+    const ruleIdSet = new Set(ruleIds);
+    this.rules = this.rules.map((rule) => (ruleIdSet.has(rule.id) ? { ...rule, unblockUntil } : rule));
   }
 
   private static buildBlockPageUrl(_rules: BlockRule[], targetUrl: string): string {
@@ -168,6 +176,11 @@ export default class TabRedirectStrategy implements BlockingStrategy {
     }
   }
 
+  async testUrlIsBlocked(url: string) {
+    const evaluated = await this.evaluate(NaN, url);
+    return Boolean(evaluated.url && typeof evaluated.url === 'string');
+  }
+
   /**
    * Since this strategy blocks by redirecting tabs, unblock means:
    * - Don’t block that rule for a short period (engine/rules state handles this via unblockUntil).
@@ -184,11 +197,10 @@ export default class TabRedirectStrategy implements BlockingStrategy {
     }
     const unblockUntil = this.getUnblockUntilTime();
     let hasMissingRule;
-    if (unblockUntil) {
-      const promises = ruleIds.map((ruleId) => StorageService.updateRule(ruleId, { unblockUntil }));
-      const results = await Promise.all(promises);
-      hasMissingRule = results.some((result) => result === null);
-    }
+    const promises = ruleIds.map((ruleId) => StorageService.updateRule(ruleId, { unblockUntil }));
+    const results = await Promise.all(promises);
+    hasMissingRule = results.some((result) => result === null);
+    this.applyUnblockToLoadedRules(ruleIds, unblockUntil);
     if (hasMissingRule) {
       console.warn('Some rules expected in handleUnblock were not found.');
     }

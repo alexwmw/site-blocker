@@ -2,6 +2,7 @@ import path from 'node:path';
 
 import { crx } from '@crxjs/vite-plugin';
 import react from '@vitejs/plugin-react-swc';
+import svgr from 'vite-plugin-svgr';
 import { defineConfig } from 'vitest/config';
 
 import manifest from './manifest.json';
@@ -9,6 +10,7 @@ import manifest from './manifest.json';
 export default defineConfig({
   plugins: [
     react(),
+    svgr(),
     crx({
       manifest,
       contentScripts: {
@@ -28,6 +30,7 @@ export default defineConfig({
       input: {
         // popup and options are not required as they are explicitly referenced in the manifest
         blockPage: path.resolve(__dirname, 'block-page.html'),
+        onboarding: path.resolve(__dirname, 'onboarding.html'),
       },
       output: {
         entryFileNames: 'public/[name].js',

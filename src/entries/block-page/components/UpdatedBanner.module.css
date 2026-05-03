@@ -1,0 +1,31 @@
+.updatedBanner {
+  header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    span {
+      font-size: 1rem;
+      margin-block: 10px 0;
+      &:first-of-type {
+        font-weight: 700;
+      }
+      &:last-of-type {
+        font-size: 2rem;
+        font-family: var(--font-family-brand), sans-serif;
+        font-weight: 500;
+        margin-top: 0;
+      }
+    }
+  }
+  .iconRow {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .iconRow svg {
+    height: 50px;
+  }
+}

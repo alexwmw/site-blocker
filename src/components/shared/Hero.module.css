@@ -4,17 +4,32 @@
 }
 
 .heroTitle {
-  margin: 8px 0 0;
+  margin: 0;
+}
+
+.row {
+  display: flex;
+  gap: 20px;
+  /*align-items: center;*/
+}
+
+.holdIcon {
+  height: 54px;
+  /*filter: saturate(0.8);*/
 }
 
 .compact {
   padding: 12px;
-}
 
-.compact .brandRow {
-  margin-bottom: 8px;
-}
+  .row {
+    gap: 12px;
+  }
 
-.compact .heroTitle {
-  font-size: 1.2rem;
+  .heroTitle {
+    font-size: 1.2rem;
+  }
+
+  .holdIcon {
+    height: 36px;
+  }
 }

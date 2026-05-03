@@ -69,15 +69,11 @@ export class MigrationService {
     const normalizedTheme = value.toLowerCase().trim(); // Legacy values are capitalised
 
     if (normalizedTheme === 'light') {
-      return 'mindful-light';
+      return 'focus-light';
     }
 
     if (normalizedTheme === 'dark') {
       return 'focus-dark';
-    }
-
-    if (normalizedTheme === 'mindful') {
-      return 'mindful-light';
     }
 
     return this.isTheme(normalizedTheme) ? normalizedTheme : fallback;
@@ -113,7 +109,7 @@ export class MigrationService {
 
       // Filter out dates greater than DD 31 / MM 12
       if (day > 31 || month > 12) {
-        throw new Error('Invalid date');
+        return new Date().toISOString();
       }
 
       const date = new Date(year, month - 1, day, h, m, s);
@@ -337,12 +333,13 @@ export class MigrationService {
       rules: legacy.providers ? this.mapRules(legacy.providers) : [],
     };
 
+    if (legacy) {
+      rawMigratedData.settings.showMigrationBrief = true;
+    }
     const result = storageSchema.safeParse(rawMigratedData);
 
     if (result.success) {
       await chrome.storage.local.set(result.data);
-      // -- do not clear, because data will be lost if using the extension on more than once device
-      // await chrome.storage.sync.clear();
       console.log('Migration complete:', result.data);
     } else {
       console.error('Migration failed validation:', result.error.flatten());

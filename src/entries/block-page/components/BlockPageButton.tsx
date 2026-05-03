@@ -1,43 +1,51 @@
 import clsx from 'clsx';
-import type { LottieRef } from 'lottie-react';
 import type { KeyboardEventHandler, MouseEventHandler } from 'react';
 
 import styles from './BlockPageButton.module.css';
-import LottieHold from './LottieHold';
-import LottieSuccess from './LottieSuccess';
+import ButtonOutline from './buttonOutline.svg?react';
+import Completion from './Completion';
+
+import Title from '@/assets/icons/icon-white-on-bg.svg?react';
 
 export type HoldButtonProps = {
-  player: LottieRef;
   remainingTime: number | null;
   onMouseDown: MouseEventHandler;
   onKeyDown: KeyboardEventHandler;
   autoFocus: boolean;
   holdIsComplete: boolean;
+  animationDuration: number;
+  held: boolean;
 };
 
 const HoldButton = (props: HoldButtonProps) => {
-  const { autoFocus, holdIsComplete, player, remainingTime, onKeyDown, onMouseDown } = props;
-  const RelevantLottie = holdIsComplete ? LottieSuccess : LottieHold;
-  const buttonText = String(remainingTime === null ? 'HOLD' : remainingTime);
+  const { autoFocus, animationDuration, held, holdIsComplete, remainingTime, onKeyDown, onMouseDown } = props;
+  const buttonText =
+    remainingTime === null ? <Title title='Hold' /> : <span>{remainingTime === 0 ? '' : remainingTime}</span>;
 
   return (
     <div className={styles.holdAction}>
       <div className={styles.buttonStack}>
-        <RelevantLottie lottieRef={player} />
+        {holdIsComplete ? (
+          <Completion className={styles.completionAnimation} />
+        ) : (
+          <ButtonOutline
+            className={clsx(styles.buttonEdge, held && styles.held)}
+            style={{ animationDuration: animationDuration + 's' }}
+          />
+        )}
         <button
           autoFocus={autoFocus}
           onKeyDown={onKeyDown}
           onMouseDown={onMouseDown}
-          className={clsx(styles.holdButton, holdIsComplete && styles.holdComplete)}
+          className={clsx(styles.holdButton, held && styles.held, holdIsComplete && styles.holdComplete)}
           aria-live='polite'
           disabled={holdIsComplete}
+          style={{ animationDuration: animationDuration + 's' }}
         >
           {buttonText}
         </button>
       </div>
-      <p className={styles.holdCaption}>
-        {holdIsComplete ? 'Success! Redirecting…' : 'Click and hold or press Space.'}
-      </p>
+      <p className={styles.holdCaption}>{holdIsComplete ? 'Success!' : 'Click and hold.'}</p>
     </div>
   );
 };
