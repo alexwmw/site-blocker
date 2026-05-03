@@ -196,10 +196,9 @@ export default class TabRedirectStrategy implements BlockingStrategy {
       return { ok: false, reason: 'Unsupported target URL.' };
     }
     const unblockUntil = this.getUnblockUntilTime();
-    let hasMissingRule;
     const promises = ruleIds.map((ruleId) => StorageService.updateRule(ruleId, { unblockUntil }));
     const results = await Promise.all(promises);
-    hasMissingRule = results.some((result) => result === null);
+    const hasMissingRule = results.some((result) => result === null);
     this.applyUnblockToLoadedRules(ruleIds, unblockUntil);
     if (hasMissingRule) {
       console.warn('Some rules expected in handleUnblock were not found.');
