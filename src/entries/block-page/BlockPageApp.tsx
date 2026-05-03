@@ -33,7 +33,11 @@ const BlockPageApp = () => {
 
   const TitleImage = theme?.endsWith('dark') ? TitleLight : TitleDark;
 
-  const { proceedToTargetUrl, testTargetUrl } = useNavigateOnUnblock(ruleIds, targetUrl);
+  const {
+    proceedToTargetUrl,
+    testAndProceedToTargetUrl,
+    error: navigationError,
+  } = useNavigateOnUnblock(ruleIds, targetUrl);
 
   const targetIdentity = useMemo(() => SiteIdentityService.fromUrl(targetUrl), [targetUrl]);
 
@@ -73,13 +77,7 @@ const BlockPageApp = () => {
   useEffect(() => {
     const onVisible = () => {
       if (document.visibilityState === 'visible') {
-        testTargetUrl()
-          .then((response) => {
-            if (response === 'unblocked') {
-              proceedToTargetUrl().catch(console.error);
-            }
-          })
-          .catch(console.error);
+        testAndProceedToTargetUrl().catch(console.error);
       }
     };
 
@@ -87,7 +85,7 @@ const BlockPageApp = () => {
     return () => {
       document.removeEventListener('visibilitychange', onVisible);
     };
-  }, [proceedToTargetUrl, testTargetUrl]);
+  }, [testAndProceedToTargetUrl]);
 
   return (
     <Stack
@@ -114,7 +112,9 @@ const BlockPageApp = () => {
         className={styles.blockedCard}
       >
         <p className={styles.holdInstruction}>
-          {holdIsComplete && held && readyToProceed ? (
+          {navigationError ? (
+            navigationError
+          ) : holdIsComplete && held && readyToProceed ? (
             <strong>You can let go now...</strong>
           ) : holdIsComplete ? (
             <strong>Navigating...</strong>

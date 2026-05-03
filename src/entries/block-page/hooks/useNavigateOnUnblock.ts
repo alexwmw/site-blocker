@@ -2,22 +2,29 @@ import { useCallback, useState } from 'react';
 
 import { MessagesService } from '@/services/MessagesService';
 
+const MAX_RETRY_COUNT = 5;
+
 const useNavigateOnUnblock = (ruleIds: string[] | null, targetUrl: string | null) => {
   const [isNavigating, setIsNavigating] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
+  const [errorMessage, setErrorMessage] = useState<string | undefined>();
 
-  const testTargetUrl = useCallback(async () => {
+  const testAndProceedToTargetUrl = useCallback(async () => {
     if (targetUrl) {
       const response = await MessagesService.sendMessage({
         type: 'TEST_URL_REQUEST',
         payload: { targetUrl },
       });
 
+      if (response.status === 'unblocked') {
+        window.location.replace(targetUrl);
+      }
       return response.status;
     }
   }, [targetUrl]);
 
   const proceedToTargetUrl = useCallback(async () => {
-    if (!ruleIds || !targetUrl || isNavigating) {
+    if (!ruleIds || !targetUrl || isNavigating || retryCount === MAX_RETRY_COUNT) {
       return;
     }
     setIsNavigating(true);
@@ -27,11 +34,21 @@ const useNavigateOnUnblock = (ruleIds: string[] | null, targetUrl: string | null
     });
     if (response.ok) {
       window.location.replace(targetUrl);
+      setRetryCount(0);
     } else {
-      setIsNavigating(false);
+      setRetryCount((count) => count + 1);
+      setErrorMessage(response.reason);
+      setTimeout(() => {
+        setIsNavigating(false);
+      }, 1000);
     }
-  }, [ruleIds, targetUrl, isNavigating]);
+  }, [ruleIds, targetUrl, isNavigating, retryCount]);
 
-  return { proceedToTargetUrl, testTargetUrl, isNavigating };
+  return {
+    proceedToTargetUrl,
+    testAndProceedToTargetUrl,
+    isNavigating,
+    error: retryCount === MAX_RETRY_COUNT && errorMessage,
+  };
 };
 export default useNavigateOnUnblock;
