@@ -43,10 +43,6 @@ describe('BlockingEngine', () => {
   let tabStop: Mock<() => Promise<void>>;
   let tabSync: Mock<(items: SyncItems) => Promise<void>>;
   let tabHandleUnblock: Mock<(ruleId: string[], targetUrl: string, senderTabId?: number) => Promise<UnblockResponse>>;
-  let dnrStart: Mock<() => Promise<void>>;
-  let dnrStop: Mock<() => Promise<void>>;
-  let dnrSync: Mock<(items: SyncItems) => Promise<void>>;
-  let dnrHandleUnblock: Mock<(ruleId: string[], targetUrl: string, senderTabId?: number) => Promise<UnblockResponse>>;
 
   const onAddedFactory = () => createEvent<[chrome.permissions.Permissions]>();
   const onRemovedFactory = () => createEvent<[chrome.permissions.Permissions]>();
@@ -115,18 +111,6 @@ describe('BlockingEngine', () => {
     await new Promise((resolve) => setTimeout(resolve, 0));
 
     expect(tabStop).toHaveBeenCalledTimes(1);
-  });
-
-  // archived strategy - no strategy to switch to
-  it.fails('stop unregisters permission listeners and stops active strategy', async () => {
-    getAll.mockResolvedValue({ permissions: ['declarativeNetRequest'] });
-    const engine = new BlockingEngine();
-
-    await engine.start();
-    await engine.stop();
-
-    expect(onAdded.removeListener).toHaveBeenCalledTimes(1);
-    expect(onRemoved.removeListener).toHaveBeenCalledTimes(1);
   });
 
   it('sync and handleUnblock delegate to active strategy', async () => {
