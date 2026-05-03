@@ -47,7 +47,6 @@ const BlockPageApp = () => {
 
   const handleSelectReviewButton = () => {
     window.open(getChromeWebStoreUrl('reviews'), '_blank');
-    updateSettings({ isRated: true }).catch(console.error);
   };
 
   const handleDontShowReviewCard = () => {
