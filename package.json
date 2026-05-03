@@ -1,6 +1,6 @@
 {
   "name": "site-blocker",
-  "version": "1.0.0",
+  "version": "3.0.0",
   "description": "",
   "main": "dist/index.js",
   "type": "module",
@@ -13,6 +13,7 @@
     "preview": "vite preview",
     "format": "prettier --write .",
     "test": "vitest --run",
+    "typecheck": "tsc --noEmit",
     "prettier": "prettier */**/*.css --write"
   },
   "dependencies": {

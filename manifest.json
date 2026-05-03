@@ -7,7 +7,7 @@
   "permissions": ["storage", "tabs", "contextMenus", "alarms"],
   "action": {
     "default_popup": "popup.html",
-    "default_title": "Time Out: Page Blocker",
+    "default_title": "Hold",
     "default_icon": {
       "16": "icons/icon64.png",
       "32": "icons/icon128.png",
