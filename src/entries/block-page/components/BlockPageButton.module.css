@@ -80,6 +80,13 @@
   }
 }
 
+.completionAnimation {
+  height: 100%;
+  width: 100%;
+  overflow: unset;
+  z-index: 2;
+}
+
 .buttonEdge {
   opacity: 0;
   height: 100%;
@@ -113,7 +120,7 @@
     &.holdButton {
       z-index: 1;
     }
-    &:not(.holdButton) {
+    &.buttonEdge {
       position: relative;
       /*top: 1px;*/
       z-index: 0;
