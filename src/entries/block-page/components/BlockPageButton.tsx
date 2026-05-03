@@ -40,7 +40,7 @@ const HoldButton = (props: HoldButtonProps) => {
           {buttonText}
         </button>
       </div>
-      <p className={styles.holdCaption}>{holdIsComplete ? 'Success! Redirecting…' : 'Click and hold.'}</p>
+      <p className={styles.holdCaption}>{holdIsComplete ? 'Success!' : 'Click and hold.'}</p>
     </div>
   );
 };
