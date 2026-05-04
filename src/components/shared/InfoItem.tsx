@@ -1,6 +1,5 @@
 import clsx from 'clsx';
 import { Clock, Info } from 'lucide-react';
-import { useMemo } from 'react';
 
 import styles from './InfoItem.module.css';
 
@@ -20,7 +19,7 @@ type InfoItemProps = {
 };
 
 const InfoItem = ({ text, tone = 'neutral', iconName = 'Info', noIcon, ctaText, ctaAction }: InfoItemProps) => {
-  const Icon = useMemo(() => Icons[iconName], [iconName]);
+  const Icon = Icons[iconName];
 
   return (
     <div className={clsx(styles.infoItem, styles[`info${tone[0].toUpperCase()}${tone.slice(1)}`])}>
