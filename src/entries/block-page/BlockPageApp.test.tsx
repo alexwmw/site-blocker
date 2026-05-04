@@ -2,7 +2,6 @@ import { act, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import BlockPageApp from './BlockPageApp';
-
 import useBlockPageParams from './hooks/useBlockPageParams';
 import useButtonEventHandlers from './hooks/useButtonEventHandlers';
 
