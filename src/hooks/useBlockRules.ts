@@ -1,9 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import type { StorageListener } from '@/services/StorageService';
-import { StorageService } from '@/services/StorageService';
+import { MessagesService } from '@/services/MessagesService';
 import type { BlockRule } from '@/types/schema';
-import { blockRulesSchema } from '@/types/schema';
 
 const toError = (value: unknown): Error => (value instanceof Error ? value : new Error(String(value)));
 
@@ -13,8 +11,11 @@ const useBlockRules = () => {
 
   const loadBlockRules = useCallback(async () => {
     try {
-      const nextBlockRules = await StorageService.getRules();
-      setBlockRules(nextBlockRules);
+      const response = await MessagesService.sendMessage({ type: 'GET_BLOCK_RULES_REQUEST' });
+      if (!response.ok) {
+        throw new Error(response.reason ?? 'Could not load block rules');
+      }
+      setBlockRules(response.blockRules);
       setError(null);
     } catch (loadError) {
       console.error(loadError);
@@ -25,48 +26,27 @@ const useBlockRules = () => {
 
   useEffect(() => {
     loadBlockRules().catch(console.error);
-
-    const listener: StorageListener = (changes) => {
-      if (changes.rules) {
-        const validated = blockRulesSchema.safeParse(changes.rules.newValue);
-
-        if (!validated.success) {
-          const changeError = validated.error;
-          console.error(changeError);
-          setBlockRules(null);
-          setError(changeError);
-          return;
-        }
-
-        setBlockRules(validated.data);
-        setError(null);
-      }
-    };
-
-    StorageService.addListener(listener);
-
-    return () => StorageService.removeListener(listener);
   }, [loadBlockRules]);
 
   const addRule = async (rule: BlockRule) => {
-    await StorageService.addRule(rule);
+    const response = await MessagesService.sendMessage({ type: 'ADD_BLOCK_RULE_REQUEST', payload: { rule } });
+    if (!response.ok) throw new Error(response.reason ?? 'Could not add rule');
+    await loadBlockRules();
   };
 
   const removeRule = async (id: string) => {
-    await StorageService.removeRule(id);
+    const response = await MessagesService.sendMessage({ type: 'REMOVE_BLOCK_RULE_REQUEST', payload: { id } });
+    if (!response.ok) throw new Error(response.reason ?? 'Could not remove rule');
+    await loadBlockRules();
   };
 
   const updateRule = async (id: string, updates: Partial<BlockRule>) => {
-    await StorageService.updateRule(id, updates);
+    const response = await MessagesService.sendMessage({ type: 'UPDATE_BLOCK_RULE_REQUEST', payload: { id, updates } });
+    if (!response.ok) throw new Error(response.reason ?? 'Could not update rule');
+    await loadBlockRules();
   };
 
-  return {
-    blockRules,
-    error,
-    addRule,
-    removeRule,
-    updateRule,
-  };
+  return { blockRules, error, addRule, removeRule, updateRule };
 };
 
 export default useBlockRules;

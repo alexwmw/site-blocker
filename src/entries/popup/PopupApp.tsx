@@ -1,6 +1,6 @@
 import clsx from 'clsx';
 import { Settings } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import styles from './PopupApp.module.css';
 
@@ -13,207 +13,81 @@ import InfoItem from '@/components/shared/InfoItem';
 import RenderBoundary from '@/components/shared/RenderBoundary';
 import SectionHeader from '@/components/shared/SectionHeader';
 import SiteIdentity from '@/components/shared/SiteIdentity';
-import StatusItem from '@/components/shared/StatusItem';
 import useTabUrlInfo from '@/entries/popup/useTabUrlInfo';
 import useBlockRules from '@/hooks/useBlockRules';
 import useCreateRuleFromTab from '@/hooks/useCreateRuleFromTab';
 import useSettings from '@/hooks/useSettings';
 import useThemeEffect from '@/hooks/useThemeEffect';
-import { RulesService } from '@/services/RulesService';
-import { SchedulingService } from '@/services/SchedulingService';
-import { SiteIdentityService } from '@/services/SiteIdentityService';
+import { MessagesService } from '@/services/MessagesService';
 import { getOptionsPageUrl } from '@/utils/extensionUrls';
-
-const formatRemainingTime = (milliseconds: number) => {
-  const totalSeconds = Math.max(0, Math.floor(milliseconds / 1000));
-  const minutes = Math.floor(totalSeconds / 60);
-  const seconds = totalSeconds % 60;
-
-  if (minutes === 0) {
-    return `${seconds}s`;
-  }
-
-  return `${minutes}m ${seconds}s`;
-};
 
 const PopupApp = () => {
   useThemeEffect();
-  const {
-    activeTab,
-    createDomainPrefixRule,
-    createExactUrlRule,
-    error: activeTabError,
-    isResolved,
-  } = useCreateRuleFromTab();
+  const { activeTab, createDomainPrefixRule, createExactUrlRule, error: activeTabError, isResolved } = useCreateRuleFromTab();
   const { blockRules, addRule, error: blockRulesError } = useBlockRules();
   const { settings, error: settingsError } = useSettings();
-  const [tickNow, setTickNow] = useState(Date.now());
+
+  const [matchingRuleIds, setMatchingRuleIds] = useState<string[]>([]);
+  const [matchingTemporarilyUnblockedRuleIds, setMatchingTemporarilyUnblockedRuleIds] = useState<string[]>([]);
+  const [isScheduleEnabled, setIsScheduleEnabled] = useState(false);
+  const [isBlockingTime, setIsBlockingTime] = useState(true);
+  const [siteIdentity, setSiteIdentity] = useState<{ host: string | null; path: string; label: string; faviconSources: string[] }>({ host: null, path: '', label: 'Unknown site', faviconSources: [] });
 
   const popupData = blockRules && settings && isResolved ? { activeTab, blockRules, settings } : null;
-
-  const { url, isSupported, isExtensionPageUrl, domain, path } = useTabUrlInfo(activeTab);
-
-  const matchingRules = useMemo(() => {
-    return url && blockRules ? RulesService.findMatchingRules(url, blockRules) : [];
-  }, [url, blockRules]);
-
-  const matchingTemporarilyUnblockedRules = matchingRules.filter((rule) => (rule.unblockUntil ?? 0) > tickNow);
-
-  const isScheduleEnabled = Boolean(settings?.schedule.enabled);
-  const isBlockingTime = SchedulingService.isBlockingActiveNow(settings?.schedule);
-
-  const nextUnblockExpiration = matchingTemporarilyUnblockedRules.reduce<number | null>((soonest, rule) => {
-    const value = rule.unblockUntil;
-    if (!value) {
-      return soonest;
-    }
-    if (!soonest || value < soonest) {
-      return value;
-    }
-    return soonest;
-  }, null);
+  const { isSupported, isExtensionPageUrl, domain, path } = useTabUrlInfo(activeTab);
 
   useEffect(() => {
-    if (!nextUnblockExpiration) {
-      return;
-    }
+    MessagesService.sendMessage({
+      type: 'GET_POPUP_STATE_REQUEST',
+      payload: { url: activeTab?.url, favIconUrl: activeTab?.favIconUrl ?? null },
+    })
+      .then((response) => {
+        if (!response.ok) return;
+        setMatchingRuleIds(response.matchingRuleIds);
+        setMatchingTemporarilyUnblockedRuleIds(response.matchingTemporarilyUnblockedRuleIds);
+        setIsScheduleEnabled(response.isScheduleEnabled);
+        setIsBlockingTime(response.isBlockingTime);
+        setSiteIdentity(response.siteIdentity);
+      })
+      .catch(console.error);
+  }, [activeTab, blockRules, settings]);
 
-    const intervalId = window.setInterval(() => {
-      setTickNow(Date.now());
-    }, 1000);
+  const matchingRulesCount = matchingRuleIds.length;
+  const notBlockedReason = !isSupported
+    ? { text: 'This URL type cannot be blocked' }
+    : matchingTemporarilyUnblockedRuleIds.length > 0
+      ? { text: 'This page is temporarily unblocked' }
+      : isScheduleEnabled && !isBlockingTime
+        ? { text: 'This page matches a rule, but blocking is currently outside your schedule', icon: 'Clock' }
+        : matchingRulesCount > 0
+          ? { text: 'This page is temporarily unblocked' }
+          : null;
 
-    return () => {
-      window.clearInterval(intervalId);
-    };
-  }, [nextUnblockExpiration]);
-
-  const notBlockedReason = (() => {
-    if (!isSupported) {
-      return { text: 'This URL type cannot be blocked' };
-    }
-    if (matchingTemporarilyUnblockedRules.length > 0) {
-      return { text: 'This page is temporarily unblocked' };
-    }
-    if (isScheduleEnabled && !isBlockingTime) {
-      return { text: 'This page matches a rule, but blocking is currently outside your schedule', icon: 'Clock' };
-    }
-    if (matchingRules.length > 0) {
-      return { text: 'This page is temporarily unblocked' };
-    }
-    return null;
-  })();
-
-  const canAddRule = Boolean(activeTab && isSupported && matchingRules.length === 0);
+  const canAddRule = Boolean(activeTab && isSupported && matchingRulesCount === 0);
 
   const handleAddDomainClick = () => {
     const rule = createDomainPrefixRule();
-    if (rule) {
-      addRule(rule).catch(console.error);
-    }
+    if (rule) addRule(rule).catch(console.error);
   };
 
   const handleAddPathClick = () => {
     const rule = createExactUrlRule();
-    if (rule) {
-      addRule(rule).catch(console.error);
-    }
-  };
-
-  const handleOpenOptions = () => {
-    chrome.runtime.openOptionsPage().catch(console.error);
-  };
-  const handleOpenSchedule = () => {
-    window.open(getOptionsPageUrl() + '?tabId=scheduling', 'scheduling');
+    if (rule) addRule(rule).catch(console.error);
   };
 
   return (
     <main className={styles.page}>
-      <div className={styles.headerBar}>
-        <Hero
-          title='Active page status'
-          label='Hold'
-          variant='compact'
-        />
-        <div>
-          <Button
-            onClick={handleOpenOptions}
-            variant='invisible'
-          >
-            <Settings />
-          </Button>
-        </div>
-      </div>
-
-      <RenderBoundary
-        data={popupData}
-        error={activeTabError ?? blockRulesError ?? settingsError}
-      >
-        {!isExtensionPageUrl ? (
-          <div className={styles.activePageIdentity}>
-            <SiteIdentity
-              identity={SiteIdentityService.fromUrl(activeTab?.url, {
-                preferredFaviconUrl: activeTab?.favIconUrl ?? null,
-              })}
-              size='small'
-            />
-          </div>
-        ) : null}
+      <div className={styles.headerBar}><Hero title='Active page status' label='Hold' variant='compact' /><div><Button onClick={() => chrome.runtime.openOptionsPage().catch(console.error)} variant='invisible'><Settings /></Button></div></div>
+      <RenderBoundary data={popupData} error={activeTabError ?? blockRulesError ?? settingsError}>
+        {!isExtensionPageUrl ? <div className={styles.activePageIdentity}><SiteIdentity identity={siteIdentity} size='small' /></div> : null}
         <Stack topMargin>
-          {notBlockedReason ? (
-            <InfoItem
-              tone='good'
-              text={notBlockedReason.text}
-              iconName={notBlockedReason.icon as IconName}
-            />
-          ) : null}
-          {nextUnblockExpiration ? (
-            <StatusItem
-              label='Temporary unblock remaining'
-              value={formatRemainingTime(nextUnblockExpiration - tickNow)}
-              tone='neutral'
-            />
-          ) : null}
-
-          <Card
-            padding
-            as='section'
-            className={styles.flexColumn}
-          >
+          {notBlockedReason ? <InfoItem tone='good' text={notBlockedReason.text} iconName={notBlockedReason.icon as IconName} /> : null}
+          <Card padding as='section' className={styles.flexColumn}>
             <SectionHeader title='Quick actions' />
-            <Button
-              disabled={!canAddRule}
-              onClick={handleAddDomainClick}
-              className={clsx(styles.optionsButton, styles.primary)}
-            >
-              Block this site
-            </Button>
-            {domain !== path ? (
-              <Button
-                variant='secondary'
-                disabled={!canAddRule}
-                onClick={handleAddPathClick}
-                className={styles.optionsButton}
-              >
-                <div className={styles.optionsButtonText}>
-                  <div> Block this specific page</div>
-                  <div className={styles.cleanedRulePreview}>{path}</div>
-                </div>
-              </Button>
-            ) : null}
-            {blockRules && blockRules.length > 0 ? (
-              <Button
-                variant='ghost'
-                className={styles.optionsButton}
-                onClick={handleOpenOptions}
-              >
-                Manage blocking rules
-              </Button>
-            ) : null}
-            <Button
-              variant='ghost'
-              className={styles.optionsButton}
-              onClick={handleOpenSchedule}
-            >
+            <Button disabled={!canAddRule} onClick={handleAddDomainClick} className={clsx(styles.optionsButton, styles.primary)}>Block this site</Button>
+            {domain !== path ? <Button variant='secondary' disabled={!canAddRule} onClick={handleAddPathClick} className={styles.optionsButton}><div className={styles.optionsButtonText}><div> Block this specific page</div><div className={styles.cleanedRulePreview}>{path}</div></div></Button> : null}
+            {blockRules && blockRules.length > 0 ? <Button variant='ghost' className={styles.optionsButton} onClick={() => chrome.runtime.openOptionsPage().catch(console.error)}>Manage blocking rules</Button> : null}
+            <Button variant='ghost' className={styles.optionsButton} onClick={() => window.open(getOptionsPageUrl() + '?tabId=scheduling', 'scheduling')}>
               {isScheduleEnabled ? 'Edit schedule' : 'Create a blocking schedule'}
             </Button>
           </Card>

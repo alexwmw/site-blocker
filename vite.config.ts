@@ -33,6 +33,11 @@ export default defineConfig({
         onboarding: path.resolve(__dirname, 'onboarding.html'),
       },
       output: {
+        manualChunks: {
+          'vendor-react': ['react', 'react-dom'],
+          'vendor-icons': ['lucide-react'],
+          'vendor-zod': ['zod'],
+        },
         entryFileNames: 'public/[name].js',
         chunkFileNames: 'public/[name]-[hash].js',
         assetFileNames: 'public/[name]-[hash].[ext]',

@@ -1,9 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import type { StorageListener } from '@/services/StorageService';
-import { StorageService } from '@/services/StorageService';
+import { MessagesService } from '@/services/MessagesService';
 import type { Settings } from '@/types/schema';
-import { settingsSchema } from '@/types/schema';
 
 const toError = (value: unknown): Error => (value instanceof Error ? value : new Error(String(value)));
 
@@ -13,8 +11,11 @@ const useSettings = () => {
 
   const loadSettings = useCallback(async () => {
     try {
-      const nextSettings = await StorageService.getSettings();
-      setSettings(nextSettings);
+      const response = await MessagesService.sendMessage({ type: 'GET_SETTINGS_REQUEST' });
+      if (!response.ok) {
+        throw new Error(response.reason ?? 'Could not load settings');
+      }
+      setSettings(response.settings);
       setError(null);
     } catch (loadError) {
       console.error(loadError);
@@ -25,38 +26,15 @@ const useSettings = () => {
 
   useEffect(() => {
     loadSettings().catch(console.error);
-
-    const listener: StorageListener = (changes) => {
-      if (changes.settings) {
-        const validated = settingsSchema.safeParse(changes.settings.newValue);
-
-        if (!validated.success) {
-          const changeError = validated.error;
-          console.error(changeError);
-          setSettings(null);
-          setError(changeError);
-          return;
-        }
-
-        setSettings(validated.data);
-        setError(null);
-      }
-    };
-
-    StorageService.addListener(listener);
-
-    return () => StorageService.removeListener(listener);
   }, [loadSettings]);
 
   const updateSettings = async (updates: Partial<Settings>) => {
-    await StorageService.updateSettings(updates);
+    const response = await MessagesService.sendMessage({ type: 'UPDATE_SETTINGS_REQUEST', payload: { updates } });
+    if (!response.ok) throw new Error(response.reason ?? 'Could not update settings');
+    await loadSettings();
   };
 
-  return {
-    settings,
-    error,
-    updateSettings,
-  };
+  return { settings, error, updateSettings };
 };
 
 export default useSettings;
