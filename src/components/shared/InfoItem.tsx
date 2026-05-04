@@ -1,10 +1,11 @@
 import clsx from 'clsx';
-import type { LucideIcon } from 'lucide-react';
-import * as Icons from 'lucide-react';
+import { Clock, Info } from 'lucide-react';
 
 import styles from './InfoItem.module.css';
 
 export type InfoTone = 'good' | 'bad' | 'neutral';
+
+const Icons = { Clock, Info };
 
 export type IconName = keyof typeof Icons;
 
@@ -18,7 +19,7 @@ type InfoItemProps = {
 };
 
 const InfoItem = ({ text, tone = 'neutral', iconName = 'Info', noIcon, ctaText, ctaAction }: InfoItemProps) => {
-  const Icon: LucideIcon = Icons[iconName as IconName] as LucideIcon;
+  const Icon = Icons[iconName];
 
   return (
     <div className={clsx(styles.infoItem, styles[`info${tone[0].toUpperCase()}${tone.slice(1)}`])}>

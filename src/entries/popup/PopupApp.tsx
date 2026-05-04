@@ -87,7 +87,7 @@ const PopupApp = () => {
     };
   }, [nextUnblockExpiration]);
 
-  const notBlockedReason = (() => {
+  const notBlockedReason: { text: string; icon?: IconName } | null = useMemo(() => {
     if (!isSupported) {
       return { text: 'This URL type cannot be blocked' };
     }
@@ -101,7 +101,7 @@ const PopupApp = () => {
       return { text: 'This page is temporarily unblocked' };
     }
     return null;
-  })();
+  }, [isBlockingTime, isScheduleEnabled, isSupported, matchingRules.length, matchingTemporarilyUnblockedRules.length]);
 
   const canAddRule = Boolean(activeTab && isSupported && matchingRules.length === 0);
 
@@ -163,7 +163,7 @@ const PopupApp = () => {
             <InfoItem
               tone='good'
               text={notBlockedReason.text}
-              iconName={notBlockedReason.icon as IconName}
+              iconName={notBlockedReason.icon}
             />
           ) : null}
           {nextUnblockExpiration ? (
