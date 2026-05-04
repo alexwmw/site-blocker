@@ -9,31 +9,31 @@ describe('MessagesService', () => {
   });
 
   async function loadSubject() {
-    const onMessage = createEvent<
-      [message: unknown, sender: chrome.runtime.MessageSender, sendResponse: (res?: unknown) => void]
-    >();
+    const onMessage =
+      createEvent<[message: unknown, sender: chrome.runtime.MessageSender, sendResponse: (res?: unknown) => void]>();
+    const sendMessageMock = vi.fn<(message: unknown) => Promise<unknown>>();
 
     vi.stubGlobal('chrome', {
       runtime: {
-        sendMessage: vi.fn(),
+        sendMessage: sendMessageMock,
         onMessage,
       },
     });
 
     const mod = await import('./MessagesService');
-    return { MessagesService: mod.MessagesService, onMessage };
+    return { MessagesService: mod.MessagesService, onMessage, sendMessageMock };
   }
 
   it('forwards sendMessage through chrome.runtime.sendMessage', async () => {
-    const { MessagesService } = await loadSubject();
-    vi.mocked(chrome.runtime.sendMessage).mockResolvedValue({ ok: true });
+    const { MessagesService, sendMessageMock } = await loadSubject();
+    sendMessageMock.mockResolvedValue({ ok: true });
 
     const result = await MessagesService.sendMessage({
       type: 'UNBLOCK_REQUEST',
       payload: { ruleIds: ['rule-1'], targetUrl: 'https://example.com' },
     });
 
-    expect(chrome.runtime.sendMessage).toHaveBeenCalledWith({
+    expect(sendMessageMock).toHaveBeenCalledWith({
       type: 'UNBLOCK_REQUEST',
       payload: { ruleIds: ['rule-1'], targetUrl: 'https://example.com' },
     });

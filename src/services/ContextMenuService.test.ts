@@ -68,16 +68,22 @@ describe('ContextMenuService', () => {
     vi.spyOn(RulesService, 'createUrlRule')
       .mockReturnValueOnce(makeRule({ id: 'domain-rule' }))
       .mockReturnValueOnce(makeRule({ id: 'path-rule', pattern: 'example.com/page' }));
-    const addRuleSpy = vi.spyOn(StorageService, 'addRule').mockResolvedValue(makeRule());
+    const addRuleSpy = vi.spyOn(StorageService, 'addRule').mockResolvedValue({ ok: true });
 
     await ContextMenuService.createContextMenu({} as BlockingEngine);
 
-    onClicked.emit({ menuItemId: 'addDomainToBlockList' } as chrome.contextMenus.OnClickData, {
-      url: 'https://example.com/page',
-    } as chrome.tabs.Tab);
-    onClicked.emit({ menuItemId: 'addPageToBlockList' } as chrome.contextMenus.OnClickData, {
-      url: 'https://example.com/page',
-    } as chrome.tabs.Tab);
+    onClicked.emit(
+      { menuItemId: 'addDomainToBlockList' } as chrome.contextMenus.OnClickData,
+      {
+        url: 'https://example.com/page',
+      } as chrome.tabs.Tab,
+    );
+    onClicked.emit(
+      { menuItemId: 'addPageToBlockList' } as chrome.contextMenus.OnClickData,
+      {
+        url: 'https://example.com/page',
+      } as chrome.tabs.Tab,
+    );
 
     expect(RulesService.createUrlRule).toHaveBeenNthCalledWith(1, 'https://example.com/page', 'prefix', 'domain');
     expect(RulesService.createUrlRule).toHaveBeenNthCalledWith(2, 'https://example.com/page', 'prefix', 'path');
@@ -88,9 +94,12 @@ describe('ContextMenuService', () => {
   it('opens the options page from the manage action and ignores unsupported click payloads', async () => {
     await ContextMenuService.createContextMenu({} as BlockingEngine);
 
-    onClicked.emit({ menuItemId: 'manageBlockList' } as chrome.contextMenus.OnClickData, {
-      url: 'https://example.com/page',
-    } as chrome.tabs.Tab);
+    onClicked.emit(
+      { menuItemId: 'manageBlockList' } as chrome.contextMenus.OnClickData,
+      {
+        url: 'https://example.com/page',
+      } as chrome.tabs.Tab,
+    );
     onClicked.emit({ menuItemId: 'addDomainToBlockList' } as chrome.contextMenus.OnClickData, undefined);
 
     expect(chrome.runtime.openOptionsPage).toHaveBeenCalledTimes(1);
