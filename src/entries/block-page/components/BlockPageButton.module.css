@@ -72,11 +72,11 @@
 @keyframes draw {
   from {
     opacity: 0.5;
-    stroke-dashoffset: 1;
+    stroke-dashoffset: 0;
   }
   to {
     opacity: 1;
-    stroke-dashoffset: 0;
+    stroke-dashoffset: -1;
   }
 }
 
@@ -85,6 +85,7 @@
   width: 100%;
   overflow: unset;
   z-index: 2;
+  scale: 1.15;
 }
 
 .buttonEdge {
@@ -92,7 +93,7 @@
   height: 100%;
   width: 100%;
   overflow: unset;
-  transform: scale(0.86);
+  scale: 1.15;
 
   stroke-dasharray: 1;
   stroke-dashoffset: 1;
@@ -122,9 +123,7 @@
     }
     &.buttonEdge {
       position: relative;
-      /*top: 1px;*/
       z-index: 0;
-      scale: 1.22;
     }
   }
 

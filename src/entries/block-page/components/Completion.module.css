@@ -1,29 +1,16 @@
 @keyframes sq-comet {
   0% {
-    stroke-dasharray: 1 0;
+    stroke-dasharray: 0 1;
     stroke-dashoffset: 0;
     opacity: 1;
   }
-  35% {
-    stroke-dasharray: 0.2 0.8;
-    stroke-dashoffset: -0.8;
-    opacity: 1;
-  }
-  90% {
-    stroke-dasharray: 0.2 0.8;
-    stroke-dashoffset: -1.6;
+  50% {
     opacity: 1;
   }
   100% {
-    stroke-dasharray: 0.2 0.8;
-    stroke-dashoffset: -1.8;
-    opacity: 0;
-  }
-}
-
-@keyframes sq-settle {
-  to {
-    opacity: 1;
+    stroke-dasharray: 1 0;
+    stroke-dashoffset: -1;
+    stroke: var(--color-success-background);
   }
 }
 
@@ -42,15 +29,12 @@
 }
 
 .comet {
-  animation: sq-comet 0.9s linear forwards;
+  animation: sq-comet 1.2s ease-in-out forwards;
 }
-.settle {
-  opacity: 0;
-  animation: sq-settle 0.15s ease 0.88s forwards;
-}
+
 .check {
   stroke-dasharray: 1;
   stroke-dashoffset: 1;
   opacity: 0;
-  animation: sq-check 0.3s cubic-bezier(0.4, 0, 0.2, 1) 0.88s forwards;
+  animation: sq-check 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.2s forwards;
 }
