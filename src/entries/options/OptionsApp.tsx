@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react';
+import clsx from 'clsx';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import StatsGrid from '../../components/shared/StatsGrid';
 
@@ -11,12 +12,13 @@ import StarterSites from './tabs/StarterSites';
 import Tabs, { type TabItem } from '@/components/primitives/Tabs';
 import Hero from '@/components/shared/Hero';
 import RenderBoundary from '@/components/shared/RenderBoundary';
+import StarterModal from '@/entries/options/StarterModal';
 import useBlockRules from '@/hooks/useBlockRules';
 import useSettings from '@/hooks/useSettings';
 import useThemeEffect from '@/hooks/useThemeEffect';
 import { SchedulingService } from '@/services/SchedulingService';
 import { StorageService } from '@/services/StorageService';
-import type { ScheduleWindow, Settings } from '@/types/schema';
+import type { ScheduleWindow, Settings, Theme } from '@/types/schema';
 import { createUniqueId } from '@/utils/createUniqueId';
 
 type OptionsTab = 'rules' | 'scheduling' | 'preferences' | 'starter-sites';
@@ -42,11 +44,38 @@ const getTabIdFromUrlParams = (): OptionsTab => {
   return OPTIONS_TABS.find((t) => t.id === tabId)?.id ?? 'rules';
 };
 
+async function setInitialTheme() {
+  const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+  const initialTheme: Theme = isDarkMode ? 'focus-dark' : 'focus-light';
+  await StorageService.updateSettings({
+    theme: initialTheme,
+  });
+}
+
 const OptionsApp = () => {
   useThemeEffect();
   const { blockRules, error: blockRulesError, removeRule, updateRule, addRule } = useBlockRules();
   const { settings, error: settingsError, updateSettings } = useSettings();
   const [activeTab, setActiveTab] = useState<OptionsTab>(getTabIdFromUrlParams());
+  const starterMode = useMemo(() => getTabIdFromUrlParams() === 'starter-sites', []);
+  const dialogRef = useRef<HTMLDialogElement | null>(null);
+  const [modalClosed, setModalClosed] = useState(false);
+
+  useEffect(() => {
+    if (starterMode && !modalClosed && blockRules && blockRules.length === 0) {
+      setInitialTheme().catch(console.error);
+      dialogRef.current?.showModal();
+    }
+    if (activeTab !== 'starter-sites') {
+      setModalClosed(true);
+    }
+  }, [starterMode, dialogRef, blockRules, modalClosed, activeTab]);
+
+  const closeModal = useCallback(() => {
+    dialogRef.current?.close();
+    setModalClosed(true);
+  }, [dialogRef]);
 
   const optionsData = blockRules && settings ? { blockRules, settings } : null;
   const activeRuleCount = useMemo(() => blockRules?.filter((rule) => rule.enabled).length ?? 0, [blockRules]);
@@ -94,19 +123,23 @@ const OptionsApp = () => {
 
   return (
     <main className={styles.page}>
-      <Hero
-        title='Focus controls'
-        subheading='Keep your rules clear, adjust unblock friction, and tune the extension for long-term focus.'
-      />
+      {starterMode ? (
+        <Hero />
+      ) : (
+        <Hero
+          title='Focus controls'
+          subheading='Keep your rules clear, adjust unblock friction, and tune the extension for long-term focus.'
+        />
+      )}
       <RenderBoundary
         data={optionsData}
         error={blockRulesError ?? settingsError}
       >
-        <StatsGrid stats={statsToDisplay} />
+        {!starterMode ? <StatsGrid stats={statsToDisplay} /> : null}
         <Tabs
-          className={styles.tabs}
+          className={clsx(styles.tabs, starterMode && styles.centered)}
           ariaLabel='Options sections'
-          items={OPTIONS_TABS}
+          items={starterMode ? [...OPTIONS_TABS].reverse() : OPTIONS_TABS}
           activeTab={activeTab}
           onTabChange={setActiveTab}
         />
@@ -142,6 +175,14 @@ const OptionsApp = () => {
           <StarterSites
             className={styles.section}
             blockRules={blockRules ?? []}
+            addRule={addRule}
+          />
+        ) : null}
+        {starterMode && blockRules ? (
+          <StarterModal
+            dialogRef={dialogRef}
+            close={closeModal}
+            blockRules={blockRules}
             addRule={addRule}
           />
         ) : null}

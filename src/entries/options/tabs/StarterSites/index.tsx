@@ -34,10 +34,23 @@ const StarterSites = ({ className, blockRules, addRule }: StarterSitesProps) => 
           <Paragraph subtle>
             Start by adding a few common distractions below, then refine your setup in the other tabs.
           </Paragraph>
-          <Paragraph subtle>
-            Use <strong>Rules</strong> to review and edit blocked sites, <strong>Schedule</strong> to control when
-            blocking is active, and <strong>Preferences</strong> to customize themes and unblock behavior.
-          </Paragraph>
+          <ul>
+            <li>
+              <Paragraph subtle>
+                Use the <strong>Preferences</strong> tab to choose a theme and customize unblock behavior.
+              </Paragraph>
+            </li>
+            <li>
+              <Paragraph subtle>
+                Use the <strong>Schedule</strong> tab to control when blocking is active.
+              </Paragraph>
+            </li>
+            <li>
+              <Paragraph subtle>
+                Use the <strong>Rules</strong> tab to review and edit blocked sites.
+              </Paragraph>
+            </li>
+          </ul>
           <h3>How to block sites</h3>
           <Paragraph subtle>
             You can quickly block any site while browsing. Click the extension icon in your toolbar to add the current

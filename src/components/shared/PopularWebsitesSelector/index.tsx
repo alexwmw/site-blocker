@@ -70,7 +70,7 @@ const PopularWebsitesSelector = ({ addRule, blockRules }: PopularWebsitesSelecto
                     identity={SiteIdentityService.fromUrl(`https://${site}`)}
                     size='small'
                   />
-                  <div>{isBlocked ? 'Already blocked' : isPending ? 'Adding…' : 'Block site'}</div>
+                  <div>{isBlocked ? 'Added' : isPending ? 'Adding…' : 'Block'}</div>
                 </div>
               </Button>
             );
