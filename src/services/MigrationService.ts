@@ -319,10 +319,12 @@ export class MigrationService {
       }
     }
 
-    const legacy = await chrome.storage.sync.get();
+    const legacy: { [p: string]: unknown } = await chrome.storage.sync.get();
 
-    if (legacy) {
-      console.log('Legacy data found - attempting migration.');
+    const hasLegacyData = Object.keys(legacy).length > 0;
+
+    if (hasLegacyData) {
+      console.log('Legacy data found - attempting migration.', legacy);
     } else {
       console.log('No legacy data found - proceeding with defaults.');
     }
@@ -333,7 +335,7 @@ export class MigrationService {
       rules: legacy.providers ? this.mapRules(legacy.providers) : [],
     };
 
-    if (legacy) {
+    if (hasLegacyData) {
       rawMigratedData.settings.showMigrationBrief = true;
     }
     const result = storageSchema.safeParse(rawMigratedData);
