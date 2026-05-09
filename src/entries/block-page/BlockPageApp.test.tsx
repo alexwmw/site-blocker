@@ -134,7 +134,7 @@ describe('BlockPageApp', () => {
     expect(navigateHook.proceedToTargetUrl).not.toHaveBeenCalled();
 
     await act(async () => {
-      await vi.advanceTimersByTimeAsync(1000);
+      await vi.advanceTimersByTimeAsync(1500);
     });
 
     vi.mocked(useButtonEventHandlers).mockReturnValue({
