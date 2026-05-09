@@ -9,13 +9,13 @@ import Stack from '@/components/primitives/Stack';
 import PopularWebsitesSelector from '@/components/shared/PopularWebsitesSelector';
 import type { BlockRule } from '@/types/schema';
 
-type StarterSitesProps = {
+type GetStartedProps = {
   className: string;
   blockRules: BlockRule[];
   addRule: (rule: BlockRule) => Promise<unknown>;
 };
 
-const StarterSites = ({ className, blockRules, addRule }: StarterSitesProps) => {
+const GetStarted = ({ className, blockRules, addRule }: GetStartedProps) => {
   return (
     <OptionsTab
       className={clsx(styles.starterSites, className)}
@@ -66,4 +66,4 @@ const StarterSites = ({ className, blockRules, addRule }: StarterSitesProps) => 
   );
 };
 
-export default StarterSites;
+export default GetStarted;

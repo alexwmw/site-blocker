@@ -4,10 +4,10 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import StatsGrid from '../../components/shared/StatsGrid';
 
 import styles from './OptionsApp.module.css';
+import GetStarted from './tabs/GetStarted';
 import Preferences from './tabs/Preferences';
 import Rules from './tabs/Rules';
 import Scheduling from './tabs/Scheduling';
-import StarterSites from './tabs/StarterSites';
 
 import Tabs, { type TabItem } from '@/components/primitives/Tabs';
 import Hero from '@/components/shared/Hero';
@@ -21,13 +21,13 @@ import { StorageService } from '@/services/StorageService';
 import type { ScheduleWindow, Settings, Theme } from '@/types/schema';
 import { createUniqueId } from '@/utils/createUniqueId';
 
-type OptionsTab = 'rules' | 'scheduling' | 'preferences' | 'starter-sites';
+type OptionsTab = 'rules' | 'scheduling' | 'preferences' | 'get-started';
 
 const OPTIONS_TABS: ReadonlyArray<TabItem<OptionsTab>> = [
   { id: 'rules', label: 'Rules' },
   { id: 'scheduling', label: 'Schedule' },
   { id: 'preferences', label: 'Preferences' },
-  { id: 'starter-sites', label: 'Get started' },
+  { id: 'get-started', label: 'Get started' },
 ];
 
 const createNewScheduleWindow: () => ScheduleWindow = () => ({
@@ -58,7 +58,7 @@ const OptionsApp = () => {
   const { blockRules, error: blockRulesError, removeRule, updateRule, addRule } = useBlockRules();
   const { settings, error: settingsError, updateSettings } = useSettings();
   const [activeTab, setActiveTab] = useState<OptionsTab>(getTabIdFromUrlParams());
-  const starterMode = useMemo(() => getTabIdFromUrlParams() === 'starter-sites', []);
+  const starterMode = useMemo(() => getTabIdFromUrlParams() === 'get-started', []);
   const dialogRef = useRef<HTMLDialogElement | null>(null);
   const [modalClosed, setModalClosed] = useState(false);
 
@@ -67,7 +67,7 @@ const OptionsApp = () => {
       setInitialTheme().catch(console.error);
       dialogRef.current?.showModal();
     }
-    if (activeTab !== 'starter-sites') {
+    if (activeTab !== 'get-started') {
       setModalClosed(true);
     }
   }, [starterMode, dialogRef, blockRules, modalClosed, activeTab]);
@@ -171,8 +171,8 @@ const OptionsApp = () => {
             onClickEditSchedule={() => setActiveTab('scheduling')}
           />
         ) : null}
-        {activeTab === 'starter-sites' ? (
-          <StarterSites
+        {activeTab === 'get-started' ? (
+          <GetStarted
             className={styles.section}
             blockRules={blockRules ?? []}
             addRule={addRule}
