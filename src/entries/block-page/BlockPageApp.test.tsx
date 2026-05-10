@@ -82,6 +82,7 @@ describe('BlockPageApp', () => {
       onKeyDown: vi.fn(),
       held: false,
       timeRemaining: null,
+      resetTimer: () => {},
     });
     vi.mocked(useSettings).mockReturnValue({
       settings: {
@@ -127,6 +128,7 @@ describe('BlockPageApp', () => {
       onKeyDown: vi.fn(),
       held: true,
       timeRemaining: 0,
+      resetTimer: ()=>{},
     });
 
     const { rerender } = render(<BlockPageApp />);
@@ -142,6 +144,7 @@ describe('BlockPageApp', () => {
       onKeyDown: vi.fn(),
       held: false,
       timeRemaining: 0,
+      resetTimer: () => {},
     });
     rerender(<BlockPageApp />);
 
