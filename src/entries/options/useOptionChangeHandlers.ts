@@ -75,7 +75,12 @@ const useOptionChangeHandlers = (
   };
 
   const handleResetPreferences = () => {
-    updateSettings(defaultPreferenceSettings).catch(console.error);
+    // Ensure tests run when confirm does not exist
+    const hasConfirm = Boolean(window?.confirm);
+    const doReset = !hasConfirm || confirm('Are you sure you want to reset the preferences?');
+    if (doReset) {
+      updateSettings(defaultPreferenceSettings).catch(console.error);
+    }
   };
 
   return {
