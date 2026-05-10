@@ -38,7 +38,7 @@ const useButtonEventHandlers = (timeTotal: number | null) => {
     };
   }, [onRelease]);
 
-  return { onMouseDown, onKeyDown, held, timeRemaining };
+  return { onMouseDown, onKeyDown, held, timeRemaining, resetTimer: reset };
 };
 
 export default useButtonEventHandlers;

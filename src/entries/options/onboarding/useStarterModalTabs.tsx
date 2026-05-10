@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 
 import ExtensionIcon from '@/assets/icons/icon-white-on-bg.svg?react';
 import HoldTitle from '@/assets/icons/title-brand-colors.svg?react';
@@ -22,7 +22,11 @@ const useStarterModalTabs = () => {
   const { settings, updateSettings } = useSettings();
   const { handleHoldDurationChange, handleThemeChange } = useOptionChangeHandlers(settings, updateSettings);
 
-  const { onKeyDown, onMouseDown, timeRemaining, held } = useButtonEventHandlers(settings?.holdDurationSeconds ?? 0);
+  const { onKeyDown, onMouseDown, timeRemaining, held, resetTimer } = useButtonEventHandlers(
+    settings?.holdDurationSeconds ?? 0,
+  );
+
+  useEffect(() => resetTimer(), [resetTimer, settings?.holdDurationSeconds]);
 
   return useMemo(() => {
     if (!blockRules) {
@@ -34,6 +38,7 @@ const useStarterModalTabs = () => {
           <header>
             <HoldTitle width='200px' />
           </header>
+          <br />
           <h2>Welcome to Hold!</h2>
         </div>
         <Stack gap='x-small'>
@@ -43,14 +48,20 @@ const useStarterModalTabs = () => {
           <Paragraph centered>
             It helps you browse intentionally by gently interrupting distracting websites before you dive in.
           </Paragraph>
+          <Paragraph
+            strong
+            centered
+          >
+            Let's get you up and running.
+          </Paragraph>
         </Stack>
       </>,
       <>
         <h2>Introducing the Hold button</h2>
         <Stack gap='x-small'>
           <Paragraph>
-            When you visit a distracting site, the <strong>Hold button</strong> gives you a quick way to pause and check
-            in with your intentions.
+            When you visit a distracting site, the <strong>Hold button</strong> gives you a moment to pause and decide
+            whether you want to continue.
           </Paragraph>
           <Paragraph>Hold the button for the set duration to unblock the website temporarily. </Paragraph>
           <Paragraph strong>Try it out below!</Paragraph>
@@ -66,13 +77,14 @@ const useStarterModalTabs = () => {
         </Stack>
       </>,
       <>
-        <h2>Make it yours</h2>
+        <h2>How long will you hold?</h2>
         <Paragraph>
-          There are lots of ways to customise <Hold />. Here are a couple of settings to get started. You can change
-          these any time in the <strong>Preferences</strong> tab.
+          There are lots of ways to customise <Hold />. Let's start by setting the hold duration.
+        </Paragraph>
+        <Paragraph>
+          You can change this setting any time in the <strong>Preferences</strong> tab.
         </Paragraph>
         <Stack gap='x-small'>
-          <h3>Choose how long to hold the Hold button</h3>
           <SettingsGrid>
             <Setting
               settingId='holdToUnblock'
@@ -91,24 +103,19 @@ const useStarterModalTabs = () => {
       </>,
       <>
         <h2>Make it yours</h2>
-        <Paragraph>
-          There are lots of ways to customise <Hold />. Here are a couple of settings to get started. You can change
-          these any time in the <strong>Preferences</strong> tab.
-        </Paragraph>
+        <Paragraph>Choose a theme and mode. You'll be able to tweak these later.</Paragraph>
         <Stack gap='x-small'>
-          <h3>Choose your theme</h3>
           {settings ? (
             <ThemeSelector
               theme={settings.theme}
               handleThemeChange={handleThemeChange}
-              previewHeight={72}
+              previewHeight={140}
             />
           ) : null}
-          <br />
         </Stack>
       </>,
       <>
-        <h2>Set a schedule</h2>
+        <h2>Want to set your own hours?</h2>
         <Stack gap='x-small'>
           <Paragraph>
             You can set a blocking schedule any time in the <strong>Schedule</strong> tab.{' '}
