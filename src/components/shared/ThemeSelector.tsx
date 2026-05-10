@@ -48,7 +48,7 @@ const ThemeSelector = ({ theme, handleThemeChange, previewHeight }: ThemeSelecto
         ]}
       />
       <div className={styles.themePreviewContainer}>
-        <strong>Block page image</strong>
+        <strong>Block page background</strong>
         <Card
           style={{ height: previewHeight ? `${previewHeight}px` : undefined }}
           className={clsx(styles.themePreview)}

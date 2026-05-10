@@ -42,7 +42,7 @@ chrome.runtime.onInstalled.addListener((details) => {
   MigrationService.migrate().catch(console.error);
 
   if (details.reason === 'install') {
-    chrome.tabs.create({ url: chrome.runtime.getURL('options.html?showOnboarding=true') }).catch(console.error);
+    chrome.tabs.create({ url: chrome.runtime.getURL('options.html?onboard=true') }).catch(console.error);
   }
 });
 

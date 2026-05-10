@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import StatsGrid from '../../components/shared/StatsGrid';
 
@@ -44,11 +44,17 @@ const getTabIdFromUrlParams = (): OptionsTab => {
   return OPTIONS_TABS.find((t) => t.id === tabId)?.id ?? 'rules';
 };
 
-const getIsOnboardingFromUrlParams = (): boolean => {
+const getOnboardFromUrlParams = (): boolean => {
   const queryString = window.location.search;
   const p = new URLSearchParams(queryString);
-  const val = p.get('showOnboarding');
+  const val = p.get('onboard');
   return val === 'true';
+};
+
+const removeOnboardFromUrlParams = () => {
+  const url = new URL(window.location.href);
+  url.searchParams.delete('onboard');
+  window.history.replaceState({}, '', url);
 };
 
 async function setInitialTheme() {
@@ -64,25 +70,28 @@ const OptionsApp = () => {
   useThemeEffect();
   const { blockRules, error: blockRulesError, removeRule, updateRule, addRule } = useBlockRules();
   const { settings, error: settingsError, updateSettings } = useSettings();
-  const showOnboarding = useMemo(() => getIsOnboardingFromUrlParams(), []);
-  const [activeTab, setActiveTab] = useState<OptionsTab>(showOnboarding ? 'get-started' : getTabIdFromUrlParams());
+  const [isFirstTime] = useState(getOnboardFromUrlParams());
+  const [activeTab, setActiveTab] = useState<OptionsTab>(isFirstTime ? 'get-started' : getTabIdFromUrlParams());
   const dialogRef = useRef<HTMLDialogElement | null>(null);
-  const [modalClosed, setModalClosed] = useState(false);
+  const [isFinishedOnboarding, setIsFinishedOnboarding] = useState<boolean>(!isFirstTime);
 
   useEffect(() => {
-    if (showOnboarding && !modalClosed && blockRules && blockRules.length === 0) {
+    if (isFirstTime) {
       setInitialTheme().catch(console.error);
-      dialogRef.current?.showModal();
     }
-    if (activeTab !== 'get-started') {
-      setModalClosed(true);
+  }, [isFirstTime]);
+
+  useLayoutEffect(() => {
+    if (isFirstTime && !isFinishedOnboarding && blockRules && blockRules.length === 0 && dialogRef.current) {
+      dialogRef.current.showModal();
     }
-  }, [showOnboarding, dialogRef, blockRules, modalClosed, activeTab]);
+  }, [isFirstTime, blockRules, isFinishedOnboarding]);
 
   const closeModal = useCallback(() => {
+    removeOnboardFromUrlParams();
+    setIsFinishedOnboarding(true);
     dialogRef.current?.close();
-    setModalClosed(true);
-  }, [dialogRef]);
+  }, []);
 
   const optionsData = blockRules && settings ? { blockRules, settings } : null;
   const activeRuleCount = useMemo(() => blockRules?.filter((rule) => rule.enabled).length ?? 0, [blockRules]);
@@ -138,11 +147,11 @@ const OptionsApp = () => {
         data={optionsData}
         error={blockRulesError ?? settingsError}
       >
-        {!showOnboarding ? <StatsGrid stats={statsToDisplay} /> : null}
+        {!isFirstTime ? <StatsGrid stats={statsToDisplay} /> : null}
         <Tabs
           className={clsx(styles.tabs)}
           ariaLabel='Options sections'
-          items={showOnboarding ? [...OPTIONS_TABS].reverse() : OPTIONS_TABS}
+          items={isFirstTime ? [...OPTIONS_TABS].reverse() : OPTIONS_TABS}
           activeTab={activeTab}
           onTabChange={setActiveTab}
         />
@@ -181,12 +190,10 @@ const OptionsApp = () => {
             addRule={addRule}
           />
         ) : null}
-        {showOnboarding ? (
-          <StarterModal
-            dialogRef={dialogRef}
-            close={closeModal}
-          />
-        ) : null}
+        <StarterModal
+          dialogRef={dialogRef}
+          close={closeModal}
+        />
       </RenderBoundary>
     </main>
   );
