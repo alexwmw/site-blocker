@@ -61,3 +61,14 @@
   border-color: var(--color-border-strong);
   color: var(--color-text-primary);
 }
+
+.button:has(> svg:global(.lucide):first-child),
+.button:has(> svg:global(.lucide):last-child) {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  align-items: center;
+  > svg:global(.lucide) {
+    width: 1rem;
+  }
+}

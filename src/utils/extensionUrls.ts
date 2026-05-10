@@ -20,3 +20,14 @@ export function getChromeWebStoreUrl(page?: WebStorePage) {
   }
   return baseUrl;
 }
+
+export function getAllowIncognitoUrl() {
+  return `chrome://extensions/?id=${chrome.runtime.id}#:~:text=Allow%20in%20Incognito`;
+}
+
+export function getPinToToolbarUrl() {
+  return `chrome://extensions/?id=${chrome.runtime.id}#:~:text=Pin%20to%20toolbar`;
+}
+export function getRemoveExtensionUrl() {
+  return `chrome://extensions/?id=${chrome.runtime.id}#:~:text=Remove%20extension`;
+}

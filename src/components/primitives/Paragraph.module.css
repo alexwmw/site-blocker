@@ -1,9 +1,25 @@
-.subtle {
+.paragraph {
   margin: 8px 0 0;
-  color: var(--color-text-secondary);
   font-size: 0.92rem;
+  line-height: 1.35;
+}
+
+.paragraph li {
+  margin: 8px 0 0;
+}
+
+.subtle {
+  color: var(--color-text-secondary);
+}
+
+.strong {
+  font-weight: bold;
 }
 
 .small {
   font-size: 0.75rem;
+}
+
+.centered {
+  text-align: center;
 }

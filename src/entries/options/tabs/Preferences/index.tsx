@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { ExternalLink } from 'lucide-react';
 
 import OptionsTab from '../OptionsTab';
 
@@ -6,13 +6,16 @@ import styles from './Preferences.module.css';
 
 import Button from '@/components/primitives/Button';
 import Card from '@/components/primitives/Card';
+import Paragraph from '@/components/primitives/Paragraph';
 import Setting from '@/components/primitives/Setting';
 import Stack from '@/components/primitives/Stack';
 import Switch from '@/components/primitives/Switch';
 import SectionHeader from '@/components/shared/SectionHeader';
 import SettingsGrid from '@/components/shared/SettingsGrid';
+import ThemeSelector from '@/components/shared/ThemeSelector';
 import useOptionChangeHandlers from '@/entries/options/useOptionChangeHandlers';
-import { type Settings, SETTINGS_LIMITS, type Theme } from '@/types/schema';
+import { type Settings, SETTINGS_LIMITS } from '@/types/schema';
+import { getAllowIncognitoUrl, getPinToToolbarUrl, getRemoveExtensionUrl } from '@/utils/extensionUrls';
 
 type PreferencesProps = {
   className?: string;
@@ -21,7 +24,6 @@ type PreferencesProps = {
 };
 
 const Preferences = ({ className, settings, updateSettings }: PreferencesProps) => {
-  const [[theme, mode], setModeAndTheme] = useState<string[]>([]);
   const {
     handleExtendedUnblockDurationChange,
     handleExtendedUnblockEnabledChange,
@@ -31,12 +33,6 @@ const Preferences = ({ className, settings, updateSettings }: PreferencesProps) 
     handleThemeChange,
   } = useOptionChangeHandlers(settings, updateSettings);
 
-  useEffect(() => {
-    if (settings?.theme) {
-      setModeAndTheme(settings.theme.split('-'));
-    }
-  }, [settings?.theme]);
-
   if (!settings) {
     return (
       <OptionsTab
@@ -45,6 +41,17 @@ const Preferences = ({ className, settings, updateSettings }: PreferencesProps) 
       />
     );
   }
+
+  const pinToToolbar = () => {
+    chrome.tabs.create({ url: getPinToToolbarUrl() }).catch(console.error);
+  };
+
+  const allowIncognito = () => {
+    chrome.tabs.create({ url: getAllowIncognitoUrl() }).catch(console.error);
+  };
+  const removeExtension = () => {
+    chrome.tabs.create({ url: getRemoveExtensionUrl() }).catch(console.error);
+  };
 
   return (
     <OptionsTab
@@ -113,35 +120,42 @@ const Preferences = ({ className, settings, updateSettings }: PreferencesProps) 
           className={styles.preferenceCard}
         >
           <SectionHeader title='Appearance' />
-          <SettingsGrid>
-            <Setting
-              settingId='theme'
-              as='select'
-              label='Theme'
-              value={theme}
-              onChange={(event) => {
-                handleThemeChange((event.target.value + '-' + mode) as Theme);
-              }}
-              options={[
-                { value: 'focus', label: 'Abstract focus' },
-                { value: 'mountains', label: 'Mountain calm' },
-                { value: 'rainforest', label: 'Deep forest' },
-              ]}
-            />
-            <Setting
-              settingId='mode'
-              as='select'
-              label='Mode'
-              value={mode}
-              onChange={(event) => {
-                handleThemeChange((theme + '-' + event.target.value) as Theme);
-              }}
-              options={[
-                { value: 'light', label: 'Light' },
-                { value: 'dark', label: 'Dark' },
-              ]}
-            />
-          </SettingsGrid>
+          <ThemeSelector
+            theme={settings.theme}
+            handleThemeChange={handleThemeChange}
+          />
+        </Card>
+        <Card padding>
+          <SectionHeader title='Extension settings' />
+          <Stack>
+            <Paragraph subtle>
+              These options are controlled by the browser. Selecting the links below will open the Chrome extensions
+              settings page.
+            </Paragraph>
+            <SettingsGrid>
+              <Button
+                onClick={pinToToolbar}
+                variant='secondary'
+              >
+                <ExternalLink />
+                Pin to toolbar
+              </Button>
+              <Button
+                onClick={allowIncognito}
+                variant='secondary'
+              >
+                <ExternalLink />
+                Allow in incognito
+              </Button>
+              <Button
+                onClick={removeExtension}
+                variant='secondary'
+              >
+                <ExternalLink />
+                Remove extension
+              </Button>
+            </SettingsGrid>
+          </Stack>
         </Card>
 
         <div className={styles.preferenceActions}>

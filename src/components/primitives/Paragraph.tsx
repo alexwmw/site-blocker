@@ -3,16 +3,20 @@ import type { ReactNode } from 'react';
 
 import styles from './Paragraph.module.css';
 
-const Paragraph = ({
-  children,
-  subtle,
-  size = 'medium',
-}: {
+type ParagraphProps = {
   children: ReactNode;
-  subtle?: boolean;
   size?: 'small' | 'medium';
-}) => {
-  return <p className={clsx(subtle && styles.subtle, styles[size])}>{children}</p>;
+  subtle?: boolean;
+  strong?: boolean;
+  centered?: boolean;
+};
+
+const Paragraph = ({ children, size = 'medium', ...rest }: ParagraphProps) => {
+  const styleProps = Object.entries(rest)
+    .filter(([_key, value]) => typeof value === 'boolean' && value)
+    .map(([key]) => styles[key]);
+
+  return <p className={clsx(styles.paragraph, styleProps, styles[size])}>{children}</p>;
 };
 
 export default Paragraph;

@@ -1,8 +1,6 @@
 import { useMemo, useState } from 'react';
 
 import Button from '@/components/primitives/Button';
-import Card from '@/components/primitives/Card';
-import Paragraph from '@/components/primitives/Paragraph';
 import Stack from '@/components/primitives/Stack';
 import SiteIdentity from '@/components/shared/SiteIdentity';
 import { POPULAR_WEBSITES } from '@/services/popularWebsites';
@@ -42,42 +40,34 @@ const PopularWebsitesSelector = ({ addRule, blockRules }: PopularWebsitesSelecto
   };
 
   return (
-    <Card padding>
-      <Stack gap='small'>
-        <div>
-          <h2>Popular websites</h2>
-          <Paragraph subtle>Choose common distractions to block in one click.</Paragraph>
-        </div>
-        <Stack
-          gap='small'
-          variant={'two-columns'}
-        >
-          {POPULAR_WEBSITES.map((site) => {
-            const isBlocked = alreadyBlockedSites.has(site);
-            const isPending = pendingSite === site;
+    <Stack
+      gap='small'
+      variant={'two-columns'}
+    >
+      {POPULAR_WEBSITES.map((site) => {
+        const isBlocked = alreadyBlockedSites.has(site);
+        const isPending = pendingSite === site;
 
-            return (
-              <Button
-                key={site}
-                variant={isBlocked ? 'secondary' : 'ghost'}
-                disabled={isBlocked || Boolean(pendingSite)}
-                onClick={() => {
-                  handleAddSite(site).catch(console.error);
-                }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <SiteIdentity
-                    identity={SiteIdentityService.fromUrl(`https://${site}`)}
-                    size='small'
-                  />
-                  <div>{isBlocked ? 'Added' : isPending ? 'Adding…' : 'Block'}</div>
-                </div>
-              </Button>
-            );
-          })}
-        </Stack>
-      </Stack>
-    </Card>
+        return (
+          <Button
+            key={site}
+            variant={isBlocked ? 'secondary' : 'ghost'}
+            disabled={isBlocked || Boolean(pendingSite)}
+            onClick={() => {
+              handleAddSite(site).catch(console.error);
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <SiteIdentity
+                identity={SiteIdentityService.fromUrl(`https://${site}`)}
+                size='small'
+              />
+              <div>{isBlocked ? 'Added' : isPending ? 'Adding…' : 'Block'}</div>
+            </div>
+          </Button>
+        );
+      })}
+    </Stack>
   );
 };
 
