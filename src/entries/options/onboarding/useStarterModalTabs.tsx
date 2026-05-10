@@ -38,7 +38,7 @@ const useStarterModalTabs = () => {
         </div>
         <Stack gap='x-small'>
           <Paragraph centered>
-            <Hold /> is a website blocker with mindfulness at it core.
+            <Hold /> is a website blocker with mindfulness at its core.
           </Paragraph>
           <Paragraph centered>
             It helps you stay mindful of your browsing habits by gently interrupting distracting websites before you
