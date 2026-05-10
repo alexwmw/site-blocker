@@ -1,7 +1,7 @@
 import type { Settings } from '@/types/schema';
 
 export const defaultSettings: Settings = {
-  theme: 'focus-dark',
+  theme: 'focus-light',
   blockPageHeadline: 'Stay on track',
   holdDurationSeconds: 15,
   schedule: {
