@@ -158,6 +158,6 @@ describe('background entry', () => {
 
     expect(migrate).toHaveBeenCalledTimes(2);
     expect(tabsCreate).toHaveBeenCalledTimes(1);
-    expect(tabsCreate).toHaveBeenCalledWith({ url: 'chrome-extension://test/onboarding.html' });
+    expect(tabsCreate).toHaveBeenCalledWith({ url: 'chrome-extension://test/options.html?onboard=true' });
   });
 });

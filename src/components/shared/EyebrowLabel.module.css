@@ -7,3 +7,7 @@
   font-size: 0.75rem;
   font-family: var(--font-family-brand), sans-serif;
 }
+
+.accentColor {
+  color: var(--color-accent);
+}

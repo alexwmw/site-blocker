@@ -13,15 +13,7 @@ const Completion = ({ className }: { className?: string }) => {
         className={styles.comet}
         d='M90 0 H110 A90 90 0 0 1 200 90 V110 A90 90 0 0 1 110 200 H90 A90 90 0 0 1 0 110 V90 A90 90 0 0 1 90 0 Z'
         stroke='var(--color-brand-contrast)'
-        strokeWidth={11}
-        fill='none'
-        pathLength='1'
-      />
-      <path
-        className={styles.settle}
-        d='M90 0 H110 A90 90 0 0 1 200 90 V110 A90 90 0 0 1 110 200 H90 A90 90 0 0 1 0 110 V90 A90 90 0 0 1 90 0 Z'
-        stroke='var(--color-brand-contrast)'
-        strokeWidth={11}
+        strokeWidth={5}
         fill='none'
         pathLength='1'
       />
@@ -29,7 +21,7 @@ const Completion = ({ className }: { className?: string }) => {
         className={styles.check}
         d='M62 100 L86 124 L138 74'
         stroke='var(--color-text-inverse)'
-        strokeWidth={11}
+        strokeWidth={9}
         strokeLinecap='round'
         strokeLinejoin='round'
         fill='none'

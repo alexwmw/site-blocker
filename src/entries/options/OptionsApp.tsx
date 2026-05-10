@@ -1,31 +1,33 @@
-import { useMemo, useState } from 'react';
+import clsx from 'clsx';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import StatsGrid from '../../components/shared/StatsGrid';
 
 import styles from './OptionsApp.module.css';
+import GetStarted from './tabs/GetStarted';
 import Preferences from './tabs/Preferences';
 import Rules from './tabs/Rules';
 import Scheduling from './tabs/Scheduling';
-import StarterSites from './tabs/StarterSites';
 
 import Tabs, { type TabItem } from '@/components/primitives/Tabs';
 import Hero from '@/components/shared/Hero';
 import RenderBoundary from '@/components/shared/RenderBoundary';
+import StarterModal from '@/entries/options/onboarding/StarterModal';
 import useBlockRules from '@/hooks/useBlockRules';
 import useSettings from '@/hooks/useSettings';
 import useThemeEffect from '@/hooks/useThemeEffect';
 import { SchedulingService } from '@/services/SchedulingService';
 import { StorageService } from '@/services/StorageService';
-import type { ScheduleWindow, Settings } from '@/types/schema';
+import type { ScheduleWindow, Settings, Theme } from '@/types/schema';
 import { createUniqueId } from '@/utils/createUniqueId';
 
-type OptionsTab = 'rules' | 'scheduling' | 'preferences' | 'starter-sites';
+type OptionsTab = 'rules' | 'scheduling' | 'preferences' | 'get-started';
 
 const OPTIONS_TABS: ReadonlyArray<TabItem<OptionsTab>> = [
   { id: 'rules', label: 'Rules' },
   { id: 'scheduling', label: 'Schedule' },
   { id: 'preferences', label: 'Preferences' },
-  { id: 'starter-sites', label: 'Get started' },
+  { id: 'get-started', label: 'Get started' },
 ];
 
 const createNewScheduleWindow: () => ScheduleWindow = () => ({
@@ -42,11 +44,54 @@ const getTabIdFromUrlParams = (): OptionsTab => {
   return OPTIONS_TABS.find((t) => t.id === tabId)?.id ?? 'rules';
 };
 
+const getOnboardFromUrlParams = (): boolean => {
+  const queryString = window.location.search;
+  const p = new URLSearchParams(queryString);
+  const val = p.get('onboard');
+  return val === 'true';
+};
+
+const removeOnboardFromUrlParams = () => {
+  const url = new URL(window.location.href);
+  url.searchParams.delete('onboard');
+  window.history.replaceState({}, '', url);
+};
+
+async function setInitialTheme() {
+  const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+  const initialTheme: Theme = isDarkMode ? 'focus-dark' : 'focus-light';
+  await StorageService.updateSettings({
+    theme: initialTheme,
+  });
+}
+
 const OptionsApp = () => {
   useThemeEffect();
   const { blockRules, error: blockRulesError, removeRule, updateRule, addRule } = useBlockRules();
   const { settings, error: settingsError, updateSettings } = useSettings();
-  const [activeTab, setActiveTab] = useState<OptionsTab>(getTabIdFromUrlParams());
+  const [isFirstTime] = useState(getOnboardFromUrlParams());
+  const [activeTab, setActiveTab] = useState<OptionsTab>(isFirstTime ? 'get-started' : getTabIdFromUrlParams());
+  const dialogRef = useRef<HTMLDialogElement | null>(null);
+  const [isFinishedOnboarding, setIsFinishedOnboarding] = useState<boolean>(!isFirstTime);
+
+  useEffect(() => {
+    if (isFirstTime) {
+      setInitialTheme().catch(console.error);
+    }
+  }, [isFirstTime]);
+
+  useLayoutEffect(() => {
+    if (isFirstTime && !isFinishedOnboarding && blockRules && blockRules.length === 0 && dialogRef.current) {
+      dialogRef.current.showModal();
+    }
+  }, [isFirstTime, blockRules, isFinishedOnboarding]);
+
+  const closeModal = useCallback(() => {
+    removeOnboardFromUrlParams();
+    setIsFinishedOnboarding(true);
+    dialogRef.current?.close();
+  }, []);
 
   const optionsData = blockRules && settings ? { blockRules, settings } : null;
   const activeRuleCount = useMemo(() => blockRules?.filter((rule) => rule.enabled).length ?? 0, [blockRules]);
@@ -102,11 +147,11 @@ const OptionsApp = () => {
         data={optionsData}
         error={blockRulesError ?? settingsError}
       >
-        <StatsGrid stats={statsToDisplay} />
+        {!isFirstTime ? <StatsGrid stats={statsToDisplay} /> : null}
         <Tabs
-          className={styles.tabs}
+          className={clsx(styles.tabs)}
           ariaLabel='Options sections'
-          items={OPTIONS_TABS}
+          items={isFirstTime ? [...OPTIONS_TABS].reverse() : OPTIONS_TABS}
           activeTab={activeTab}
           onTabChange={setActiveTab}
         />
@@ -138,13 +183,17 @@ const OptionsApp = () => {
             onClickEditSchedule={() => setActiveTab('scheduling')}
           />
         ) : null}
-        {activeTab === 'starter-sites' ? (
-          <StarterSites
+        {activeTab === 'get-started' ? (
+          <GetStarted
             className={styles.section}
             blockRules={blockRules ?? []}
             addRule={addRule}
           />
         ) : null}
+        <StarterModal
+          dialogRef={dialogRef}
+          close={closeModal}
+        />
       </RenderBoundary>
     </main>
   );

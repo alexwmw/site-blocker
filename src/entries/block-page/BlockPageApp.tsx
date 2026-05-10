@@ -22,6 +22,8 @@ import useThemeEffect from '@/hooks/useThemeEffect';
 import { SiteIdentityService } from '@/services/SiteIdentityService';
 import { getChromeWebStoreUrl } from '@/utils/extensionUrls';
 
+const ANIMATION_UX_DELAY_MS = 1500;
+
 const BlockPageApp = () => {
   const theme = useThemeEffect();
   const { settings, updateSettings } = useSettings();
@@ -63,7 +65,7 @@ const BlockPageApp = () => {
       // UX delay
       t = setTimeout(() => {
         setReadyToProceed(true);
-      }, 1000);
+      }, ANIMATION_UX_DELAY_MS);
     }
     if (holdIsComplete && !held && readyToProceed) {
       proceedToTargetUrl().catch(console.error);

@@ -1,6 +1,6 @@
-.body {
-  background: var(--color-bg);
-  color: var(--color-text-primary);
+:root:has(dialog:open) {
+  overflow: clip;
+  scrollbar-gutter: unset;
 }
 
 .page {
@@ -18,4 +18,11 @@
 
 .tabs {
   margin-top: 20px;
+
+  &.centered {
+    justify-content: center;
+    > * {
+      flex: 1;
+    }
+  }
 }

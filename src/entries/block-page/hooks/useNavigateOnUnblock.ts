@@ -4,6 +4,8 @@ import { MessagesService } from '@/services/MessagesService';
 
 const MAX_RETRY_COUNT = 5;
 
+const RETRY_TIMEOUT_MS = 1000;
+
 const useNavigateOnUnblock = (ruleIds: string[] | null, targetUrl: string | null) => {
   const [isNavigating, setIsNavigating] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
@@ -40,7 +42,7 @@ const useNavigateOnUnblock = (ruleIds: string[] | null, targetUrl: string | null
       setErrorMessage(response.reason);
       setTimeout(() => {
         setIsNavigating(false);
-      }, 1000);
+      }, RETRY_TIMEOUT_MS);
     }
   }, [ruleIds, targetUrl, isNavigating, retryCount]);
 

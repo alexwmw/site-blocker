@@ -1,0 +1,66 @@
+.modal {
+  border: none;
+  padding: 0;
+  background-color: transparent;
+  width: 460px;
+}
+
+.modalInner {
+  background: var(--color-bg);
+  min-height: 570px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.mainContent {
+  h2,
+  h3 {
+    margin: 0;
+  }
+}
+.titleRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal::backdrop {
+  backdrop-filter: blur(2px) brightness(0.33);
+}
+
+.prevNextButtonRow {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+  align-items: center;
+
+  > button {
+    width: 100px;
+  }
+
+  .indicators {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+
+    > div {
+      background: var(--color-accent-soft);
+      height: 10px;
+      width: 10px;
+      border-radius: 50%;
+      transition:
+        background-color 0.2s,
+        border-color 0.2s;
+      border: 1px solid var(--color-accent-soft);
+      &.selected {
+        background: var(--color-accent-strong);
+        border-color: var(--color-accent-strong);
+      }
+      &.hollow {
+        background: transparent;
+      }
+    }
+  }
+}

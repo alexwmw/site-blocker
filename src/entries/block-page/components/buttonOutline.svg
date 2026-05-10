@@ -1,7 +1,7 @@
 <svg viewBox="0 0 100 100">
     <path d="M45 0 H55 A45 45 0 0 1 100 45 V55 A45 45 0 0 1 55 100 H45 A45 45 0 0 1 0 55 V45 A45 45 0 0 1 45 0 Z"
           stroke="var(--color-brand-contrast)"
-          stroke-width="6"
+          stroke-width="3"
           fill="none"
           pathLength="1"
     />

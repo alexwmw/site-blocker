@@ -131,7 +131,7 @@ const Rules = ({ blockRules, className, onClickEditSchedule, removeRule, schedul
       ) : null}
       {emptyRuleList ? (
         <Card className={styles.emptyState}>
-          <p>No rules yet.</p>
+          <Paragraph strong>No rules yet.</Paragraph>
           <Paragraph subtle>
             Add rules from the popup or select <strong>Get started</strong> to start blocking distracting sites.
           </Paragraph>

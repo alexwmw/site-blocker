@@ -1,0 +1,60 @@
+.themePreviewContainer {
+  display: grid;
+  grid-template-rows: auto auto 1fr;
+  gap: 8px;
+}
+
+.themePreview {
+  position: relative;
+  overflow: clip;
+  height: 38.5px;
+  border-radius: var(--radius-sm);
+  transition: height 0.4s ease;
+}
+
+.themeCover {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.3s;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center center;
+
+  &.rainforest {
+    background-image: var(--image-block-page-overlay), var(--block-page-rainforest-image);
+  }
+  &.mountains {
+    background-image: var(--image-block-page-overlay), var(--block-page-mountains-image);
+  }
+  &.focus {
+    background-image: var(--image-block-page-overlay), var(--block-page-focus-image);
+  }
+}
+[data-theme='focus-light'] .themePreview {
+  filter: brightness(110%) saturate(110%) hue-rotate(220deg);
+}
+[data-theme='focus-dark'] .themePreview {
+  filter: contrast(115%) hue-rotate(200deg);
+}
+
+[data-theme='rainforest-light'],
+[data-theme='rainforest-dark'] {
+  .rainforest {
+    opacity: 1;
+  }
+}
+
+[data-theme='mountains-light'],
+[data-theme='mountains-dark'] {
+  .mountains {
+    opacity: 1;
+  }
+}
+
+[data-theme='focus-light'],
+[data-theme='focus-dark'] {
+  .focus {
+    opacity: 1;
+  }
+}
