@@ -12,10 +12,9 @@ type ThemeSelectorProps = {
   theme: Theme;
   handleThemeChange: (theme: Theme) => void;
   previewHeight?: number;
-  disableHover?: boolean;
 };
 
-const ThemeSelector = ({ theme, handleThemeChange, previewHeight, disableHover }: ThemeSelectorProps) => {
+const ThemeSelector = ({ theme, handleThemeChange, previewHeight }: ThemeSelectorProps) => {
   const [themeName, mode] = useMemo((): string[] => {
     return theme.split('-');
   }, [theme]);
@@ -49,10 +48,10 @@ const ThemeSelector = ({ theme, handleThemeChange, previewHeight, disableHover }
         ]}
       />
       <div className={styles.themePreviewContainer}>
-        <strong>Block page preview</strong>
+        <strong>Block page image</strong>
         <Card
           style={{ height: previewHeight ? `${previewHeight}px` : undefined }}
-          className={clsx(styles.themePreview, disableHover && styles.disableHover)}
+          className={clsx(styles.themePreview)}
         >
           <div className={clsx(styles.themeCover, styles.rainforest)} />
           <div className={clsx(styles.themeCover, styles.mountains)} />

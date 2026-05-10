@@ -12,7 +12,7 @@ import Scheduling from './tabs/Scheduling';
 import Tabs, { type TabItem } from '@/components/primitives/Tabs';
 import Hero from '@/components/shared/Hero';
 import RenderBoundary from '@/components/shared/RenderBoundary';
-import StarterModal from '@/entries/options/StarterModal';
+import StarterModal from '@/entries/options/onboarding/StarterModal';
 import useBlockRules from '@/hooks/useBlockRules';
 import useSettings from '@/hooks/useSettings';
 import useThemeEffect from '@/hooks/useThemeEffect';
@@ -44,6 +44,13 @@ const getTabIdFromUrlParams = (): OptionsTab => {
   return OPTIONS_TABS.find((t) => t.id === tabId)?.id ?? 'rules';
 };
 
+const getIsOnboardingFromUrlParams = (): boolean => {
+  const queryString = window.location.search;
+  const p = new URLSearchParams(queryString);
+  const val = p.get('showOnboarding');
+  return val === 'true';
+};
+
 async function setInitialTheme() {
   const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
 
@@ -57,20 +64,20 @@ const OptionsApp = () => {
   useThemeEffect();
   const { blockRules, error: blockRulesError, removeRule, updateRule, addRule } = useBlockRules();
   const { settings, error: settingsError, updateSettings } = useSettings();
-  const [activeTab, setActiveTab] = useState<OptionsTab>(getTabIdFromUrlParams());
-  const starterMode = useMemo(() => getTabIdFromUrlParams() === 'get-started', []);
+  const showOnboarding = useMemo(() => getIsOnboardingFromUrlParams(), []);
+  const [activeTab, setActiveTab] = useState<OptionsTab>(showOnboarding ? 'get-started' : getTabIdFromUrlParams());
   const dialogRef = useRef<HTMLDialogElement | null>(null);
   const [modalClosed, setModalClosed] = useState(false);
 
   useEffect(() => {
-    if (starterMode && !modalClosed && blockRules && blockRules.length === 0) {
+    if (showOnboarding && !modalClosed && blockRules && blockRules.length === 0) {
       setInitialTheme().catch(console.error);
       dialogRef.current?.showModal();
     }
     if (activeTab !== 'get-started') {
       setModalClosed(true);
     }
-  }, [starterMode, dialogRef, blockRules, modalClosed, activeTab]);
+  }, [showOnboarding, dialogRef, blockRules, modalClosed, activeTab]);
 
   const closeModal = useCallback(() => {
     dialogRef.current?.close();
@@ -123,23 +130,19 @@ const OptionsApp = () => {
 
   return (
     <main className={styles.page}>
-      {starterMode ? (
-        <Hero />
-      ) : (
-        <Hero
-          title='Focus controls'
-          subheading='Keep your rules clear, adjust unblock friction, and tune the extension for long-term focus.'
-        />
-      )}
+      <Hero
+        title='Focus controls'
+        subheading='Keep your rules clear, adjust unblock friction, and tune the extension for long-term focus.'
+      />
       <RenderBoundary
         data={optionsData}
         error={blockRulesError ?? settingsError}
       >
-        {!starterMode ? <StatsGrid stats={statsToDisplay} /> : null}
+        {!showOnboarding ? <StatsGrid stats={statsToDisplay} /> : null}
         <Tabs
-          className={clsx(styles.tabs, starterMode && styles.centered)}
+          className={clsx(styles.tabs)}
           ariaLabel='Options sections'
-          items={starterMode ? [...OPTIONS_TABS].reverse() : OPTIONS_TABS}
+          items={showOnboarding ? [...OPTIONS_TABS].reverse() : OPTIONS_TABS}
           activeTab={activeTab}
           onTabChange={setActiveTab}
         />
@@ -178,12 +181,10 @@ const OptionsApp = () => {
             addRule={addRule}
           />
         ) : null}
-        {starterMode && blockRules ? (
+        {showOnboarding ? (
           <StarterModal
             dialogRef={dialogRef}
             close={closeModal}
-            blockRules={blockRules}
-            addRule={addRule}
           />
         ) : null}
       </RenderBoundary>

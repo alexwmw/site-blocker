@@ -12,12 +12,6 @@
   transition: height 0.4s ease;
 }
 
-.themePreview:not(.disableHover):hover {
-  height: 200px;
-  transition-delay: 0.4s;
-  cursor: pointer;
-}
-
 .themeCover {
   position: absolute;
   inset: 0;

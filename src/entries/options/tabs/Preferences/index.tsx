@@ -123,6 +123,7 @@ const Preferences = ({ className, settings, updateSettings }: PreferencesProps) 
           <ThemeSelector
             theme={settings.theme}
             handleThemeChange={handleThemeChange}
+            previewHeight={160}
           />
         </Card>
         <Card padding>
