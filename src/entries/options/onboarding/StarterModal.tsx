@@ -22,7 +22,7 @@ const StarterModal = ({ close, dialogRef }: { dialogRef: Ref<HTMLDialogElement>;
       Array.from({ length: nTabs }).map((_, i) => (
         <div
           key={i}
-          className={clsx(i === tabIndex && styles.selected)}
+          className={clsx(i === tabIndex && styles.selected, i > tabIndex && styles.hollow)}
         />
       )),
     [tabIndex, nTabs],

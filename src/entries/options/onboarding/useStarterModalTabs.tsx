@@ -101,7 +101,7 @@ const useStarterModalTabs = () => {
             <ThemeSelector
               theme={settings.theme}
               handleThemeChange={handleThemeChange}
-              previewHeight={66}
+              previewHeight={72}
             />
           ) : null}
           <br />
@@ -127,8 +127,8 @@ const useStarterModalTabs = () => {
                 window={settings.schedule.windows[0]}
                 disabled={true}
                 windowIndex={0}
-                removeWindow={() => new Promise((resolve) => {})}
-                updateWindow={() => new Promise((resolve) => {})}
+                removeWindow={async () => {}}
+                updateWindow={async () => {}}
               />
             </div>
           ) : null}
