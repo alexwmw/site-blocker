@@ -46,6 +46,8 @@ const StarterModal = ({ close, dialogRef }: { dialogRef: Ref<HTMLDialogElement>;
     <dialog
       className={styles.modal}
       ref={dialogRef}
+      onClose={close}
+      onCancel={close}
     >
       <Card
         className={styles.modalInner}
