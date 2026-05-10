@@ -128,7 +128,7 @@ describe('BlockPageApp', () => {
       onKeyDown: vi.fn(),
       held: true,
       timeRemaining: 0,
-      resetTimer: ()=>{},
+      resetTimer: () => {},
     });
 
     const { rerender } = render(<BlockPageApp />);
