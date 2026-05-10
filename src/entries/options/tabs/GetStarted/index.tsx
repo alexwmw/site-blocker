@@ -95,7 +95,7 @@ const GetStarted = ({ className, blockRules, addRule }: GetStartedProps) => {
           </Paragraph>
         </Card>
         <Card padding>
-          <summary>Starter sites</summary>
+          <h3>Starter sites</h3>
           <Paragraph subtle>Choose common distractions to block in one click.</Paragraph>
           <br />
           <PopularWebsitesSelector
