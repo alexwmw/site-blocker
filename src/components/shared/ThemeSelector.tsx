@@ -16,7 +16,8 @@ type ThemeSelectorProps = {
 
 const ThemeSelector = ({ theme, handleThemeChange, previewHeight }: ThemeSelectorProps) => {
   const [themeName, mode] = useMemo((): string[] => {
-    return theme.split('-');
+    const [t, m] = theme.split('-');
+    return [t, m ?? 'light'];
   }, [theme]);
   return (
     <SettingsGrid>
