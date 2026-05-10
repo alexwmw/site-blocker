@@ -41,8 +41,7 @@ const useStarterModalTabs = () => {
             <Hold /> is a website blocker with mindfulness at its core.
           </Paragraph>
           <Paragraph centered>
-            It helps you stay mindful of your browsing habits by gently interrupting distracting websites before you
-            dive in.
+            It helps you browse intentionally by gently interrupting distracting websites before you dive in.
           </Paragraph>
         </Stack>
       </>,
