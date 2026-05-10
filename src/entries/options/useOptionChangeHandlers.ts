@@ -79,7 +79,12 @@ const useOptionChangeHandlers = (
     const hasConfirm = Boolean(window?.confirm);
     const doReset = !hasConfirm || confirm('Are you sure you want to reset the preferences?');
     if (doReset) {
-      updateSettings(defaultPreferenceSettings).catch(console.error);
+      const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      updateSettings(defaultPreferenceSettings)
+        .then(() => {
+          updateSettings({ theme: isDarkMode ? 'focus-dark' : 'focus-light' }).catch(console.error);
+        })
+        .catch(console.error);
     }
   };
 

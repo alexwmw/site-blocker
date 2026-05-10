@@ -173,7 +173,8 @@
   color-scheme: dark;
 }
 
-:root[data-theme='focus-light'] {
+:root[data-theme='focus-light'],
+:root[data-theme='focus'] {
   --color-bg: #f6f6f4;
   --color-bg-translucent: rgba(246, 246, 244, 0.72);
   --color-bg-elevated: #ffffff;

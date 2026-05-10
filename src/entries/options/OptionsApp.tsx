@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import StatsGrid from '../../components/shared/StatsGrid';
 
@@ -18,7 +18,7 @@ import useSettings from '@/hooks/useSettings';
 import useThemeEffect from '@/hooks/useThemeEffect';
 import { SchedulingService } from '@/services/SchedulingService';
 import { StorageService } from '@/services/StorageService';
-import type { ScheduleWindow, Settings, Theme } from '@/types/schema';
+import type { ScheduleWindow, Settings } from '@/types/schema';
 import { createUniqueId } from '@/utils/createUniqueId';
 
 type OptionsTab = 'rules' | 'scheduling' | 'preferences' | 'get-started';
@@ -57,15 +57,6 @@ const removeOnboardFromUrlParams = () => {
   window.history.replaceState({}, '', url);
 };
 
-async function setInitialTheme() {
-  const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-  const initialTheme: Theme = isDarkMode ? 'focus-dark' : 'focus-light';
-  await StorageService.updateSettings({
-    theme: initialTheme,
-  });
-}
-
 const OptionsApp = () => {
   useThemeEffect();
   const { blockRules, error: blockRulesError, removeRule, updateRule, addRule } = useBlockRules();
@@ -74,12 +65,6 @@ const OptionsApp = () => {
   const [activeTab, setActiveTab] = useState<OptionsTab>(isFirstTime ? 'get-started' : getTabIdFromUrlParams());
   const dialogRef = useRef<HTMLDialogElement | null>(null);
   const [isFinishedOnboarding, setIsFinishedOnboarding] = useState<boolean>(!isFirstTime);
-
-  useEffect(() => {
-    if (isFirstTime) {
-      setInitialTheme().catch(console.error);
-    }
-  }, [isFirstTime]);
 
   useLayoutEffect(() => {
     if (isFirstTime && !isFinishedOnboarding && blockRules && blockRules.length === 0 && dialogRef.current) {

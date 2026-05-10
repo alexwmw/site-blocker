@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { Check, ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { Check, ChevronLeft, ChevronRight } from 'lucide-react';
 import type { Ref } from 'react';
 import { useMemo, useState } from 'react';
 
@@ -57,13 +57,6 @@ const StarterModal = ({ close, dialogRef }: { dialogRef: Ref<HTMLDialogElement>;
           <EyebrowLabel accentColor>
             Step {tabIndex + 1} of {nTabs}
           </EyebrowLabel>
-
-          <Button
-            variant={'ghost'}
-            onClick={close}
-          >
-            <X />
-          </Button>
         </div>
         <Stack
           as='section'
@@ -85,7 +78,7 @@ const StarterModal = ({ close, dialogRef }: { dialogRef: Ref<HTMLDialogElement>;
           </Button>
           <div className={styles.indicators}>{dots}</div>
           <Button
-            variant={'primary'}
+            variant={tabIndex === lastTabIndex ? 'primary' : 'secondary'}
             onClick={handleNext}
             autoFocus
           >

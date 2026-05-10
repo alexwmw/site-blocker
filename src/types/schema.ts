@@ -14,6 +14,7 @@ export const THEMES = [
   'rainforest-dark',
   'focus-light',
   'focus-dark',
+  'focus',
 ] as const;
 
 /** User-selected UI theme. */
