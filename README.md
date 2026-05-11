@@ -121,10 +121,6 @@ This generates an optimised `dist` folder ready for uploading to the Chrome Web 
 
 Hold was developed with assistance from Codex (OpenAI).
 
-## License
-
-MIT
-
 ## Support
 
 For issues, feature requests, or questions, please open an issue on GitHub.
