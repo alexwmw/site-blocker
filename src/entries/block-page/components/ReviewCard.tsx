@@ -1,6 +1,6 @@
 import styles from './ReviewCard.module.css';
 
-import chromeWebStoreIcon from '@/assets/images/chrome-web-store.svg';
+import chromeWebStoreIcon from '@/assets/icons/chrome-web-store.svg';
 import Button from '@/components/primitives/Button';
 import Card from '@/components/primitives/Card';
 import Stack from '@/components/primitives/Stack';
