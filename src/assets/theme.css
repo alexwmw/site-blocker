@@ -26,6 +26,8 @@
   --shadow-card: 0 12px 34px rgb(30 34 38 / 10%);
   --shadow-soft: 0 3px 10px rgb(28 34 38 / 7%);
 
+  --arrow-right-icon: url('/icons/arrow-right.svg');
+
   /* =========================
      CORE BRAND (GLOBAL)
      ========================= */
