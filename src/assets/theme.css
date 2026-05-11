@@ -12,9 +12,24 @@
   --font-family-brand: fredoka, var(--font-family-headings), sans-serif;
   --font-family-buttons: figtree, var(--font-family-headings), sans-serif;
 
-  --block-page-focus-image: url('images/abstract.webp');
-  --block-page-rainforest-image: url('images/green.webp');
-  --block-page-mountains-image: url('images/mountains.webp');
+  --block-page-focus-image: image-set(
+    url('images/abstract_480.webp') 0.25x,
+    url('images/abstract_1920.webp') 1x,
+    url('images/abstract_3840.webp') 2x,
+    url('images/abstract_5120.webp') 2.6x
+  );
+  --block-page-rainforest-image: image-set(
+    url('images/green_480.webp') 0.25x,
+    url('images/green_1920.webp') 1x,
+    url('images/green_3840.webp') 2x,
+    url('images/green_5120.webp') 2.6x
+  );
+  --block-page-mountains-image: image-set(
+    url('images/mountains_480.webp') 0.25x,
+    url('images/mountains_1920.webp') 1x,
+    url('images/mountains_3840.webp') 2x,
+    url('images/mountains_5120.webp') 2.6x
+  );
 
   --transition-duration: 0.25s;
 
