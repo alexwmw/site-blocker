@@ -22,13 +22,13 @@
   background-position: center center;
 
   &.rainforest {
-    background-image: var(--image-block-page-overlay), var(--block-page-rainforest-image);
+    background-image: var(--image-block-page-overlay), var(--block-page-rainforest-thumbnail);
   }
   &.mountains {
-    background-image: var(--image-block-page-overlay), var(--block-page-mountains-image);
+    background-image: var(--image-block-page-overlay), var(--block-page-mountains-thumbnail);
   }
   &.focus {
-    background-image: var(--image-block-page-overlay), var(--block-page-focus-image);
+    background-image: var(--image-block-page-overlay), var(--block-page-focus-thumbnail);
   }
 }
 [data-theme='focus-light'] .themePreview {

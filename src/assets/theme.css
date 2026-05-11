@@ -12,20 +12,21 @@
   --font-family-brand: fredoka, var(--font-family-headings), sans-serif;
   --font-family-buttons: figtree, var(--font-family-headings), sans-serif;
 
+  --block-page-focus-thumbnail: url('images/abstract_480.webp');
+  --block-page-rainforest-thumbnail: url('images/green_480.webp');
+  --block-page-mountains-thumbnail: url('images/mountains_480.webp');
+
   --block-page-focus-image: image-set(
-    url('images/abstract_480.webp') 0.25x,
     url('images/abstract_1920.webp') 1x,
     url('images/abstract_3840.webp') 2x,
     url('images/abstract_5120.webp') 2.6x
   );
   --block-page-rainforest-image: image-set(
-    url('images/green_480.webp') 0.25x,
     url('images/green_1920.webp') 1x,
     url('images/green_3840.webp') 2x,
     url('images/green_5120.webp') 2.6x
   );
   --block-page-mountains-image: image-set(
-    url('images/mountains_480.webp') 0.25x,
     url('images/mountains_1920.webp') 1x,
     url('images/mountains_3840.webp') 2x,
     url('images/mountains_5120.webp') 2.6x
@@ -108,6 +109,7 @@
   --color-warning: #9c6a45;
 
   --image-block-page-bg: var(--block-page-mountains-image);
+  --image-block-page-preview: var(--block-page-mountains-thumbnail);
   --image-block-page-overlay: linear-gradient(180deg, rgb(251 248 245 /42%), rgb(245 239 233 / 22%));
 
   color-scheme: light;
@@ -139,6 +141,7 @@
 
   --color-block-page-bg: #131112;
   --image-block-page-bg: var(--block-page-mountains-image);
+  --image-block-page-preview: var(--block-page-mountains-thumbnail);
   --image-block-page-overlay: linear-gradient(180deg, rgb(18 16 16 / 82%), rgb(8 7 7 / 88%));
 
   color-scheme: dark;
@@ -150,6 +153,7 @@
   --color-accent-soft: #8fb9a3;
 
   --image-block-page-bg: var(--block-page-rainforest-image);
+  --image-block-page-preview: var(--block-page-rainforest-thumbnail);
   --image-block-page-overlay: linear-gradient(180deg, rgb(245 251 247 / 64%), rgb(232 244 237 / 33%));
 
   color-scheme: light;
@@ -185,6 +189,7 @@
 
   --color-block-page-bg: #111613;
   --image-block-page-bg: var(--block-page-rainforest-image);
+  --image-block-page-preview: var(--block-page-rainforest-thumbnail);
   --image-block-page-overlay: linear-gradient(180deg, rgb(18 26 21 / 74%), rgb(10 14 12 / 82%));
 
   color-scheme: dark;
@@ -212,6 +217,7 @@
   --color-accent-soft: #7faeb1;
 
   --image-block-page-bg: var(--block-page-focus-image);
+  --image-block-page-preview: var(--block-page-focus-thumbnail);
   --image-block-page-overlay: linear-gradient(180deg, rgb(255 255 255 / 6%), rgb(245 245 245 / 14%));
 
   body:has(#block-page) {
@@ -248,6 +254,7 @@
 
   --color-block-page-bg: #0f1111;
   --image-block-page-bg: var(--block-page-focus-image);
+  --image-block-page-preview: var(--block-page-focus-thumbnail);
   --image-block-page-overlay: linear-gradient(180deg, rgb(20 24 24 / 76%), rgb(10 12 12 / 86%));
 
   body:has(#block-page) {
