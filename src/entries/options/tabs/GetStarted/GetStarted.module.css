@@ -36,7 +36,7 @@ details summary::before {
 
   display: inline-block;
   background-color: var(--color-accent-strong);
-  mask-image: url('../../../../assets/icons/arrow-right.svg');
+  mask-image: var(--arrow-right-icon);
   mask-repeat: no-repeat;
   transition: transform 0.1s ease;
 }
