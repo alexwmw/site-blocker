@@ -91,14 +91,17 @@ const PopupApp = () => {
     if (!isSupported) {
       return { text: 'This URL type cannot be blocked' };
     }
+    if (isScheduleEnabled && !isBlockingTime && matchingRules.length > 0) {
+      return { text: 'This page matches a rule, but blocking is currently outside your schedule', icon: 'Clock' };
+    }
     if (matchingTemporarilyUnblockedRules.length > 0) {
       return { text: 'This page is temporarily unblocked' };
     }
-    if (isScheduleEnabled && !isBlockingTime) {
-      return { text: 'This page matches a rule, but blocking is currently outside your schedule', icon: 'Clock' };
-    }
     if (matchingRules.length > 0) {
       return { text: 'This page is temporarily unblocked' };
+    }
+    if (isScheduleEnabled && !isBlockingTime) {
+      return { text: 'Scheduling is on', icon: 'Clock' };
     }
     return null;
   }, [isBlockingTime, isScheduleEnabled, isSupported, matchingRules.length, matchingTemporarilyUnblockedRules.length]);
