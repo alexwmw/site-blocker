@@ -1,4 +1,5 @@
 import { ArrowRight } from 'lucide-react';
+import { useRef } from 'react';
 
 import styles from './UpdatedBanner.module.css';
 
@@ -7,13 +8,23 @@ import LegacyIcon from '@/assets/icons/legacy-icon.svg?react';
 import Button from '@/components/primitives/Button';
 import Card from '@/components/primitives/Card';
 import Stack from '@/components/primitives/Stack';
+import Hold from '@/components/shared/Hold';
 
 type ReviewCardProps = {
   onSelectDontShow: () => void;
-  onSelectWebStoreLink: () => void;
 };
 
-const UpdatedBanner = ({ onSelectDontShow, onSelectWebStoreLink }: ReviewCardProps) => {
+const UpdatedBanner = ({ onSelectDontShow }: ReviewCardProps) => {
+  const ref = useRef<HTMLDialogElement>(null);
+  const { version } = chrome.runtime.getManifest();
+
+  const handleMoreInfoOpen = () => {
+    ref.current?.show();
+  };
+
+  const handleMoreInfoClose = () => {
+    ref.current?.close();
+  };
   return (
     <Card
       className={styles.updatedBanner}
@@ -21,25 +32,31 @@ const UpdatedBanner = ({ onSelectDontShow, onSelectWebStoreLink }: ReviewCardPro
       padding
       variant='subtle'
     >
-      <Stack gap='small'>
-        <header>
-          <div className={styles.iconRow}>
-            <LegacyIcon />
-            <ArrowRight />
-            <HoldIcon />
-          </div>
-          <span>Time Out : Page Blocker</span>
-
-          <span>is now</span>
-
-          <span>Hold</span>
-        </header>
-        <p>Thank you for your continued support.</p>
+      <Stack gap='medium'>
+        <div className={styles.iconRow}>
+          <LegacyIcon />
+          <ArrowRight />
+          <HoldIcon />
+        </div>
+        <h2>Updated to Hold v{version}</h2>
+        <dialog ref={ref}>
+          <Card padding>
+            <div>
+              <h3>Time Out has been rebranded: Welcome to Hold</h3>
+              <p>Same core experience, with a fresh new look and identity.</p>
+              <p>Your settings and blocked sites remain unchanged.</p>
+              <p>
+                Thank you for choosing <Hold />.
+              </p>
+            </div>
+            <Button onClick={handleMoreInfoClose}>Close</Button>
+          </Card>
+        </dialog>
         <Button
-          onClick={onSelectWebStoreLink}
+          onClick={handleMoreInfoOpen}
           variant='secondary'
         >
-          View in the Chrome Web Store
+          More info
         </Button>
         <Button
           onClick={onSelectDontShow}

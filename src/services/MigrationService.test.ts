@@ -164,9 +164,10 @@ describe('MigrationService - Deep Logic Tests', () => {
   describe('Full Migration - Real World Scenario', () => {
     it('should not migrate if the latest version already exists', async () => {
       // Simulate latest version already being there
-      chromeMock.storage.local.get.mockResolvedValue({ version: 4 });
+      chromeMock.storage.local.get.mockResolvedValue({ version: 3 });
 
-      await MigrationService.migrate();
+      const res = await MigrationService.migrate();
+      expect(res.didMigrate).toBe(false);
 
       // Verify sync.get was never even called
       expect(chromeMock.storage.sync.get).not.toHaveBeenCalled();
@@ -182,7 +183,7 @@ describe('MigrationService - Deep Logic Tests', () => {
       };
 
       chromeMock.storage.local.get.mockResolvedValue({
-        version: 3,
+        version: 999,
         settings: {
           ...LEGACY_DATA_1.options,
           theme: 'invalid-theme',
@@ -203,11 +204,11 @@ describe('MigrationService - Deep Logic Tests', () => {
         rules: [existingRule],
       });
 
-      await MigrationService.migrate();
+      const res = await MigrationService.migrate();
 
       const [calls] = chromeMock.storage.local.set.mock.calls[0];
-
-      expect(calls.version).toBe(4);
+      expect(res.didMigrate).toBe(true);
+      expect(calls.version).toBe(3);
       expect(calls.settings.theme).toBe('focus');
       expect(calls.settings.blockPageHeadline).toBe('Stay on track');
       expect(calls.settings.holdDurationSeconds).toBe(1);
@@ -220,15 +221,40 @@ describe('MigrationService - Deep Logic Tests', () => {
       const realLegacyData = LEGACY_DATA_1;
       chromeMock.storage.local.get.mockResolvedValue({});
       chromeMock.storage.sync.get.mockResolvedValue(realLegacyData);
-      await MigrationService.migrate();
+      const res = await MigrationService.migrate();
 
       const [calls] = chromeMock.storage.local.set.mock.calls[0];
+
+      expect(res).toStrictEqual({ didMigrate: true, fromVersion: 2, toVersion: 3 });
 
       // Check Settings
       expect(calls.settings.holdDurationSeconds).toBe(6);
       expect(calls.settings.extendedUnblock.enabled).toBe(true);
       expect(calls.settings.schedule.windows[0].days[1]).toBe(true); // Tuesday was string true
       expect(calls.settings.schedule.windows[0].days[2]).toBe(false); // Wednesday was boolean false
+      expect(calls.settings.schedule.windows[0].start).toBe('09:00');
+
+      // Check Rules
+      expect(calls.rules).toHaveLength(2);
+      expect(calls.rules[0].enabled).toBe(true); // unblocked: "false" means enabled: true
+      expect(calls.rules[0].createdAt).toBe('2025-02-16T22:15:14.000Z'); // 16/02/2025, 22:15:14
+    });
+
+    it('should migrate complex legacy object to clean types (2)', async () => {
+      const realLegacyData = LEGACY_DATA_2;
+      chromeMock.storage.local.get.mockResolvedValue({});
+      chromeMock.storage.sync.get.mockResolvedValue(realLegacyData);
+      const res = await MigrationService.migrate();
+
+      const [calls] = chromeMock.storage.local.set.mock.calls[0];
+
+      expect(res).toStrictEqual({ didMigrate: true, fromVersion: 2, toVersion: 3 });
+
+      // Check Settings
+      expect(calls.settings.holdDurationSeconds).toBe(6);
+      expect(calls.settings.extendedUnblock.enabled).toBe(true);
+      expect(calls.settings.schedule.windows[0].days[1]).toBe(false);
+      expect(calls.settings.schedule.windows[0].days[2]).toBe(false);
       expect(calls.settings.schedule.windows[0].start).toBe('09:00');
 
       // Check Rules

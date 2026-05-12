@@ -12,6 +12,12 @@ import {
 } from '@/types/schema';
 import { createUniqueId } from '@/utils/createUniqueId';
 
+type MigrateResultTrue = { didMigrate: true; fromVersion: number; toVersion: number };
+type MigrateResultFalse = { didMigrate: false; fromVersion?: never; toVersion?: never };
+export type MigrateResult = MigrateResultTrue | MigrateResultFalse;
+
+const MIN_LOCAL_SCHEMA_VERSION = 3;
+
 export class MigrationService {
   private static toBool(val: string | boolean | undefined, fallback: boolean): boolean {
     if (val === 'true' || val === true) {
@@ -295,15 +301,17 @@ export class MigrationService {
     return validated.success ? validated.data : [];
   }
 
-  static async migrate(): Promise<void> {
+  static async migrate(): Promise<MigrateResult> {
     const current = await chrome.storage.local.get(['version', 'settings', 'rules']);
 
     if (current?.version === CURRENT_STORAGE_VERSION) {
       console.log('Current data does not require migration.');
-      return;
+      return { didMigrate: false };
     }
 
-    if (typeof current?.version === 'number' && current.version >= 3) {
+    // Local schema has only existed since v3. If a local version exists in that range,
+    // ensure normalization (upgrade/downgrade safe) before falling back to test for legacy sync data.
+    if (typeof current?.version === 'number' && current.version > MIN_LOCAL_SCHEMA_VERSION) {
       console.log('Existing local data found - applying safe defaults for the latest schema.');
 
       const result = storageSchema.safeParse({
@@ -315,15 +323,15 @@ export class MigrationService {
       if (result.success) {
         await chrome.storage.local.set(result.data);
         console.log('Migration complete:', result.data);
-        return;
+        return { didMigrate: true, fromVersion: current.version, toVersion: result.data.version };
       }
     }
 
     const legacy: { [p: string]: unknown } = await chrome.storage.sync.get();
 
-    const hasLegacyData = Object.keys(legacy).length > 0;
+    const hasV2LegacyData = Object.keys(legacy).length > 0;
 
-    if (hasLegacyData) {
+    if (hasV2LegacyData) {
       console.log('Legacy data found - attempting migration.', legacy);
     } else {
       console.log('No legacy data found - proceeding with defaults.');
@@ -335,21 +343,21 @@ export class MigrationService {
       rules: legacy.providers ? this.mapRules(legacy.providers) : [],
     };
 
-    if (hasLegacyData) {
-      rawMigratedData.settings.showMigrationBrief = true;
-    }
     const result = storageSchema.safeParse(rawMigratedData);
 
     if (result.success) {
       await chrome.storage.local.set(result.data);
       console.log('Migration complete:', result.data);
-    } else {
-      console.error('Migration failed validation:', result.error.flatten());
-      await chrome.storage.local.set({
-        version: CURRENT_STORAGE_VERSION,
-        settings: defaultSettings,
-        rules: [],
-      });
+      return hasV2LegacyData
+        ? { didMigrate: true, fromVersion: 2, toVersion: CURRENT_STORAGE_VERSION }
+        : { didMigrate: false };
     }
+    console.error('Migration failed validation:', result.error.flatten());
+    await chrome.storage.local.set({
+      version: CURRENT_STORAGE_VERSION,
+      settings: defaultSettings,
+      rules: [],
+    });
+    return { didMigrate: false };
   }
 }

@@ -39,7 +39,11 @@ chrome.runtime.onInstalled.addListener(initIcons);
  * -------------------------------------------- */
 chrome.runtime.onInstalled.addListener((details) => {
   console.log('Installed/updated:', details.reason);
-  MigrationService.migrate().catch(console.error);
+  MigrationService.migrate()
+    .then(({ didMigrate, fromVersion }) =>
+      StorageService.updateSettings({ showMigrationBrief: didMigrate && fromVersion === 2 }),
+    )
+    .catch(console.error);
 
   if (details.reason === 'install') {
     chrome.tabs.create({ url: chrome.runtime.getURL('options.html?onboard=true') }).catch(console.error);
