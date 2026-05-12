@@ -4,7 +4,7 @@ import { z } from 'zod';
 export const TIME_REGEX = /^([01][0-9]|2[0-3]):[0-5][0-9]$/;
 
 /** Current persisted storage schema version. */
-export const CURRENT_STORAGE_VERSION = 4;
+export const CURRENT_STORAGE_VERSION = 3;
 
 /** Supported UI themes. */
 export const THEMES = [

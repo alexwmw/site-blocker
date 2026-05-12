@@ -43,10 +43,6 @@ const BlockPageApp = () => {
 
   const targetIdentity = useMemo(() => SiteIdentityService.fromUrl(targetUrl), [targetUrl]);
 
-  const handleSelectWebStoreButton = () => {
-    window.open(getChromeWebStoreUrl(), '_blank');
-  };
-
   const handleSelectReviewButton = () => {
     window.open(getChromeWebStoreUrl('reviews'), '_blank');
   };
@@ -155,10 +151,7 @@ const BlockPageApp = () => {
       </Stack>
       <Stack className={clsx(styles.absStack, styles.absStackRight)}>
         {settings?.showMigrationBrief ? (
-          <UpdatedBanner
-            onSelectWebStoreLink={handleSelectWebStoreButton}
-            onSelectDontShow={handleHideBanner}
-          />
+          <UpdatedBanner onSelectDontShow={handleHideBanner} />
         ) : (
           <TitleImage className={styles.titleImage} />
         )}

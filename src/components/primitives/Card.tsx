@@ -9,7 +9,7 @@ type CardProps<T extends ElementType = 'div'> = {
   className?: string;
   padding?: boolean;
   variant?: string;
-} & Omit<ComponentPropsWithoutRef<T>, 'as' | 'children' | 'className'>;
+} & Omit<ComponentPropsWithoutRef<T>, 'as' | 'children' | 'className' | 'padding' | 'variant'>;
 
 const Card = <T extends ElementType = 'div'>({ as, children, padding, className, variant, ...rest }: CardProps<T>) => {
   const Component = as ?? 'div';

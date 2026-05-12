@@ -93,8 +93,8 @@
   .absStack {
     position: initial;
     margin-top: 40px;
-    &.absStackRight {
-      display: none;
-    }
+  }
+  .titleImage {
+    display: none;
   }
 }
