@@ -16,6 +16,8 @@ type MigrateResultTrue = { didMigrate: true; fromVersion: number; toVersion: num
 type MigrateResultFalse = { didMigrate: false; fromVersion?: never; toVersion?: never };
 export type MigrateResult = MigrateResultTrue | MigrateResultFalse;
 
+const MIN_LOCAL_SCHEMA_VERSION = 3;
+
 export class MigrationService {
   private static toBool(val: string | boolean | undefined, fallback: boolean): boolean {
     if (val === 'true' || val === true) {
@@ -307,8 +309,9 @@ export class MigrationService {
       return { didMigrate: false };
     }
 
-    // Defensive guard for downgrade scenarios where storage was written by a newer build.
-    if (typeof current?.version === 'number' && current.version > CURRENT_STORAGE_VERSION) {
+    // Local schema has only existed since v3. If a local version exists in that range,
+    // ensure normalization (upgrade/downgrade safe) before falling back to test for legacy sync data.
+    if (typeof current?.version === 'number' && current.version > MIN_LOCAL_SCHEMA_VERSION) {
       console.log('Existing local data found - applying safe defaults for the latest schema.');
 
       const result = storageSchema.safeParse({
