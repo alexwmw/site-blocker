@@ -1,4 +1,5 @@
 import clsx from 'clsx';
+import { useEffect, useState } from 'react';
 
 import styles from './Scheduling.module.css';
 
@@ -17,6 +18,14 @@ type SchedulingWindowProps = {
 };
 
 const SchedulingWindow = ({ window, windowIndex, disabled, removeWindow, updateWindow }: SchedulingWindowProps) => {
+  const [startValue, setStartValue] = useState(window.start);
+  const [endValue, setEndValue] = useState(window.end);
+
+  useEffect(() => {
+    setStartValue(window.start);
+    setEndValue(window.end);
+  }, [window.start, window.end]);
+
   return (
     <Card
       padding
@@ -57,11 +66,15 @@ const SchedulingWindow = ({ window, windowIndex, disabled, removeWindow, updateW
           settingId='startTime'
           label='Start time'
           type='time'
-          step={900}
-          value={window.start}
+          value={startValue}
           disabled={disabled}
           onChange={(event) => {
-            updateWindow({ start: event.target.value }).catch(console.error);
+            setStartValue(event.target.value);
+          }}
+          onBlur={() => {
+            if (startValue !== window.start) {
+              updateWindow({ start: startValue }).catch(console.error);
+            }
           }}
         />
       </div>
@@ -70,11 +83,15 @@ const SchedulingWindow = ({ window, windowIndex, disabled, removeWindow, updateW
           settingId='endTime'
           label='End time'
           type='time'
-          step={900}
-          value={window.end}
+          value={endValue}
           disabled={disabled}
           onChange={(event) => {
-            updateWindow({ end: event.target.value }).catch(console.error);
+            setEndValue(event.target.value);
+          }}
+          onBlur={() => {
+            if (endValue !== window.end) {
+              updateWindow({ end: endValue }).catch(console.error);
+            }
           }}
         />
       </div>
