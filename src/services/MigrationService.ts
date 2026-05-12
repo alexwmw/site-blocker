@@ -307,7 +307,11 @@ export class MigrationService {
       return { didMigrate: false };
     }
 
-    if (typeof current?.version === 'number' && current.version !== CURRENT_STORAGE_VERSION) {
+    if (
+      typeof current?.version === 'number' &&
+      current.version >= CURRENT_STORAGE_VERSION &&
+      current.version !== CURRENT_STORAGE_VERSION
+    ) {
       console.log('Existing local data found - applying safe defaults for the latest schema.');
 
       const result = storageSchema.safeParse({
