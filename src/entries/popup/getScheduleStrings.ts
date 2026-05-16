@@ -35,6 +35,9 @@ export const getNextChangeString = (schedule: Schedule | undefined, isBlockingAc
   }
   const time = getTimeString(nextChangeTime);
   const day = getDayString(nextChangeTime);
-  const transition = isBlockingActiveNow ? 'ends' : 'starts';
-  return `Schedule ${transition}: ${day} ${time}`;
+  const transitions = isBlockingActiveNow ? 'ends' : 'starts';
+  if (day === 'tomorrow' && time === '12:00 am') {
+    return `Schedule ${transitions}: at midnight`;
+  }
+  return `Schedule ${transitions}: ${day} ${time}`;
 };
