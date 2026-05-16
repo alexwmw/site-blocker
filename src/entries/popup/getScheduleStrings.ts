@@ -31,7 +31,7 @@ export const getNextChangeString = (schedule: Schedule | undefined, isBlockingAc
   }
   const nextChangeTime = SchedulingService.getNextChangeTime(schedule);
   if (!nextChangeTime) {
-    return null;
+    return 'Schedule enabled but no schedule is set';
   }
   const time = getTimeString(nextChangeTime);
   const day = getDayString(nextChangeTime);
