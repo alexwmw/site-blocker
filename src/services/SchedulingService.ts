@@ -50,18 +50,10 @@ export class SchedulingService {
     return true;
   }
 
-  private static pickEarlier(current: number | null, candidate: number): number {
-    if (current === null) {
-      return candidate;
-    }
-    return candidate < current ? candidate : current;
-  }
-
-  static getNextChangeTime(schedule: Schedule, now: Date = new Date()): Date | null {
+  private static getChangeCandidates(schedule: Schedule, now: Date): number[] {
     const nowTs = now.getTime();
     const { day } = this.getCurrentDayAndMinutes(now);
-
-    let next: number | null = null;
+    const candidates = new Set<number>();
 
     for (const window of schedule.windows) {
       if (window.days.every((d) => !d)) {
@@ -71,8 +63,6 @@ export class SchedulingService {
       const startMin = this.timeToMinutes(window.start);
       const endMin = this.timeToMinutes(window.end);
 
-      // Check today through the same weekday next week.
-      // Including i=7 prevents missing weekly windows when today's window already ended.
       for (let i = 0; i <= 7; i++) {
         const checkDay = (day + i) % 7;
 
@@ -83,24 +73,35 @@ export class SchedulingService {
         const baseDate = new Date(now);
         baseDate.setDate(now.getDate() + i);
 
-        // --- START time candidate ---
         const startDate = new Date(baseDate);
         startDate.setHours(Math.floor(startMin / 60), startMin % 60, 0, 0);
-
         if (startDate.getTime() > nowTs) {
-          next = this.pickEarlier(next, startDate.getTime());
+          candidates.add(startDate.getTime());
         }
 
-        // --- END time candidate ---
         const endDate = new Date(baseDate);
         endDate.setHours(Math.floor(endMin / 60), endMin % 60, 0, 0);
-
         if (endDate.getTime() > nowTs) {
-          next = this.pickEarlier(next, endDate.getTime());
+          candidates.add(endDate.getTime());
         }
       }
     }
 
-    return next ? new Date(next) : null;
+    return Array.from(candidates).sort((a, b) => a - b);
   }
+
+  static getNextChangeTime(schedule: Schedule, now: Date = new Date()): Date | null {
+    const activeNow = this.isScheduleActiveNow(schedule, now);
+    const candidates = this.getChangeCandidates(schedule, now);
+
+    for (const candidateTs of candidates) {
+      const candidateState = this.isScheduleActiveNow(schedule, new Date(candidateTs));
+      if (candidateState !== activeNow) {
+        return new Date(candidateTs);
+      }
+    }
+
+    return null;
+  }
+
 }

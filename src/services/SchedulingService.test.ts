@@ -93,4 +93,27 @@ describe('SchedulingService', () => {
 
     expect(SchedulingService.getNextChangeTime(schedule, now)).toStrictEqual(new Date('2026-01-12T09:00:00.000Z'));
   });
+
+  it('skips intermediate boundaries that do not change the effective blocking state', () => {
+    const schedule = buildSchedule({
+      windows: [
+        {
+          id: '_initial',
+          days: [false, false, false, false, false, true, false],
+          start: '20:00',
+          end: '22:00',
+        },
+        {
+          id: 'second',
+          days: [false, false, false, false, false, true, false],
+          start: '21:00',
+          end: '23:00',
+        },
+      ],
+    });
+
+    const now = new Date('2026-01-10T21:30:00.000Z'); // Saturday
+
+    expect(SchedulingService.getNextChangeTime(schedule, now)).toStrictEqual(new Date('2026-01-10T23:00:00.000Z'));
+  });
 });
