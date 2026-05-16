@@ -8,12 +8,12 @@ import Button from '@/components/primitives/Button';
 import Card from '@/components/primitives/Card';
 import Stack from '@/components/primitives/Stack';
 import Hero from '@/components/shared/Hero';
-import type { IconName } from '@/components/shared/InfoItem';
 import InfoItem from '@/components/shared/InfoItem';
 import RenderBoundary from '@/components/shared/RenderBoundary';
 import SectionHeader from '@/components/shared/SectionHeader';
 import SiteIdentity from '@/components/shared/SiteIdentity';
 import StatusItem from '@/components/shared/StatusItem';
+import { getNextChangeString } from '@/entries/popup/getScheduleStrings';
 import useTabUrlInfo from '@/entries/popup/useTabUrlInfo';
 import useBlockRules from '@/hooks/useBlockRules';
 import useCreateRuleFromTab from '@/hooks/useCreateRuleFromTab';
@@ -87,24 +87,23 @@ const PopupApp = () => {
     };
   }, [nextUnblockExpiration]);
 
-  const notBlockedReason: { text: string; icon?: IconName } | null = useMemo(() => {
+  const scheduleInfoLabel = useMemo(
+    () => getNextChangeString(settings?.schedule, isBlockingTime),
+    [isBlockingTime, settings?.schedule],
+  );
+
+  const notBlockedReason: string | null = useMemo(() => {
     if (!isSupported) {
-      return { text: 'This URL type cannot be blocked' };
-    }
-    if (isScheduleEnabled && !isBlockingTime && matchingRules.length > 0) {
-      return { text: 'This page matches a rule, but blocking is currently outside your schedule', icon: 'Clock' };
+      return 'This URL type cannot be blocked';
     }
     if (matchingTemporarilyUnblockedRules.length > 0) {
-      return { text: 'This page is temporarily unblocked' };
+      return 'This page is temporarily unblocked';
     }
-    if (matchingRules.length > 0) {
-      return { text: 'This page is temporarily unblocked' };
-    }
-    if (isScheduleEnabled && !isBlockingTime) {
-      return { text: 'Scheduling is on', icon: 'Clock' };
+    if (!isBlockingTime && matchingRules.length > 0) {
+      return 'This page will be blocked when schedule starts';
     }
     return null;
-  }, [isBlockingTime, isScheduleEnabled, isSupported, matchingRules.length, matchingTemporarilyUnblockedRules.length]);
+  }, [isBlockingTime, isSupported, matchingRules.length, matchingTemporarilyUnblockedRules.length]);
 
   const canAddRule = Boolean(activeTab && isSupported && matchingRules.length === 0);
 
@@ -162,21 +161,28 @@ const PopupApp = () => {
           </div>
         ) : null}
         <Stack topMargin>
-          {notBlockedReason ? (
-            <InfoItem
-              tone='good'
-              text={notBlockedReason.text}
-              iconName={notBlockedReason.icon}
-            />
-          ) : null}
-          {nextUnblockExpiration ? (
-            <StatusItem
-              label='Temporary unblock remaining'
-              value={formatRemainingTime(nextUnblockExpiration - tickNow)}
-              tone='neutral'
-            />
-          ) : null}
-
+          <Stack gap='x-small'>
+            {isScheduleEnabled && scheduleInfoLabel ? (
+              <InfoItem
+                tone='good'
+                text={scheduleInfoLabel}
+                iconName='Clock'
+              />
+            ) : null}
+            {notBlockedReason ? (
+              <InfoItem
+                tone='good'
+                text={notBlockedReason}
+              />
+            ) : null}
+            {nextUnblockExpiration ? (
+              <StatusItem
+                label='Temporary unblock remaining'
+                value={formatRemainingTime(nextUnblockExpiration - tickNow)}
+                tone='neutral'
+              />
+            ) : null}
+          </Stack>
           <Card
             padding
             as='section'
