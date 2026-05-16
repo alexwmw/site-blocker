@@ -20,11 +20,25 @@ type SchedulingWindowProps = {
 const SchedulingWindow = ({ window, windowIndex, disabled, removeWindow, updateWindow }: SchedulingWindowProps) => {
   const [startValue, setStartValue] = useState(window.start);
   const [endValue, setEndValue] = useState(window.end);
+  const [timeError, setTimeError] = useState<string | null>(null);
 
   useEffect(() => {
     setStartValue(window.start);
     setEndValue(window.end);
+    setTimeError(null);
   }, [window.start, window.end]);
+
+  const isRangeValid = (start: string, end: string) => start < end;
+
+  const validateRange = (start: string, end: string): boolean => {
+    if (!isRangeValid(start, end)) {
+      setTimeError('End time must be later than start time.');
+      return false;
+    }
+
+    setTimeError(null);
+    return true;
+  };
 
   return (
     <Card
@@ -69,9 +83,14 @@ const SchedulingWindow = ({ window, windowIndex, disabled, removeWindow, updateW
           value={startValue}
           disabled={disabled}
           onChange={(event) => {
-            setStartValue(event.target.value);
+            const nextStart = event.target.value;
+            setStartValue(nextStart);
+            validateRange(nextStart, endValue);
           }}
           onBlur={() => {
+            if (!validateRange(startValue, endValue)) {
+              return;
+            }
             if (startValue !== window.start) {
               updateWindow({ start: startValue }).catch(console.error);
             }
@@ -86,13 +105,19 @@ const SchedulingWindow = ({ window, windowIndex, disabled, removeWindow, updateW
           value={endValue}
           disabled={disabled}
           onChange={(event) => {
-            setEndValue(event.target.value);
+            const nextEnd = event.target.value;
+            setEndValue(nextEnd);
+            validateRange(startValue, nextEnd);
           }}
           onBlur={() => {
+            if (!validateRange(startValue, endValue)) {
+              return;
+            }
             if (endValue !== window.end) {
               updateWindow({ end: endValue }).catch(console.error);
             }
           }}
+          fieldHint={timeError ?? undefined}
         />
       </div>
     </Card>

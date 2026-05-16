@@ -28,14 +28,36 @@ describe('SchedulingWindow', () => {
 
     const startInput = screen.getByLabelText('Start time') as HTMLInputElement;
 
-    fireEvent.change(startInput, { target: { value: '19:19' } });
+    fireEvent.change(startInput, { target: { value: '16:19' } });
 
-    expect(startInput.value).toBe('19:19');
+    expect(startInput.value).toBe('16:19');
     expect(updateWindow).not.toHaveBeenCalled();
 
     fireEvent.blur(startInput);
 
     expect(updateWindow).toHaveBeenCalledTimes(1);
-    expect(updateWindow).toHaveBeenCalledWith({ start: '19:19' });
+    expect(updateWindow).toHaveBeenCalledWith({ start: '16:19' });
+  });
+
+  it('shows a validation error and blocks persistence when end time is earlier than start time', () => {
+    const updateWindow = vi.fn(async () => {});
+
+    render(
+      <SchedulingWindow
+        window={windowData}
+        windowIndex={0}
+        disabled={false}
+        removeWindow={vi.fn(async () => {})}
+        updateWindow={updateWindow}
+      />,
+    );
+
+    const endInput = screen.getByLabelText('End time') as HTMLInputElement;
+
+    fireEvent.change(endInput, { target: { value: '08:00' } });
+    fireEvent.blur(endInput);
+
+    expect(updateWindow).not.toHaveBeenCalled();
+    expect(screen.getByText('End time must be later than start time.')).toBeTruthy();
   });
 });
